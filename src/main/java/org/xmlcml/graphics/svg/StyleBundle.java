@@ -20,8 +20,20 @@ import org.apache.log4j.Logger;
 import org.xmlcml.cml.base.CMLConstants;
 
 public class StyleBundle implements CMLConstants {
+
 	private static Logger LOG = Logger.getLogger(StyleBundle.class);
 	
+	public static final String CLIP_PATH = "clip-path";
+	public static final String FILL = "fill";
+	public static final String FONT_WEIGHT = "font-weight";
+	public static final String FONT_SIZE = "font-size";
+	public static final String FONT_FAMILY = "font-family";
+	public static final String FONT_STYLE = "font-style";
+	public static final String STROKE_LINECAP = "stroke-linecap";
+	public static final String STROKE_WIDTH = "stroke-width";
+	public static final String STROKE = "stroke";
+	public static final String OPACITY = "opacity";
+
 	public final static StyleBundle DEFAULT_STYLE_BUNDLE = new StyleBundle(
 		null,	
 		"#000000",
@@ -43,6 +55,18 @@ public class StyleBundle implements CMLConstants {
 	private Double strokeWidth;
 	private Double opacity;
 
+	public static String[] STYLE_NAMES = {
+		CLIP_PATH,
+		FILL,
+		STROKE,
+		FONT_FAMILY,
+		FONT_SIZE,
+		FONT_STYLE,
+		FONT_WEIGHT,
+		STROKE_WIDTH,
+		OPACITY
+	};
+	
 	StyleBundle() {
 	}
 	
@@ -115,21 +139,21 @@ public class StyleBundle implements CMLConstants {
 					String[] aa = s.split(S_COLON);
 					aa[0] = aa[0].trim();
 					aa[1] = aa[1].trim();
-					if (aa[0].equals("fill")) {
+					if (aa[0].equals(FILL)) {
 						fill = aa[1];
-					} else if (aa[0].equals("stroke")) {
+					} else if (aa[0].equals(STROKE)) {
 						stroke = aa[1];
-					} else if (aa[0].equals("stroke-width")) {
+					} else if (aa[0].equals(STROKE_WIDTH)) {
 						strokeWidth = getDouble(aa[1]); 
-					} else if (aa[0].equals("font-family")) {
+					} else if (aa[0].equals(FONT_FAMILY)) {
 						fontFamily = aa[1]; 
-					} else if (aa[0].equals("font-size")) {
+					} else if (aa[0].equals(FONT_SIZE)) {
 						fontSize = getDouble(aa[1]); 
-					} else if (aa[0].equals("font-weight")) {
+					} else if (aa[0].equals(FONT_WEIGHT)) {
 						fontWeight = aa[1]; 
-					} else if (aa[0].equals("opacity")) {
+					} else if (aa[0].equals(OPACITY)) {
 						opacity = getDouble(aa[1]); 
-					} else if (aa[0].equals("stroke-linecap")) {
+					} else if (aa[0].equals(STROKE_LINECAP)) {
 						LOG.trace("Ignored style: "+aa[0]);
 					} else {
 						LOG.trace("unsupported style: "+aa[0]);
@@ -144,25 +168,25 @@ public class StyleBundle implements CMLConstants {
 	public void setSubStyle(String subStyle, Object object) {
 		if (subStyle == null) {
 			throw new RuntimeException("null style");
-		} else if (subStyle.equals("clip-path")) {
+		} else if (subStyle.equals(CLIP_PATH)) {
 			clipPath = (String) object;
-		} else if (subStyle.equals("fill")) {
+		} else if (subStyle.equals(FILL)) {
 			fill = (String) object;
-		} else if (subStyle.equals("stroke")) {
+		} else if (subStyle.equals(STROKE)) {
 			stroke = (String) object;
-		} else if (subStyle.equals("stroke-width")) {
+		} else if (subStyle.equals(STROKE_WIDTH)) {
 			strokeWidth = (Double) object; 
-		} else if (subStyle.equals("font-family")) {
+		} else if (subStyle.equals(FONT_FAMILY)) {
 			fontFamily = (String) object; 
-		} else if (subStyle.equals("font-size")) {
+		} else if (subStyle.equals(FONT_SIZE)) {
 			fontSize = (Double) object; 
-		} else if (subStyle.equals("font-style")) {
+		} else if (subStyle.equals(FONT_STYLE)) {
 			fontStyle = (String) object; 
-		} else if (subStyle.equals("font-weight")) {
+		} else if (subStyle.equals(FONT_WEIGHT)) {
 			fontWeight = (String) object; 
-		} else if (subStyle.equals("opacity")) {
+		} else if (subStyle.equals(OPACITY)) {
 			opacity = (Double) object; 
-		} else if (subStyle.equals("stroke-linecap")) {
+		} else if (subStyle.equals(STROKE_LINECAP)) {
 		} else {
 			LOG.trace("unsupported style: "+subStyle);
 		}
@@ -171,23 +195,23 @@ public class StyleBundle implements CMLConstants {
 	
 	public Object getSubStyle(String ss) {
 		Object subStyle = null;
-		if (ss.equals("fill")) {
+		if (ss.equals(FILL)) {
 			subStyle = getFill();
-		} else if (ss.equals("stroke")) {
+		} else if (ss.equals(STROKE)) {
 			subStyle = getStroke();
-		} else if (ss.equals("stroke-width")) {
+		} else if (ss.equals(STROKE_WIDTH)) {
 			subStyle = getStrokeWidth();
-		} else if (ss.equals("font-family")) {
+		} else if (ss.equals(FONT_FAMILY)) {
 			subStyle = getFontFamily();
-		} else if (ss.equals("font-size")) {
+		} else if (ss.equals(FONT_SIZE)) {
 			subStyle = getFontSize();
-		} else if (ss.equals("font-weight")) {
+		} else if (ss.equals(FONT_WEIGHT)) {
 			subStyle = getFontWeight();
-		} else if (ss.equals("opacity")) {
+		} else if (ss.equals(OPACITY)) {
 			subStyle = getOpacity();
-		} else if (ss.equals("clip-path")) {
+		} else if (ss.equals(CLIP_PATH)) {
 			subStyle = getClipPath();
-		} else if (ss.equals("stroke-linecap")) {
+		} else if (ss.equals(STROKE_LINECAP)) {
 			LOG.debug("ignored style: "+ss);
 		} else {
 			LOG.trace("unknown subStyle: "+ss);
@@ -271,14 +295,14 @@ public class StyleBundle implements CMLConstants {
 	
 	public String toString() {
 		String s = "";
-		s = addString(s, clipPath, "clip-path");
-		s = addString(s, fill, "fill");
-		s = addString(s, stroke, "stroke");
-		s = addDouble(s, strokeWidth, "stroke-width");
-		s = addString(s, fontFamily, "font-family");
-		s = addDouble(s, fontSize, "font-size");
-		s = addString(s, fontWeight, "font-weight");
-		s = addDouble(s, opacity, "opacity");
+		s = addString(s, clipPath, CLIP_PATH);
+		s = addString(s, fill, FILL);
+		s = addString(s, stroke, STROKE);
+		s = addDouble(s, strokeWidth, STROKE_WIDTH);
+		s = addString(s, fontFamily, FONT_FAMILY);
+		s = addDouble(s, fontSize, FONT_SIZE);
+		s = addString(s, fontWeight, FONT_WEIGHT);
+		s = addDouble(s, opacity, OPACITY);
 		return s;
 	}
 

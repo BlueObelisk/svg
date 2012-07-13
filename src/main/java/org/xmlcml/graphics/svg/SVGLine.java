@@ -249,7 +249,13 @@ public class SVGLine extends SVGElement {
 		return bbox.getXRange().getRange() < eps && bbox.getYRange().getRange() < eps;
 	}
 
-	public Real2 getCommonPoint(SVGLine l, double eps) {
+	/** do lines join at ends?
+	 * 
+	 * @param l
+	 * @param eps
+	 * @return
+	 */
+	public Real2 getCommonEndPoint(SVGLine l, double eps) {
 		Real2 point = null;
 		if (l.getXY(0).isEqualTo(getXY(0), eps) ||  l.getXY(1).isEqualTo(getXY(0), eps)) {
 			point = getXY(0);

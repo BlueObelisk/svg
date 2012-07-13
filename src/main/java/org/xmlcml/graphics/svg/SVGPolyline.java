@@ -406,7 +406,7 @@ public class SVGPolyline extends SVGPoly {
 		for (SVGLine line : lineList) {
 			String xmlS = line.toXML();
 			if (xmlSet.contains(xmlS)) {
-				LOG.debug("duplicate line in polyline "+xmlS);
+				LOG.trace("duplicate line in polyline "+xmlS);
 				count++;
 			} else {
 				xmlSet.add(xmlS);
