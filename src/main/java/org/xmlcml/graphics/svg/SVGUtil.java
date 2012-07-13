@@ -47,7 +47,7 @@ public class SVGUtil {
 		Element element = null;
 		try {
 			element = new Builder().build(is).getRootElement();
-			return SVGElement.createSVG(element);
+			return SVGElement.readAndCreateSVG(element);
 		} catch (Exception e) {
 			throw new RuntimeException("cannot parse input stream", e);
 		}
@@ -203,7 +203,7 @@ public class SVGUtil {
 			element.setBoundingBoxCached(cached);
 		}
 	}
-
+	
 	public static Real2Range createBoundingBox(List<SVGElement> elementList) {
 		Real2Range r2r = null;
 		if (elementList != null && elementList.size() > 0) {

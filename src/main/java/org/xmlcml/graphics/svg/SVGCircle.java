@@ -227,5 +227,34 @@ public class SVGCircle extends SVGElement {
 	protected double getBBStrokeWidth() {
 		return 0.5;
 	}
+	
+	public boolean includes(Real2 point) {
+		Real2 center = this.getCXY();
+		return point != null && point.getDistance(center) < getRad();
+	}
 
+	/** tests whether element is geometricallyContained within this
+	 * @param element
+	 * @return
+	 * @Override
+	 */
+	public boolean includes(SVGElement element) {
+		Real2Range thisBbox = this.getBoundingBox();
+		Real2Range elementBox = (element == null) ? null : element.getBoundingBox();
+		if (thisBbox == null) {
+			return false;
+		}
+		Real2[] corners = elementBox.getCorners();
+		if (!this.includes(corners[0]) || !this.includes(corners[1])) {
+			return false;
+		}
+		// generate and test other corners
+		if (!this.includes(new Real2(corners[0].x, corners[1].y))) {
+			return false;
+		}
+		if (!this.includes(new Real2(corners[1].x, corners[0].y))) {
+			return false;
+		}
+		return true;
+	}
 }

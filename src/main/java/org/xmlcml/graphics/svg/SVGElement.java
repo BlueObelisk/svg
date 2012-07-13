@@ -17,6 +17,7 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
+
 import java.awt.Graphics2D;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -96,7 +97,7 @@ public class SVGElement extends GraphicsElement {
 	
 	/** copy constructor from non-subclassed elements
 	 */
-	public static SVGElement createSVG(Element element) {
+	public static SVGElement readAndCreateSVG(Element element) {
 		SVGElement newElement = null;
 		String tag = element.getLocalName();
 		if (tag == null || tag.equals(S_EMPTY)) {
@@ -160,7 +161,7 @@ public class SVGElement extends GraphicsElement {
 				} else if (node instanceof ProcessingInstruction) {
 					newNode = new ProcessingInstruction((ProcessingInstruction) node);
 				} else if (node instanceof Element) {
-					newNode = createSVG((Element) node);
+					newNode = readAndCreateSVG((Element) node);
 				} else {
 					throw new RuntimeException("Cannot create new node: "+node.getClass());
 				}
@@ -875,19 +876,22 @@ public class SVGElement extends GraphicsElement {
 	}
 	
 	public static SVGRect createGraphicalBox(Real2Range r2r, String stroke, String fill, Double strokeWidth, Double opacity) {
-		RealRange xr = r2r.getXRange();
-		RealRange yr = r2r.getYRange();
-		if (xr == null || yr == null) {
-			LOG.error("null bbox");
-			return null;
+		SVGRect rect = null;
+		if (r2r != null) {
+			RealRange xr = r2r.getXRange();
+			RealRange yr = r2r.getYRange();
+			if (xr == null || yr == null) {
+				LOG.error("null bbox");
+				return null;
+			}
+			double dx = (xr.getRange() < Real.EPS) ? 1.0 : 0.0; 
+			double dy = (yr.getRange() < Real.EPS) ? 1.0 : 0.0; 
+			rect = new SVGRect(new Real2(xr.getMin()-dx, yr.getMin()-dy), new Real2(xr.getMax()+dx, yr.getMax()+dy));
+			rect.setStrokeWidth(strokeWidth);
+			rect.setStroke(stroke);
+			rect.setFill(fill);
+			rect.setOpacity(opacity);
 		}
-		double dx = (xr.getRange() < Real.EPS) ? 1.0 : 0.0; 
-		double dy = (yr.getRange() < Real.EPS) ? 1.0 : 0.0; 
-		SVGRect rect = new SVGRect(new Real2(xr.getMin()-dx, yr.getMin()-dy), new Real2(xr.getMax()+dx, yr.getMax()+dy));
-		rect.setStrokeWidth(strokeWidth);
-		rect.setStroke(stroke);
-		rect.setFill(fill);
-		rect.setOpacity(opacity);
 		return rect;
 	}
 
@@ -928,6 +932,11 @@ public class SVGElement extends GraphicsElement {
 			SVGRect svgBox = SVGElement.drawBox(element.getBoundingBox(), svgParent, stroke, fill, strokeWidth, opacity);
 		}
 	}
+	public static void drawBoundingBoxes(List<SVGElement> elements, String stroke, String fill, double strokeWidth, double opacity) {
+		for (SVGElement element : elements) {
+			SVGRect svgBox = SVGElement.drawBox(element.getBoundingBox(), null, stroke, fill, strokeWidth, opacity);
+		}
+	}
 	public static void drawBoxes(List<Real2Range> boxes, SVGElement svgParent, String stroke, String fill, double strokeWidth, double opacity) {
 		for (Real2Range box : boxes) {
 			SVGRect svgBox = SVGElement.drawBox(box, svgParent, stroke, fill, strokeWidth, opacity);
@@ -936,8 +945,14 @@ public class SVGElement extends GraphicsElement {
 	public static SVGRect drawBox(Real2Range box, SVGElement svgParent,
 			String stroke, String fill, double strokeWidth, double opacity) {
 		SVGRect svgBox = createGraphicalBox(box, stroke, fill, strokeWidth, opacity);
-		svgParent.appendChild(svgBox);
+		if (svgBox != null) {
+			svgParent.appendChild(svgBox);
+		}
 		return svgBox;
+	}
+
+	public SVGRect drawBox(String stroke, String fill, double strokeWidth, double opacity) {
+		return SVGElement.drawBox(this.getBoundingBox(), this, stroke, fill, strokeWidth, opacity);
 	}
 
 	public static void applyTransformsWithinElementsAndFormat(SVGElement svgElement) {
@@ -995,7 +1010,18 @@ public class SVGElement extends GraphicsElement {
 		for (SVGElement g : emptyGList) {
 			g.detach();
 		}
-		LOG.debug("removed emptyG: "+emptyGList.size());
+		LOG.trace("removed emptyG: "+emptyGList.size());
 	}
 
+	/** tests whether element is geometricallyContained within this
+	 * for most elements uses this.getBoundingBox()
+	 * can be overridden for special cases such as circle
+	 * @param element
+	 * @return
+	 */
+	public boolean includes(SVGElement element) {
+		Real2Range thisBbox = this.getBoundingBox();
+		Real2Range elementBox = (element == null) ? null : element.getBoundingBox();
+		return thisBbox != null && thisBbox.includes(elementBox);
+	}
 }
