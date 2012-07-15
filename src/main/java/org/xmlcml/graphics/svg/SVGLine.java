@@ -30,6 +30,7 @@ import nu.xom.Nodes;
 
 import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Euclid;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
@@ -212,6 +213,9 @@ public class SVGLine extends SVGElement {
 	}
 	
 	public Line2 getEuclidLine() {
+		if (euclidLine == null) {
+			euclidLine = new Line2(this.getXY(0), this.getXY(1));
+		}
 		return euclidLine;
 	}
 
