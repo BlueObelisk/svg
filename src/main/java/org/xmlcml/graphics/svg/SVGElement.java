@@ -79,7 +79,6 @@ public class SVGElement extends GraphicsElement {
 	private Element userElement;
 	private String strokeSave;
 	private String fillSave;
-//	Transform2 transform = new Transform2();
 
 	
 	/** constructor.
