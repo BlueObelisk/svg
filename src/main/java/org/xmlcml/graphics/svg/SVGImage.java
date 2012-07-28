@@ -16,6 +16,9 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
@@ -128,4 +131,20 @@ public class SVGImage extends SVGElement {
 		this.setWidth(wh.getX());
 		this.setHeight(wh.getY());
 	}
+	
+	/** makes a new list composed of the images in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGImage> extractImages(List<SVGElement> elements) {
+		List<SVGImage> imageList = new ArrayList<SVGImage>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGImage) {
+				imageList.add((SVGImage) element);
+			}
+		}
+		return imageList;
+	}
+	
 }
