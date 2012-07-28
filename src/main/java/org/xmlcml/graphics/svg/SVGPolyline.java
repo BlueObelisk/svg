@@ -427,4 +427,18 @@ public class SVGPolyline extends SVGPoly {
 		return duplicate;
 	}
 
+	/** makes a new list composed of the polylines in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGPolyline> extractPolylines(List<SVGElement> elements) {
+		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGPolyline) {
+				polylineList.add((SVGPolyline) element);
+			}
+		}
+		return polylineList;
+	}
 }

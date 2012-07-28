@@ -19,6 +19,8 @@ package org.xmlcml.graphics.svg;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import nu.xom.Element;
 import nu.xom.Node;
@@ -578,4 +580,18 @@ public class SVGText extends SVGElement {
 		return span;
 	}
 
+	/** makes a new list composed of the texts in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGText> extractTexts(List<SVGElement> elements) {
+		List<SVGText> textList = new ArrayList<SVGText>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGText) {
+				textList.add((SVGText) element);
+			}
+		}
+		return textList;
+	}
 }

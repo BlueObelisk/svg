@@ -17,9 +17,10 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
-
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -256,5 +257,20 @@ public class SVGCircle extends SVGElement {
 			return false;
 		}
 		return true;
+	}
+	
+	/** makes a new list composed of the circles in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGCircle> extractCircles(List<SVGElement> elements) {
+		List<SVGCircle> circleList = new ArrayList<SVGCircle>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGCircle) {
+				circleList.add((SVGCircle) element);
+			}
+		}
+		return circleList;
 	}
 }

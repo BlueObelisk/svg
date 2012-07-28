@@ -16,6 +16,9 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nu.xom.Element;
 import nu.xom.Node;
 
@@ -79,4 +82,18 @@ public class SVGPolygon extends SVGPoly {
 		return real2Array.size();
 	}
 
+	/** makes a new list composed of the polygons in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGPolygon> extractPolygons(List<SVGElement> elements) {
+		List<SVGPolygon> polygonList = new ArrayList<SVGPolygon>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGPolygon) {
+				polygonList.add((SVGPolygon) element);
+			}
+		}
+		return polygonList;
+	}
 }

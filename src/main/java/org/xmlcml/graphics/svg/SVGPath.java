@@ -18,6 +18,7 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
+import java.util.ArrayList;
 import java.util.List;
 
 import nu.xom.Attribute;
@@ -533,6 +534,22 @@ public class SVGPath extends SVGElement {
 		return polyline;
 	}
 
+	/** makes a new list composed of the paths in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGPath> extractPaths(List<SVGElement> elements) {
+		List<SVGPath> pathList = new ArrayList<SVGPath>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGPath) {
+				pathList.add((SVGPath) element);
+			}
+		}
+		return pathList;
+	}
+	
+
 }
 class Real2String {
 	String s;
@@ -571,7 +588,9 @@ class Real2String {
 		} catch (Exception e) {
 			throw new RuntimeException("bad double ["+sss+"] ... "+s);
 		}
+		SVGPath.extractPaths(new ArrayList<SVGElement>());
 		return x;
 	}
+	
 }
 
