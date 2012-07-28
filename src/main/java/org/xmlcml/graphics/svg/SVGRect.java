@@ -21,6 +21,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -207,7 +209,18 @@ public class SVGRect extends SVGElement {
 		}
 	}
 	
-//	public String toString() {
-//		s 
-//	}
+	/** makes a new list composed of the rects in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGRect> extractRects(List<SVGElement> elements) {
+		List<SVGRect> rectList = new ArrayList<SVGRect>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGRect) {
+				rectList.add((SVGRect) element);
+			}
+		}
+		return rectList;
+	}
 }

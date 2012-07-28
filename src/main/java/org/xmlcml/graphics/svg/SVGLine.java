@@ -380,8 +380,18 @@ public class SVGLine extends SVGElement {
 		return (dd < d && dd > -d);
 	}
 
-	//not allowed (?by Elliotte)
-//	public String toString() {
-//		return euclidLine.toString();
-//	}
+	/** makes a new list composed of the lines in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGLine> extractLines(List<SVGElement> elements) {
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGLine) {
+				lineList.add((SVGLine) element);
+			}
+		}
+		return lineList;
+	}
 }
