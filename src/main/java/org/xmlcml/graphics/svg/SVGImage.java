@@ -19,13 +19,12 @@ package org.xmlcml.graphics.svg;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xmlcml.euclid.Angle;
+import nu.xom.Element;
+import nu.xom.Node;
+
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
-
-import nu.xom.Element;
-import nu.xom.Node;
 
 /** supports defs
  * 
