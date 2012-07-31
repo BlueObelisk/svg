@@ -58,7 +58,7 @@ public class SVGGBox extends SVGG {
 					SVGRect rect = lastBox.getRect();
 					LOG.debug("RECT "+rect);
 					Transform2 t2 = lastBox.getTransform2FromAttribute();
-					System.out.println(">>>"+t2);
+					LOG.debug(">>>"+t2);
 					childBox.debug("SVGRRRRRRRRRR");
 				}
 				box.appendChild(childBox);

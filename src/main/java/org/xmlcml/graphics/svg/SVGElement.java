@@ -880,7 +880,7 @@ public class SVGElement extends GraphicsElement {
 			RealRange xr = r2r.getXRange();
 			RealRange yr = r2r.getYRange();
 			if (xr == null || yr == null) {
-				LOG.error("null bbox");
+				LOG.trace("null bbox");
 				return null;
 			}
 			double dx = (xr.getRange() < Real.EPS) ? 1.0 : 0.0; 
