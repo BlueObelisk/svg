@@ -17,10 +17,12 @@
 package org.xmlcml.graphics.svg;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 
@@ -38,10 +40,43 @@ import org.xmlcml.euclid.Real2Range;
  */
 public class SVGPolyline extends SVGPoly {
 	private static Logger LOG = Logger.getLogger(SVGPolyline.class);
+	
 	public final static String TAG ="polyline";
+	public final static String[] SVG_ATTS0 = {
+		"points"
+	};
+	public final static List<String> SVG_ATTS = Arrays.asList(
+		new String[] {
+			"points"
+		}
+	);
+	
 	private List<SVGLine> lineList;
 	private List<SVGMarker> pointList;
 	private Boolean isClosed = false;
+	public List<SVGLine> getLineList() {
+		if (lineList == null) {
+			createLineList();
+		}
+		return lineList;
+	}
+
+	public List<SVGMarker> getPointList() {
+		return pointList;
+	}
+
+	public Boolean getIsClosed() {
+		return isClosed;
+	}
+
+	public Boolean getIsBox() {
+		return isBox;
+	}
+
+	public Boolean getIsAligned() {
+		return isAligned;
+	}
+
 	private Boolean isBox;
 	private Boolean isAligned = null;
 
@@ -208,6 +243,7 @@ public class SVGPolyline extends SVGPoly {
 			lineList = null;
 		}
 		if (lineList == null) {
+			String id = this.getId();
 			lineList = new ArrayList<SVGLine>();
 			pointList = new ArrayList<SVGMarker>();
 			SVGMarker lastPoint = new SVGMarker(real2Array.get(0));
@@ -215,6 +251,7 @@ public class SVGPolyline extends SVGPoly {
 			SVGLine line;
 			for (int i = 1; i < real2Array.size(); i++) {
 				line = new SVGLine(real2Array.elementAt(i-1), real2Array.elementAt(i));
+				copyNonSVGAttributes(this, line);
 				SVGMarker point = new SVGMarker(real2Array.get(i));
 				pointList.add(point);
 				lastPoint.addLine(line);
@@ -229,7 +266,16 @@ public class SVGPolyline extends SVGPoly {
 		return lineList;
 	}
 	
-	public SVGLine createLine() {
+	private void copyNonSVGAttributes(SVGPolyline svgPolyline, SVGLine line) {
+		for (int i = 0; i < svgPolyline.getAttributeCount(); i++) {
+			Attribute attribute = svgPolyline.getAttribute(i);
+			if (!SVG_ATTS.contains(attribute.getLocalName())) {
+				line.addAttribute((Attribute)attribute.copy());
+			}
+		}
+	}
+
+	public SVGLine createSingleLine() {
 		createLineList();
 		return lineList.size() == 1 ? lineList.get(0) : null;
 	}

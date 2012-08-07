@@ -32,6 +32,8 @@ import org.xmlcml.euclid.Transform2;
 public class SVGScript extends SVGElement {
 
 	public final static String TAG ="script";
+
+	private static final String HREF = "href";
 	/** constructor
 	 */
 	public SVGScript() {
@@ -76,8 +78,8 @@ public class SVGScript extends SVGElement {
 		// no-op
 	}
 	
-	public void setHRef(String href, String value) {
-		this.addAttribute(new Attribute(CMLConstants.XLINK_PREFIX+CMLConstants.S_COLON+href, CMLConstants.XLINK_NS, value));
+	public void setHRef(String value) {
+		this.addAttribute(new Attribute(CMLConstants.XLINK_PREFIX+CMLConstants.S_COLON+HREF, CMLConstants.XLINK_NS, value));
 	}
 	
 }
