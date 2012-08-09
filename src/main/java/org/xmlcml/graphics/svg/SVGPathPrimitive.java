@@ -14,6 +14,11 @@ import org.xmlcml.euclid.Transform2;
  */
 public abstract class SVGPathPrimitive {
 
+	public static final char ABS_LINE = 'L';
+	public static final char ABS_MOVE = 'M';
+	public static final char REL_LINE = 'l';
+	public static final char REL_MOVE = 'm';
+	
 	protected Real2 coords;
 	protected Real2Array coordArray;
 	
@@ -42,16 +47,16 @@ public abstract class SVGPathPrimitive {
 				r2s = new Real2String(dd.substring(ii));
 				r2 = r2s.getReal2();
 				ii += r2s.idx;
-				if (cc == 'M') {
+				if (cc == ABS_MOVE) {
 					pathPrimitive = new MovePrimitive(r2);
 					lastXY = r2;
-				} else if (cc == 'm') {
+				} else if (cc == REL_MOVE) {
 					lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
 					pathPrimitive = new MovePrimitive(lastXY);
-				} else if (cc == 'L') {
+				} else if (cc == ABS_LINE) {
 					pathPrimitive = new LinePrimitive(r2);
 					lastXY = r2;
-				} else if (cc == 'l') {
+				} else if (cc == REL_LINE) {
 					lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
 					pathPrimitive = new LinePrimitive(lastXY);
 				}
