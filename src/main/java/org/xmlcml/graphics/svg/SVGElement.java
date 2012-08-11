@@ -17,7 +17,6 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
-
 import java.awt.Graphics2D;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,6 +45,7 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealArray;
 import org.xmlcml.euclid.RealRange;
+import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
 
 /** base class for lightweight generic SVG element.
@@ -332,17 +332,29 @@ public class SVGElement extends GraphicsElement {
 		} else if (keyword.equals(ROTATE) && ra.size() == 3) {
 			throw new RuntimeException("rotate about point not yet supported");
 		} else if (keyword.equals(MATRIX) && ra.size() == 6) {
-			array[0][0] = raa[0];
-			array[0][1] = raa[1];
-			array[0][2] = raa[4];
-			array[1][0] = raa[2];
-			array[1][1] = raa[3];
-			array[1][2] = raa[5];
+			t2 = createTransformFrom1D(ra.getArray());
 		} else {
 			throw new RuntimeException("Unknown/unsuported transform keyword: "+keyword);
 		}
 
 		return t2;
+	}
+
+	private static Transform2 createTransformFrom1D(double[] raa) {
+		double[][] array = new double[3][];
+		for (int i = 0; i < 3; i++) {
+			array[i] = new double[3];
+		}
+		array[0][0] = raa[0];
+		array[0][1] = raa[2];
+		array[0][2] = raa[4];
+		array[1][0] = raa[1];
+		array[1][1] = raa[3];
+		array[1][2] = raa[5];
+		array[2][0] = 0.0;
+		array[2][1] = 0.0;
+		array[2][2] = 1.0;
+		return new Transform2(new RealSquareMatrix(array));	
 	}
 	/**
 	 * 
@@ -531,17 +543,7 @@ public class SVGElement extends GraphicsElement {
 			ts = ts.substring(0, ts.length()-1);
 			ts = ts.replace(S_COMMA, S_SPACE);
 			RealArray realArray = new RealArray(ts);
-			double[] dd = new double[9];
-			dd[0] = realArray.elementAt(0);
-			dd[1] = realArray.elementAt(1);
-			dd[2] = realArray.elementAt(4);
-			dd[3] = realArray.elementAt(2);
-			dd[4] = realArray.elementAt(3);
-			dd[5] = realArray.elementAt(5);
-			dd[6] = 0.0;
-			dd[7] = 0.0;
-			dd[8] = 1.0;
-			t = new Transform2(dd);
+			t = createTransformFrom1D(realArray.getArray());
 		}
 		return t;
 	}
