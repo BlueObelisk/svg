@@ -115,13 +115,7 @@ public class SVGUtil {
 					Attribute attribute = (Attribute) transformAttributes.get(i);
 					if (attribute.getParent() instanceof SVGText) {
 						SVGText text = (SVGText) attribute.getParent();
-						Transform2 transform2 = text.getTransform();
-						RealSquareMatrix rotMat = transform2.getRotationMatrix();
-						Real2 xy = new Real2(text.getXY());
-						Transform2 newTransform2 = new Transform2(new Vector2(xy)); 
-						newTransform2 = newTransform2.concatenate(new Transform2(rotMat));
-						newTransform2 = newTransform2.concatenate(new Transform2(new Vector2(xy.multiplyBy(-1.0))));
-						text.setTransform(newTransform2);
+						text.setTransformToRotateAboutTextOrigin();
 					} else {
 						attribute.detach();
 					}
@@ -130,6 +124,7 @@ public class SVGUtil {
 			}
 		}
 	}
+
 
 /**
 <g>
@@ -171,12 +166,6 @@ public class SVGUtil {
 	 *?  //svg:g[@font-size]/svg:text[not(@font-size)] >> //svg:g[@font-size]/svg:text[@font-size]
 	 * @param svg
 	 */
-//	public static void denormalizeFontSizes(SVGSVG svg) {
-//		List<SVGElement> texts = SVGUtil.getQuerySVGElements(svg, "//svg:g[@font-size]/svg:text[not(@font-size)]");
-//		for (SVGElement text : texts) {
-//			((SVGText)text).setFontSize(((SVGG)text.getParent()).getFontSize());
-//		}
-//	}
 	
 	public static void denormalizeFontSizes(SVGSVG svg) {
 		List<SVGElement> gs = SVGUtil.getQuerySVGElements(svg, "//svg:g[@font-size and svg:text[not(@font-size)]]");

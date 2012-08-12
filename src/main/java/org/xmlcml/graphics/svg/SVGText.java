@@ -34,8 +34,10 @@ import org.xmlcml.euclid.EuclidConstants;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Util;
+import org.xmlcml.euclid.Vector2;
 
 /** draws text.
  * 
@@ -594,5 +596,22 @@ public class SVGText extends SVGElement {
 			}
 		}
 		return textList;
+	}
+	/** special routine to make sure characters are correctly oriented
+	 * 
+	 */
+	public void setTransformToRotateAboutTextOrigin() {
+		Transform2 transform2 = this.getTransform();
+		RealSquareMatrix rotMat = transform2.getRotationMatrix();
+		setTransformToRotateAboutTextOrigin(rotMat);
+	}
+
+	
+	public void setTransformToRotateAboutTextOrigin(RealSquareMatrix rotMat) {
+		Real2 xy = new Real2(this.getXY());
+		Transform2 newTransform2 = new Transform2(new Vector2(xy)); 
+		newTransform2 = newTransform2.concatenate(new Transform2(rotMat));
+		newTransform2 = newTransform2.concatenate(new Transform2(new Vector2(xy.multiplyBy(-1.0))));
+		this.setTransform(newTransform2);
 	}
 }
