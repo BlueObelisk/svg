@@ -14,7 +14,9 @@ import org.apache.log4j.Logger;
 import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.euclid.Vector2;
 
 public class SVGUtil {
 
@@ -110,7 +112,19 @@ public class SVGUtil {
 				applyCumulativeTransforms(leafElements);
 				Nodes transformAttributes = root.query("//@transform");
 				for (int i = 0; i < transformAttributes.size(); i++) {
-					transformAttributes.get(i).detach();
+					Attribute attribute = (Attribute) transformAttributes.get(i);
+					if (attribute.getParent() instanceof SVGText) {
+						SVGText text = (SVGText) attribute.getParent();
+						Transform2 transform2 = text.getTransform();
+						RealSquareMatrix rotMat = transform2.getRotationMatrix();
+						Real2 xy = new Real2(text.getXY());
+						Transform2 newTransform2 = new Transform2(new Vector2(xy)); 
+						newTransform2 = newTransform2.concatenate(new Transform2(rotMat));
+						newTransform2 = newTransform2.concatenate(new Transform2(new Vector2(xy.multiplyBy(-1.0))));
+						text.setTransform(newTransform2);
+					} else {
+						attribute.detach();
+					}
 				}
 				root.addAttribute(new Attribute(TRANSFORMS_APPLIED, "yes"));
 			}
