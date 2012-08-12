@@ -211,10 +211,12 @@ public class SVGElement extends GraphicsElement {
 	protected void processTransform(Transform2 transform) {
 		double[] matrix = transform.getMatrixAsArray();
 		this.addAttribute(new Attribute(TRANSFORM, MATRIX+"(" +
-			matrix[0] +"," +
-			"0., 0.," +
-			matrix[4] +"," +
-			matrix[2]+","+matrix[5]+
+				matrix[0] +"," +
+				matrix[3] +"," +
+				matrix[1] +"," +
+				matrix[4] +"," +
+				matrix[2]+","+
+				matrix[5]+
 			")"));
 	}
 

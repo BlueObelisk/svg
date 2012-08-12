@@ -158,6 +158,7 @@ public class SVGText extends SVGElement {
 		if (!angle.isEqualTo(0.0, EPS)) {
 			Transform2 t = Transform2.getRotationAboutPoint(angle, xy);
 			this.setTransform(t);
+			LOG.trace("text: "+this.toXML());
 		}
 	}
 
