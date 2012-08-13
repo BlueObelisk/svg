@@ -737,10 +737,26 @@ public class SVGElement extends GraphicsElement {
 	 * @param places decimal places
 	 */
 	public void format(int places) {
+		formatCommonAttributes(places);
 		List<SVGElement> childElements = SVGUtil.getQuerySVGElements(this,  "./svg:*");
 		for (SVGElement childElement : childElements) {
 			childElement.format(places);
 		}
+	}
+
+	private void formatCommonAttributes(int places) {
+		Transform2 t2 = this.getTransform();
+		if (t2 != null) {
+			t2 = formatTransform(t2, places);
+			this.setTransform(t2);
+		}
+	}
+
+	private Transform2 formatTransform(Transform2 t2, int places) {
+		RealArray ra = new RealArray(t2.getMatrixAsArray());
+		ra.format(places);
+		t2 = new Transform2(ra.getArray());
+		return t2;
 	}
 
 	public double getX() {
