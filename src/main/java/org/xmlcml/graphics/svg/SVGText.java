@@ -17,6 +17,7 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
+
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -259,8 +260,23 @@ public class SVGText extends SVGElement {
 			double height = this.getFontSize() * fontWidthFactor;
 			Real2 xy = this.getXY();
 			boundingBox = new Real2Range(xy, xy.plus(new Real2(width, -height)));
+			
+			rotateBoundingBoxForRotatedText();
 		}
 		return boundingBox;
+	}
+	private void rotateBoundingBoxForRotatedText() {
+		Transform2 t2 = this.getTransform();
+		if (t2 != null) {
+			Angle rotation = t2.getAngleOfRotation();
+			// significant rotation?
+			if (!rotation.isEqualTo(0., 0.001)) {
+				Real2[] corners = boundingBox.getCorners();
+				corners[0].transformBy(t2);
+				corners[1].transformBy(t2);
+				boundingBox = new Real2Range(corners[0], corners[1]);
+			}
+		}
 	}
 
 	/** this is a hack and depends on what information is available

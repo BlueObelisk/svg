@@ -32,6 +32,7 @@ import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealArray;
 
 /** draws a straight line.
  * 
@@ -42,29 +43,8 @@ public class SVGPolyline extends SVGPoly {
 	private static Logger LOG = Logger.getLogger(SVGPolyline.class);
 	
 	public final static String TAG ="polyline";
-	public final static String[] SVG_ATTS0 = {
-		"points"
-	};
-	public final static List<String> SVG_ATTS = Arrays.asList(
-		new String[] {
-			"points"
-		}
-	);
-	
-	private List<SVGLine> lineList;
-	private List<SVGMarker> pointList;
 	private Boolean isClosed = false;
-	public List<SVGLine> getLineList() {
-		if (lineList == null) {
-			createLineList();
-		}
-		return lineList;
-	}
-
-	public List<SVGMarker> getPointList() {
-		return pointList;
-	}
-
+	
 	public Boolean getIsClosed() {
 		return isClosed;
 	}
@@ -234,55 +214,9 @@ public class SVGPolyline extends SVGPoly {
 		return newPoly;
 	}
 
-	public List<SVGLine> createLineList() {
-		return createLineList(false);
-	}
-	
-	public List<SVGLine> createLineList(boolean clear) {
-		if (clear) {
-			lineList = null;
-		}
-		if (lineList == null) {
-			String id = this.getId();
-			lineList = new ArrayList<SVGLine>();
-			pointList = new ArrayList<SVGMarker>();
-			SVGMarker lastPoint = new SVGMarker(real2Array.get(0));
-			pointList.add(lastPoint);
-			SVGLine line;
-			for (int i = 1; i < real2Array.size(); i++) {
-				line = new SVGLine(real2Array.elementAt(i-1), real2Array.elementAt(i));
-				copyNonSVGAttributes(this, line);
-				SVGMarker point = new SVGMarker(real2Array.get(i));
-				pointList.add(point);
-				lastPoint.addLine(line);
-				point.addLine(line);
-				if (line.getEuclidLine().getLength() < 0.0000001) {
-					LOG.trace("ZERO LINE");
-				}
-				lineList.add(line);
-				lastPoint = point;
-			}
-		}
-		return lineList;
-	}
-	
-	private void copyNonSVGAttributes(SVGPolyline svgPolyline, SVGLine line) {
-		for (int i = 0; i < svgPolyline.getAttributeCount(); i++) {
-			Attribute attribute = svgPolyline.getAttribute(i);
-			if (!SVG_ATTS.contains(attribute.getLocalName())) {
-				line.addAttribute((Attribute)attribute.copy());
-			}
-		}
-	}
-
 	public SVGLine createSingleLine() {
 		createLineList();
 		return lineList.size() == 1 ? lineList.get(0) : null;
-	}
-	
-	public List<SVGMarker> createPointList() {
-		createLineList();
-		return pointList;
 	}
 	
 	/** is polyline aligned with axes?
@@ -307,10 +241,12 @@ public class SVGPolyline extends SVGPoly {
 	 * @param epsilon tolerance in coords
 	 * @return is rectangle
 	 */
-	public Boolean isBox(double epsilon) {
+	public boolean isBox(double epsilon) {
 		if (isBox == null) {
+			isBox = false;
 			createLineList();
-			if (lineList.size() == 4) {
+			if (lineList == null) {
+			} else if (lineList.size() == 4) {
 				SVGLine line0 = lineList.get(0);
 				SVGLine line2 = lineList.get(2);
 				Real2 point0 = line0.getXY(0);
@@ -328,8 +264,6 @@ public class SVGPolyline extends SVGPoly {
 							Real.isEqual(point1.getX(), point2.getX(), epsilon) &&
 							Real.isEqual(point3.getX(), point0.getX(), epsilon);
 				}
-			} else {
-				isBox = false;
 			}
 		}
 		return isBox;
@@ -403,20 +337,22 @@ public class SVGPolyline extends SVGPoly {
 		return newPolyline;
 	}
 	
-	private List<SVGLine> ensureLineList() {
-		if (lineList == null) {
-			lineList = new ArrayList<SVGLine>();
-		}
-		return lineList;
+	/** alters direction of line MODIFIES THIS
+	 * 
+	 */
+	public void reverse() {
+		Real2Array r2a = this.getReal2Array();
+		r2a.reverse();
+		this.setReal2Array(r2a);
 	}
-
-	private List<SVGMarker> ensurePointList() {
-		if (pointList == null) {
-			pointList = new ArrayList<SVGMarker>();
-		}
-		return pointList;
+	
+	@Override
+	public void setReal2Array(Real2Array r2a) {
+		super.setReal2Array(r2a);
+//		lineList = null;
+//		pointList = null;
 	}
-
+	
 	public SVGPolygon createPolygon(double eps) {
 		createLineList();
 		SVGPolygon polygon = null;
@@ -486,5 +422,21 @@ public class SVGPolyline extends SVGPoly {
 			}
 		}
 		return polylineList;
+	}
+
+	/** appends points in polyline into this
+	 * 'start' allows for skipping common point(s) 
+	 * @param polyline
+	 * @param start point in polyline to start at
+	 */
+	public void appendIntoSingleLine(SVGPolyline polyline, int start) {
+		Real2Array r2a = polyline.real2Array;
+		if (start != 0) {
+			r2a = r2a.createSubArray(start);
+		}
+		this.real2Array.add(r2a);
+		this.setReal2Array(real2Array);
+		createLineList(true);
+		createPointList();
 	}
 }

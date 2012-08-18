@@ -394,4 +394,9 @@ public class SVGLine extends SVGElement {
 		}
 		return lineList;
 	}
+
+	public Double getLength() {
+		Line2 line2 = getEuclidLine();
+		return (line2 == null) ? null : line2.getLength();
+	}
 }
