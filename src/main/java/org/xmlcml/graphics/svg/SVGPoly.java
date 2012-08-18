@@ -21,6 +21,9 @@ import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -46,7 +49,20 @@ public abstract class SVGPoly extends SVGElement {
 	private static Logger LOG = Logger.getLogger(SVGPoly.class);
 	
 	public final static String MONOTONIC = "monotonic";
+	public final static String POINTS = "points";
+	public final static String[] SVG_ATTS0 = {
+		POINTS
+	};
+	public final static List<String> SVG_ATTS = Arrays.asList(
+		new String[] {
+			POINTS
+		}
+	);
+	
+	
 	protected Real2Array real2Array;
+	protected List<SVGLine> lineList;
+	protected List<SVGMarker> pointList;
 	
 	/** constructor
 	 */
@@ -92,7 +108,7 @@ public abstract class SVGPoly extends SVGElement {
 			System.err.println("null real2Array in polyline: ");
 		} else {
 			String points = r2a.getStringArray();
-			this.addAttribute(new Attribute("points", points));
+			this.addAttribute(new Attribute(POINTS, points));
 			// copy unless same object
 			if (this.real2Array != r2a) {
 				this.real2Array = new Real2Array(r2a);
@@ -129,6 +145,11 @@ public abstract class SVGPoly extends SVGElement {
 		}
 	}
 
+	public List<SVGMarker> createPointList() {
+		createLineList();
+		return pointList;
+	}
+	
 	public Line2D.Double createAndSetLine2D() {
 		double x1 = this.getDouble("x1");
 		double y1 = this.getDouble("y1");
@@ -149,14 +170,6 @@ public abstract class SVGPoly extends SVGElement {
 		Line2D.Double path2 = new Line2D.Double(xy1.x, xy1.y, xy2.x, xy2.y);
 		return path2;
 	}
-	
-//	public Line2D.Double getPath2() {
-//		return path2;
-//	}
-//
-//	public void setPath2(Line2D.Double path2) {
-//		this.path2 = path2;
-//	}
 	
 	public void applyTransform(Transform2 t2) {
 		Real2Array xy = this.getReal2Array();
@@ -252,6 +265,84 @@ public abstract class SVGPoly extends SVGElement {
 	 */
 	protected double getBBStrokeWidth() {
 		return 0.3;
+	}
+
+	public List<SVGLine> getLineList() {
+		if (lineList == null) {
+			createLineList();
+		}
+		return lineList;
+	}
+
+	public List<SVGMarker> getPointList() {
+		if (pointList == null) {
+			createPointList();
+		}
+		return pointList;
+	}
+
+	public List<SVGLine> createLineList() {
+		return createLineList(false);
+	}
+	
+	public List<SVGLine> createLineList(boolean clear) {
+		Attribute pointsAtt = this.getAttribute(POINTS);
+		if (clear) {
+			lineList = null;
+			if (pointsAtt != null) {
+				pointsAtt.detach();
+			}
+		}
+		if (lineList == null) {
+			if (pointsAtt != null) {
+				real2Array = Real2Array.createFromPairs(pointsAtt.getValue(), CMLConstants.S_SPACE);
+			}
+			String id = this.getId();
+			lineList = new ArrayList<SVGLine>();
+			pointList = new ArrayList<SVGMarker>();
+			SVGMarker lastPoint = new SVGMarker(real2Array.get(0));
+			pointList.add(lastPoint);
+			SVGLine line;
+			for (int i = 1; i < real2Array.size(); i++) {
+				line = new SVGLine(real2Array.elementAt(i-1), real2Array.elementAt(i));
+				copyNonSVGAttributes(this, line);
+				SVGMarker point = new SVGMarker(real2Array.get(i));
+				pointList.add(point);
+				lastPoint.addLine(line);
+				point.addLine(line);
+				if (line.getEuclidLine().getLength() < 0.0000001) {
+					LOG.trace("ZERO LINE");
+				}
+				lineList.add(line);
+				lastPoint = point;
+			}
+			setReal2Array(real2Array);
+		}
+		ensureLineList();
+		return lineList;
+	}
+	
+	private void copyNonSVGAttributes(SVGPoly svgPoly, SVGLine line) {
+		for (int i = 0; i < svgPoly.getAttributeCount(); i++) {
+			Attribute attribute = svgPoly.getAttribute(i);
+			if (!SVG_ATTS.contains(attribute.getLocalName())) {
+				line.addAttribute((Attribute)attribute.copy());
+			}
+		}
+	}
+
+	protected List<SVGLine> ensureLineList() {
+		if (lineList == null) {
+			lineList = new ArrayList<SVGLine>();
+		}
+		return lineList;
+	}
+
+	protected List<SVGMarker> ensurePointList() {
+		if (pointList == null) {
+			pointList = new ArrayList<SVGMarker>();
+		}
+		return pointList;
 	}
 
 }
