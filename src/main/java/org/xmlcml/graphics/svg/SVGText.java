@@ -165,13 +165,20 @@ public class SVGText extends SVGElement {
 		}
 	}
 
+	/** result is always positive
+	 * 
+	 * @param t2
+	 */
 	public void transformFontSize(Transform2 t2) {
 		Double fontSize = this.getFontSize();
 		// transform fontSize
 		if (fontSize != null) {
 			Real2 ff = new Real2(fontSize, 1.0);
 			ff.transformBy(t2);
-			this.setFontSize(ff.getX());
+//			double size = ff.getX(); // old
+			double size = Math.max(ff.getX(), ff.getY()); // takes account of rotation
+			LOG.trace("FS "+ff+" .. "+size);
+			this.setFontSize(size);
 		}
 	}
 
@@ -265,6 +272,7 @@ public class SVGText extends SVGElement {
 		}
 		return boundingBox;
 	}
+	
 	private void rotateBoundingBoxForRotatedText() {
 		Transform2 t2 = this.getTransform();
 		if (t2 != null) {

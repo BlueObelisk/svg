@@ -138,8 +138,8 @@ public abstract class SVGPoly extends SVGElement {
 
 	public void applyAttributes(Graphics2D g2d) {
 		if (g2d != null) {
-			float width = (float) this.getStrokeWidth();
-			Stroke s = new BasicStroke(width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+			double width = (double) this.getStrokeWidth();
+			Stroke s = new BasicStroke((float)width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 			g2d.setStroke(s);
 			super.applyAttributes(g2d);
 		}

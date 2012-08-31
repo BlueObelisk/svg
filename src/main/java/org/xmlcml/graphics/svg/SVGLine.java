@@ -169,8 +169,8 @@ public class SVGLine extends SVGElement {
 
 	public void applyAttributes(Graphics2D g2d) {
 		if (g2d != null) {
-			float width = (float) this.getStrokeWidth();
-			Stroke s = new BasicStroke(width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+			double width = (double) this.getStrokeWidth();
+			Stroke s = new BasicStroke((float)width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 			g2d.setStroke(s);
 			super.applyAttributes(g2d);
 		}
@@ -371,13 +371,13 @@ public class SVGLine extends SVGElement {
 	/**
 	 * are two lines perpendicular 
 	 * @param svgLine
-	 * @param d max difference between cosine and 0
+	 * @param eps max difference between cosine and 0
 	 * @return
 	 */
-	public boolean isPerpendicularTo(SVGLine svgLine, double d) {
+	public boolean isPerpendicularTo(SVGLine svgLine, double eps) {
 		Angle angle = this.getEuclidLine().getAngleMadeWith(svgLine.getEuclidLine());
 		Double dd = Math.abs(angle.cos());
-		return (dd < d && dd > -d);
+		return (dd < eps && dd > -eps);
 	}
 
 	/** makes a new list composed of the lines in the list
@@ -398,5 +398,25 @@ public class SVGLine extends SVGElement {
 	public Double getLength() {
 		Line2 line2 = getEuclidLine();
 		return (line2 == null) ? null : line2.getLength();
+	}
+
+	/** for horizontal or vertical lines make sure that first coord is smallest
+	 * 
+	 * @param eps
+	 */
+	public void normalizeDirection(double eps) {
+		Real2 xy0 = getXY(0);
+		Real2 xy1 = getXY(1);
+		if (isHorizontal(eps)) {
+			if (xy0.getX() > xy1.getX()) {
+				this.setXY(xy0, 1);
+				this.setXY(xy1, 0);
+			}
+		} else if (isVertical(eps)) {
+			if (xy0.getY() > xy1.getY()) {
+				this.setXY(xy0, 1);
+				this.setXY(xy1, 0);
+			}
+		}
 	}
 }
