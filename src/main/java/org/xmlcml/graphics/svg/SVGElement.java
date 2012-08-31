@@ -652,7 +652,7 @@ public class SVGElement extends GraphicsElement {
 		svg.appendChild(g);
 		SVGElement line = new SVGLine(new Real2(100, 200), new Real2(300, 50));
 		line.setFill("red");
-		line.setStrokeWidth(3);
+		line.setStrokeWidth(3.);
 		line.setStroke("blue");
 		g.appendChild(line);
 		SVGElement circle = new SVGCircle(new Real2(300, 150), 20);

@@ -115,6 +115,7 @@ public class SVGUtil {
 					Attribute attribute = (Attribute) transformAttributes.get(i);
 					if (attribute.getParent() instanceof SVGText) {
 						SVGText text = (SVGText) attribute.getParent();
+						LOG.trace("TEXT "+text.toXML());
 						text.setTransformToRotateAboutTextOrigin();
 					} else {
 						attribute.detach();
@@ -122,6 +123,7 @@ public class SVGUtil {
 				}
 				root.addAttribute(new Attribute(TRANSFORMS_APPLIED, "yes"));
 			}
+//			roots.get(0).debug("ROOT");
 		}
 	}
 

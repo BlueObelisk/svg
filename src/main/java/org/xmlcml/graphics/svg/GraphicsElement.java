@@ -25,6 +25,7 @@ import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.Nodes;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Transform2;
@@ -36,9 +37,14 @@ import org.xmlcml.euclid.Transform2;
  */
 public class GraphicsElement extends Element implements SVGConstants {
 
-	private static final String CLIP_PATH = "clip-path";
-	private static final String FONT_SIZE = "font-size";
+	private final static Logger LOG = Logger.getLogger(GraphicsElement.class);
+	
+	private static final String BOLD = "bold";
+	private static final String CLASS = "class";
+	
 	protected Transform2 cumulativeTransform = new Transform2();
+	protected boolean useStyleAttribute = false;
+	private StyleBundle styleBundle;
 		
 	/** constructor.
 	 * 
@@ -155,149 +161,152 @@ public class GraphicsElement extends Element implements SVGConstants {
         return namespace;
     }
 
-    public void applyStyles(StyleBundle styleBundle) {
-    	this.addAttribute(new Attribute("style", styleBundle.toString()));
+    public void applyStyles() {
+    	this.addAttribute(new Attribute(StyleBundle.STYLE, styleBundle.toString()));
     }
     
+	public boolean isUseStyleAttribute() {
+		return useStyleAttribute;
+	}
+
+	public void setUseStyleAttribute(boolean useStyleAttribute) {
+		this.useStyleAttribute = useStyleAttribute;
+		if (useStyleAttribute) {
+			convertFromExplicitAttributes();
+		} else {
+			convertToExplicitAttributes();
+		}
+	}
+
     public void setSvgClass(String svgClass) {
-    	this.addAttribute(new Attribute("class", svgClass));
+    	this.addAttribute(new Attribute(CLASS, svgClass));
     }
     
     public String getSvgClass() {
-    	return this.getAttributeValue("class");
+    	return this.getAttributeValue(CLASS);
     }
     
 	/**
 	 * @return the clipPath
 	 */
 	public String getClipPath() {
-		String clipPath = this.getAttributeValue(CLIP_PATH);
-		return (clipPath != null) ? clipPath : (String) getSubStyle(CLIP_PATH);
+		return (String) getSubStyle(StyleBundle.CLIP_PATH);
 	}
 
 	/**
 	 * @param clip-path
 	 */
 	public void setClipPath(String clipPath) {
-		setSubStyle(CLIP_PATH, clipPath);
+		setSubStyle(StyleBundle.CLIP_PATH, clipPath);
 	}
 
 	/**
 	 * @return the fill
 	 */
 	public String getFill() {
-		return (String) getSubStyle("fill");
+		return (String) getSubStyle(StyleBundle.FILL);
 	}
 
 	/**
 	 * @param fill the fill to set
 	 */
 	public void setFill(String fill) {
-		setSubStyle("fill", fill);
+		setSubStyle(StyleBundle.FILL, fill);
 	}
 
 	/**
 	 * @return the fill
 	 */
 	public String getStroke() {
-		return (String) getSubStyle("stroke");
+		return (String) getSubStyle(StyleBundle.STROKE);
 	}
 
 	/**
 	 * @param fill the fill to set
 	 */
 	public void setStroke(String stroke) {
-		setSubStyle("stroke", stroke);
+		setSubStyle(StyleBundle.STROKE, stroke);
 	}
 
 	/**
 	 * @return the font
 	 */
 	public String getFontFamily() {
-		return (String) getSubStyle("font-family");
+		return (String) getSubStyle(StyleBundle.FONT_FAMILY);
 	}
 
 	/**
 	 * @param fill the fill to set
 	 */
 	public void setFontFamily(String fontFamily) {
-		setSubStyle("font-family", fontFamily);
+		setSubStyle(StyleBundle.FONT_FAMILY, fontFamily);
 	}
 
 	/**
 	 * @return the font
 	 */
 	public String getFontStyle() {
-		return (String) getSubStyle("font-style");
+		return (String) getSubStyle(StyleBundle.FONT_STYLE);
 	}
 
 	/**
 	 * @param fill the fill to set
 	 */
 	public void setFontStyle(String fontStyle) {
-		setSubStyle("font-style", fontStyle);
+		setSubStyle(StyleBundle.FONT_STYLE, fontStyle);
 	}
 
 	/**
 	 * @return the font
 	 */
 	public String getFontWeight() {
-		return (String) getSubStyle("font-weight");
+		return (String) getSubStyle(StyleBundle.FONT_WEIGHT);
 	}
 
 	/**
 	 * @param fill the font weight to set
 	 */
 	public void setFontWeight(String fontWeight) {
-		setSubStyle("font-weight", fontWeight);
+		setSubStyle(StyleBundle.FONT_WEIGHT, fontWeight);
 	}
 
 	/**
 	 * @return the opacity (1.0 if not present or error
 	 */
-	public double getOpacity() {
-		Double opacity = (Double) getSubStyle("opacity");
-		return (opacity == null) ? Double.NaN : opacity.doubleValue();
+	public Double getOpacity() {
+		Double opacity = getDouble(getSubStyle(StyleBundle.OPACITY));
+		return (opacity == null) ? null : opacity.doubleValue();
 	}
 
 	/**
 	 * @param opacity the opacity to set
 	 */
 	public void setOpacity(double opacity) {
-		setSubStyle("opacity", new Double(opacity));
+		setSubStyle(StyleBundle.OPACITY, getDouble(opacity));
 	}
 
 	/**
 	 * @return the stroke-width (default if not present or error)
 	 */
-	public double getStrokeWidth() {
-		Double strokeWidth = (Double) getSubStyle("stroke-width");
-		return (strokeWidth == null) ? Double.NaN : strokeWidth.doubleValue();
+	public Double getStrokeWidth() {
+		Double strokeWidth = getDouble(getSubStyle(StyleBundle.STROKE_WIDTH));
+		return (strokeWidth == null) ? null : strokeWidth.doubleValue();
 	}
 
 	/**
 	 * 
 	 * @param strokeWidth
 	 */
-	public void setStrokeWidth(double strokeWidth) {
-		setSubStyle("stroke-width", new Double(strokeWidth));
+	public void setStrokeWidth(Double strokeWidth) {
+		setSubStyle(StyleBundle.STROKE_WIDTH, getDouble(strokeWidth));
 	}
 
 	/**
 	 * @return the font-size 
 	 */
-	public double getFontSize() {
-		Double fontSize = Double.NaN;
-		if (this.getAttribute(FONT_SIZE) != null) {
-			fontSize = new Double(this.getAttributeValue(FONT_SIZE));
-		} else {
-			fontSize = (Double) getSubStyle("font-size");
-			if (fontSize != null) {
-				this.setFontSize(fontSize);
-//				this.addAttribute(new Attribute(FONT_SIZE, ""+fontSize));
-			}
-		}
-		return (this.getAttribute(FONT_SIZE) == null) ? Double.NaN : new Double(this.getAttributeValue(FONT_SIZE));
+	public Double getFontSize() {
+		Double fontSize = getDouble(getSubStyle(StyleBundle.FONT_SIZE));
+		return (fontSize == null) ? null : fontSize.doubleValue();
 	}
 
 	/**
@@ -305,8 +314,17 @@ public class GraphicsElement extends Element implements SVGConstants {
 	 * @param fontSize
 	 */
 	public void setFontSize(double fontSize) {
-		this.addAttribute(new Attribute(FONT_SIZE, ""+fontSize));
-//		setSubStyle(FONT_SIZE, new Double(fontSize));
+		setSubStyle(StyleBundle.FONT_SIZE, new Double(fontSize));
+	}
+
+	private Double getDouble(Object subStyle) {
+		Double d = null;
+		try {
+			d = new Double(""+subStyle);
+		} catch (Exception e) {
+			// return null
+		}
+		return d;
 	}
 
 	protected String getTag() {
@@ -326,7 +344,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 		svg.appendChild(g);
 		SVGElement line = new SVGLine(new Real2(100, 200), new Real2(300, 50));
 		line.setFill("red");
-		line.setStrokeWidth(3);
+		line.setStrokeWidth(3.);
 		line.setStroke("blue");
 		g.appendChild(line);
 		SVGElement circle = new SVGCircle(new Real2(300, 150), 20);
@@ -340,7 +358,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 		text.setFill("red");
 		text.setStrokeWidth(1.5);
 		text.setFontSize(20);
-		text.setFontWeight("bold");
+		text.setFontWeight(BOLD);
 		g.appendChild(text);
 		CMLUtil.debug(svg, fos, 2);
 		fos.close();		
@@ -363,33 +381,63 @@ public class GraphicsElement extends Element implements SVGConstants {
 		cumulativeTransform = new Transform2();
 		for (int i = transforms.size()-1; i >= 0; i--) {
 			Transform2 t2 = ((SVGElement) transforms.get(i).getParent()).getTransform();
-//			cumulativeTransform = cumulativeTransform.concatenate(t2);
 			cumulativeTransform = t2.concatenate(cumulativeTransform);
 		}
 		return cumulativeTransform;
 	}
 
-	private Object getSubStyle(String s) {
-		StyleBundle styleBundle = getStyleBundle();
-		return (styleBundle == null) ? null : styleBundle.getSubStyle(s);
-	}
-
 	public StyleBundle getStyleBundle() {
-		StyleBundle styleBundle = null;
-		String style = this.getAttributeValue("style");
+		String style = this.getStyle();
 		if (style != null) {
 			styleBundle = new StyleBundle(style);
 		}
 		return styleBundle;
 	}
 	
-	private void setSubStyle(String ss, Object object) {
-		StyleBundle styleBundle = getStyleBundle();
+	public String getStyle() {
+		return this.getAttributeValue(StyleBundle.STYLE);
+	}
+
+	private void setSubStyle(String attName, Object value) {
+		if (useStyleAttribute) {
+			convertFromExplicitAttributes();
+			styleBundle.setSubStyle(attName, value);
+			applyStyles();
+		} else {
+			convertToExplicitAttributes();
+			if (value != null) {
+				this.addAttribute(new Attribute(attName, ""+value));
+			} else {
+				Attribute att = this.getAttribute(attName);
+				if (att != null) {
+					att.detach();
+				}
+			}
+		}
+	}
+
+	private StyleBundle convertFromExplicitAttributes() {
 		if (styleBundle == null) {
 			styleBundle = new StyleBundle();
 		}
-		styleBundle.setSubStyle(ss, object);
-		applyStyles(styleBundle);
+		styleBundle.processStyle(this.getAttributeValue(StyleBundle.STYLE));
+		styleBundle.convertAndRemoveExplicitAttributes(this);
+		return styleBundle;
+	}
+
+    void convertToExplicitAttributes() {
+		if (styleBundle != null) {
+			styleBundle.removeStyleAttributesAndMakeExplicit(this);
+		}
+	}
+
+	private Object getSubStyle(String attName) {
+		if (useStyleAttribute) {
+			StyleBundle styleBundle = getStyleBundle();
+			return (styleBundle == null) ? null : styleBundle.getSubStyle(attName);
+		} else {
+			return this.getAttributeValue(attName);
+		}
 	}
 
 	public void debug(String msg) {
