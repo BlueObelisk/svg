@@ -34,7 +34,7 @@ public class StyleBundle implements CMLConstants {
 	public static final String CLIP_PATH = "clip-path";
 	public static final String FILL = "fill";
 	public static final String FONT_FAMILY = "font-family";
-	public static final String FONT_SIZE = "foint-size";
+	public static final String FONT_SIZE = "font-size";
 	public static final String FONT_STYLE = "font-style";
 	public static final String FONT_WEIGHT = "font-weight";
 	public static final String OPACITY = "opacity";
