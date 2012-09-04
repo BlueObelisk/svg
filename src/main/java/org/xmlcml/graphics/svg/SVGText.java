@@ -277,8 +277,11 @@ public class SVGText extends SVGElement {
 		Transform2 t2 = this.getTransform();
 		if (t2 != null) {
 			Angle rotation = t2.getAngleOfRotation();
+			if (rotation == null) {
+				LOG.trace("Null angle: "+t2);
+			}
 			// significant rotation?
-			if (!rotation.isEqualTo(0., 0.001)) {
+			if (rotation != null && !rotation.isEqualTo(0., 0.001)) {
 				Real2[] corners = boundingBox.getCorners();
 				corners[0].transformBy(t2);
 				corners[1].transformBy(t2);
