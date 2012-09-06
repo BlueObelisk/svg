@@ -56,7 +56,7 @@ import org.xmlcml.euclid.Transform2;
 public class SVGElement extends GraphicsElement {
 	private static Logger LOG = Logger.getLogger(GraphicsElement.class);
 
-	public final static String CLASS = "class";
+	public final static String SVG_CLASS = "class";
 	public final static String IMPROPER = "improper";
 	public final static String IMPROPER_TRUE = "true";
 	public final static String MATRIX = "matrix";
@@ -839,11 +839,11 @@ public class SVGElement extends GraphicsElement {
 	}
 	
 	public void setClassName(String name) {
-		this.addAttribute(new Attribute(CLASS, name));
+		this.addAttribute(new Attribute(SVG_CLASS, name));
 	}
 	
-	public String getClassName() {
-		return this.getAttributeValue(CLASS);
+	public String getSVGClassName() {
+		return this.getAttributeValue(SVG_CLASS);
 	}
 
 	/** traverse all children recursively
