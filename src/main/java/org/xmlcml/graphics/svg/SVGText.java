@@ -158,7 +158,7 @@ public class SVGText extends SVGElement {
 		transformFontSize(t2);
 		//rotate text? // not tested
 		Angle angle = t2.getAngleOfRotation();
-		if (!angle.isEqualTo(0.0, EPS)) {
+		if (angle != null && !angle.isEqualTo(0.0, EPS)) {
 			Transform2 t = Transform2.getRotationAboutPoint(angle, xy);
 			this.setTransform(t);
 			LOG.trace("text: "+this.toXML());
