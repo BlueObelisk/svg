@@ -252,6 +252,22 @@ public class SVGElement extends GraphicsElement {
 		}
 	}
 	
+	/**
+	 * uses transform attribute to get angle, 0 if absent
+	 * @return angle in degrees
+	 */
+	public Double getAngleOfRotationFromTransformInDegrees() {
+		Double angle = 0.0;
+		Transform2 transform = this.getTransform();
+		if (transform != null) {
+			Angle rotationAngle = transform.getAngleOfRotation();
+			if (rotationAngle != null) {
+				angle = rotationAngle.getDegrees();
+			}
+		}
+		return angle;
+	}
+	
 	/** currently a no-op.
 	 * subclassed by elements with coordinates
 	 * @param transform
