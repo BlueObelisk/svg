@@ -17,7 +17,6 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
-
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -65,6 +64,7 @@ public class SVGText extends SVGElement {
 	private double currentBaseY = Double.NaN;
 	private String rotate = null;
 	private double calculatedTextEndCoordinate = Double.NaN;
+	private List<SVGTSpan> tspans;
 	
 	/** constructor
 	 */
@@ -72,6 +72,32 @@ public class SVGText extends SVGElement {
 		super(TAG);
 		init();
 	}
+	
+	/** constructor.
+	 * 
+	 * @param xy
+	 * @param text
+	 */
+	public SVGText(Real2 xy, String text) {
+		this();
+		setXYAndText(xy, text);
+	}
+
+	private void setXYAndText(Real2 xy, String text) {
+		setXY(xy);
+		setText(text);
+	}
+
+	/** constructor.
+	 * 
+	 * @param xy
+	 * @param text
+	 */
+	protected SVGText(Real2 xy, String text, String tag) {
+		this(tag);
+		setXYAndText(xy, text);
+	}
+
 	protected void init() {
 		super.setDefaultStyle();
 		setDefaultStyle(this);
@@ -97,8 +123,20 @@ public class SVGText extends SVGElement {
 	
 	/** constructor
 	 */
+	protected SVGText(SVGText element, String tag) {
+        super((SVGElement) element, tag);
+	}
+	
+	/** constructor
+	 */
 	public SVGText(Element element) {
         super((SVGElement) element);
+	}
+	
+	/** constructor
+	 */
+	protected SVGText(Element element, String tag) {
+        super((SVGElement) element, tag);
 	}
 	
 	protected SVGText(String tag) {
@@ -110,7 +148,7 @@ public class SVGText extends SVGElement {
      * @return Node
      */
     public Node copy() {
-        return new SVGText(this);
+        return new SVGText(this, TAG);
     }
 
     public double getX() {
@@ -139,17 +177,6 @@ public class SVGText extends SVGElement {
 	}
 	
 	
-	/** constructor.
-	 * 
-	 * @param xy
-	 * @param text
-	 */
-	public SVGText(Real2 xy, String text) {
-		this();
-		setXY(xy);
-		setText(text);
-	}
-
 	public void applyTransform(Transform2 t2) {
 		//assume scale and translation only
 		Real2 xy = getXY();
@@ -190,6 +217,7 @@ public class SVGText extends SVGElement {
      * @return this
      */
     public void format(int places) {
+    	super.format(places);
     	setXY(getXY().format(places));
     	Double fontSize = this.getFontSize();
     	if (fontSize != null) {
@@ -262,13 +290,22 @@ public class SVGText extends SVGElement {
 	 */
 	public Real2Range getBoundingBox() {
 		if (boundingBoxNeedsUpdating()) {
-			double fontWidthFactor = 1.0;
-			double width = getEstimatedHorizontalLength(fontWidthFactor);
-			double height = this.getFontSize() * fontWidthFactor;
-			Real2 xy = this.getXY();
-			boundingBox = new Real2Range(xy, xy.plus(new Real2(width, -height)));
-			
+			getChildTSpans();
+			if (tspans.size() > 0) {
+				boundingBox = tspans.get(0).getBoundingBox();
+				for (int i = 1; i < tspans.size(); i++) {
+					Real2Range r2ra = tspans.get(i).getBoundingBox();
+					boundingBox = boundingBox.plus(r2ra);
+				}
+			} else {
+				double fontWidthFactor = 1.0;
+				double width = getEstimatedHorizontalLength(fontWidthFactor);
+				double height = this.getFontSize() * fontWidthFactor;
+				Real2 xy = this.getXY();
+				boundingBox = new Real2Range(xy, xy.plus(new Real2(width, -height)));
+			}	
 			rotateBoundingBoxForRotatedText();
+				
 		}
 		return boundingBox;
 	}
@@ -296,24 +333,25 @@ public class SVGText extends SVGElement {
 	 * @return
 	 */
 	public Double getEstimatedHorizontalLength(double fontWidthFactor) {
-		String s = getText();
-		if (s == null) {
-			estimatedHorizontallength = Double.NaN;
-		} else {
-			String family = this.getFontFamily();
-			double[] lengths = FontWidths.getFontWidths(family);
-			if (lengths == null) {
-				lengths = FontWidths.SANS_SERIF;
-			}
-			double fontSize = this.getFontSize();
-			estimatedHorizontallength = 0.0;
-			for (int i = 0; i < s.length(); i++) {
-				char c = s.charAt(i);
-				if (c > 255) {
-					c = 's';  // as good as any
+		estimatedHorizontallength = Double.NaN;
+		if (this.getChildTSpans().size() ==0) {
+			String s = getText();
+			if (s != null) {
+				String family = this.getFontFamily();
+				double[] lengths = FontWidths.getFontWidths(family);
+				if (lengths == null) {
+					lengths = FontWidths.SANS_SERIF;
 				}
-				double length = fontSize * fontWidthFactor * lengths[(int)c];
-				estimatedHorizontallength += length;
+				double fontSize = this.getFontSize();
+				estimatedHorizontallength = 0.0;
+				for (int i = 0; i < s.length(); i++) {
+					char c = s.charAt(i);
+					if (c > 255) {
+						c = 's';  // as good as any
+					}
+					double length = fontSize * fontWidthFactor * lengths[(int)c];
+					estimatedHorizontallength += length;
+				}
 			}
 		}
 		return estimatedHorizontallength;
@@ -450,8 +488,6 @@ public class SVGText extends SVGElement {
 		if (!Real.isEqual(coordVert0, coordVert1, maxFontSize * fontHeightFactor)) {
 			LOG.debug("changed vertical height "+coordVert0+" => "+coordVert1+" ... "+maxFontSize);
 			LOG.trace("COORDS "+xy0+"..."+xy1);
-//			text0.debug("T0");
-//			text1.debug("T1");
 			LOG.trace("BASEY "+this.getCurrentBaseY()+"..."+text1.getCurrentBaseY());
 		} else if (fontRatio0to1 > 0.95 && fontRatio0to1 < 1.05) {
 			// no change of size
@@ -633,7 +669,6 @@ public class SVGText extends SVGElement {
 		setTransformToRotateAboutTextOrigin(rotMat);
 	}
 
-	
 	public void setTransformToRotateAboutTextOrigin(RealSquareMatrix rotMat) {
 		Real2 xy = new Real2(this.getXY());
 		Transform2 newTransform2 = new Transform2(new Vector2(xy)); 
@@ -641,4 +676,10 @@ public class SVGText extends SVGElement {
 		newTransform2 = newTransform2.concatenate(new Transform2(new Vector2(xy.multiplyBy(-1.0))));
 		this.setTransform(newTransform2);
 	}
+
+	public List<SVGTSpan> getChildTSpans() {
+		tspans = SVGTSpan.extractTSpans(SVGUtil.getQuerySVGElements(this, "./svg:tspan"));
+		return tspans;
+	}
+	
 }

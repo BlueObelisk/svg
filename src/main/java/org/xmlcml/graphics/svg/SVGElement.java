@@ -94,6 +94,11 @@ public class SVGElement extends GraphicsElement {
         this.userElement = element.userElement;
 	}
 	
+	public SVGElement(SVGElement element, String tag) {
+        super((GraphicsElement) element, tag);
+        this.userElement = element.userElement;
+	}
+	
 	/** copy constructor from non-subclassed elements
 	 */
 	public static SVGElement readAndCreateSVG(Element element) {
@@ -199,7 +204,8 @@ public class SVGElement extends GraphicsElement {
 	 * @return the transform
 	 */
 	public Transform2 getTransform() {
-		return ensureTransform();
+		Transform2 t2 = ensureTransform();
+		return t2;
 	}
 	/**
 	 * @param transform the transform to set
@@ -763,8 +769,10 @@ public class SVGElement extends GraphicsElement {
 	private void formatCommonAttributes(int places) {
 		Transform2 t2 = this.getTransform();
 		if (t2 != null) {
-			t2 = formatTransform(t2, places);
-			this.setTransform(t2);
+			if (!t2.isUnit()) {
+				t2 = formatTransform(t2, places);
+				this.setTransform(t2);
+			}
 		}
 	}
 
