@@ -17,6 +17,9 @@
 package org.xmlcml.graphics.svg;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
@@ -111,31 +114,21 @@ public class SVGG extends SVGElement {
 		return boundingBox;
 	}
 
-//	public static HtmlMenuSystem createHTMLMenuSystem(String dirname, List<SVGGBox> svgBoxList) 
-//	throws IOException {
-//		HtmlMenuSystem htmlMenuSystem = new HtmlMenuSystem();
-//    	htmlMenuSystem.setOutdir(dirname);
-//    	int i = 0;
-//		for (SVGGBox box : svgBoxList) {
-//			String id = box.getId();
-//			if (id == null) {
-//				id = "svg"+(++i);
-//			}
-//			File f = new File(dirname, SVGSVG.createFileName(id));
-//			if (box.getParent() != null) {
-//				box.detach();
-//			}
-//			SVGSVG.wrapAndWriteAsSVG(box, f);
-//			htmlMenuSystem.addHRef(f.getName());
-//		}
-//		htmlMenuSystem.outputMenuAndBottomAndIndexFrame();
-//		return htmlMenuSystem;
-//	}
-//	
-//	public void applyTransform(Transform2 transform) {
-//		this.setTransform(transform);
-//	}
-//	
+	/** makes a new list composed of the gs in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGG> extractGs(List<SVGElement> elements) {
+		List<SVGG> gList = new ArrayList<SVGG>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGG) {
+				gList.add((SVGG) element);
+			}
+		}
+		return gList;
+	}
+
 
 
 }

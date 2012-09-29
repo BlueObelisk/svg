@@ -82,10 +82,19 @@ public class GraphicsElement extends Element implements SVGConstants {
      */
     public GraphicsElement(GraphicsElement element) {
         this(element.getLocalName());
-        copyAttributesFrom(element);
+        copyAttributesChildrenElements(element);
+    }
+
+    protected GraphicsElement(GraphicsElement element, String tag) {
+        this(tag);
+        copyAttributesChildrenElements(element);
+    }
+
+	private void copyAttributesChildrenElements(GraphicsElement element) {
+		copyAttributesFrom(element);
         copyChildrenFrom(element);
         copyNamespaces(element);
-    }
+	}
 
     /**
      * copies namespaces.

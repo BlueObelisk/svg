@@ -19,6 +19,8 @@ package org.xmlcml.graphics.svg;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import nu.xom.Element;
 import nu.xom.Node;
@@ -61,16 +63,20 @@ public class SVGTSpan extends SVGText {
 	/** constructor
 	 */
 	public SVGTSpan(SVGTSpan element) {
-        super((SVGElement) element);
+        super((SVGElement) element, TAG);
 	}
 	
 	/** constructor
 	 */
 	public SVGTSpan(Element element) {
-        super((SVGElement) element);
+        super((SVGElement) element, TAG);
 	}
 	
-    /**
+    public SVGTSpan(Real2 real2, String string) {
+    	super(real2, string, TAG);
+	}
+    
+	/**
      * copy node .
      *
      * @return Node
@@ -88,4 +94,18 @@ public class SVGTSpan extends SVGText {
 	}
 
 
+	/** makes a new list composed of the tSpans in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGTSpan> extractTSpans(List<SVGElement> elements) {
+		List<SVGTSpan> tSpanList = new ArrayList<SVGTSpan>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGTSpan) {
+				tSpanList.add((SVGTSpan) element);
+			}
+		}
+		return tSpanList;
+	}
 }
