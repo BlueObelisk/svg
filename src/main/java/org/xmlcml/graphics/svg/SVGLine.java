@@ -108,6 +108,18 @@ public class SVGLine extends SVGElement {
         return new SVGLine(this);
     }
 
+	public Real2 getXY() {
+		throw new RuntimeException("Cannot define getXY() for lines");
+	}
+	
+	public double getX() {
+		throw new RuntimeException("Cannot define getY() for lines");
+	}
+	
+	public double getY() {
+		throw new RuntimeException("Cannot define getY() for lines");
+	}
+	
 	/**
 	 * @param xy coordinates of the atom
 	 * @param serial 0 or 1
