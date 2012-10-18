@@ -1,5 +1,9 @@
 package org.xmlcml.graphics.svg;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -55,6 +59,20 @@ public class SVGPathTest {
 		Assert.assertEquals("cx", 407.4, circle.getCX(), 0.2);
 		Assert.assertEquals("cx", 493.5, circle.getCY(), 0.2);
 		
+	}
+
+	@Test
+	public void testGeneralPath() {
+		GeneralPath generalPath = new GeneralPath();
+		generalPath.moveTo(1.0d, 2.0d);
+		generalPath.lineTo(3.0d, 4.0d);
+		generalPath.quadTo(5.0d, 6.0d, 7.0d, 8.0d);
+		generalPath.curveTo(9.0d, 10.0d, 11.0d, 12.0d, 13.0d, 14.0d);
+		generalPath.closePath();
+		SVGPath path = new SVGPath(generalPath);
+		String d = path.getDString();
+		Assert.assertNotNull("d", d);
+		Assert.assertEquals("d", "M 1.0 2.0 L 3.0 4.0 Q 5.0 6.0 7.0 8.0 C 9.0 10.0 11.0 12.0 13.0 14.0 Z", d.trim());
 	}
 
 }

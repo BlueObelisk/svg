@@ -687,9 +687,9 @@ public class SVGElement extends GraphicsElement {
 		text.setStroke("green");
 		text.setFill("red");
 		text.setStrokeWidth(1.5);
-		text.setFontSize(20);
-		text.setFontStyle("italic");
-		text.setFontWeight("bold");
+		text.setFontSize(new Double(20.));
+		text.setFontStyle(FontStyle.ITALIC);
+		text.setFontWeight(FontWeight.BOLD);
 		g.appendChild(text);
 		CMLUtil.debug(svg, fos, 2);
 		fos.close();		
