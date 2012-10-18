@@ -39,6 +39,16 @@ public class GraphicsElement extends Element implements SVGConstants {
 
 	private final static Logger LOG = Logger.getLogger(GraphicsElement.class);
 	
+	public enum FontWeight {
+		BOLD,
+		NORMAL
+	}
+	
+	public enum FontStyle {
+		ITALIC,
+		NORMAL
+	}
+	
 	private static final String BOLD = "bold";
 	private static final String CLASS = "class";
 	
@@ -266,6 +276,13 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
 	/**
+	 * @param fill the fill to set
+	 */
+	public void setFontStyle(FontStyle fontStyle) {
+		this.setFontStyle(fontStyle == null ? null : fontStyle.toString().toLowerCase());
+	}
+
+	/**
 	 * @return the font
 	 */
 	public String getFontWeight() {
@@ -277,6 +294,13 @@ public class GraphicsElement extends Element implements SVGConstants {
 	 */
 	public void setFontWeight(String fontWeight) {
 		setSubStyle(StyleBundle.FONT_WEIGHT, fontWeight);
+	}
+
+	/**
+	 * @param fill the font weight to set
+	 */
+	public void setFontWeight(FontWeight fontWeight) {
+		this.setFontWeight((fontWeight == null) ? null : fontWeight.toString().toLowerCase());
 	}
 
 	/**
@@ -322,8 +346,16 @@ public class GraphicsElement extends Element implements SVGConstants {
 	 * 
 	 * @param fontSize
 	 */
-	public void setFontSize(double fontSize) {
-		setSubStyle(StyleBundle.FONT_SIZE, new Double(fontSize));
+	public void setFontSize(Double fontSize) {
+		if (fontSize == null) {
+			setSubStyle(StyleBundle.FONT_SIZE, null);
+			Attribute fontSizeAttribute = this.getAttribute(StyleBundle.FONT_SIZE);
+			if (fontSizeAttribute != null) {
+				this.removeAttribute(fontSizeAttribute);
+			}
+		} else {
+			setSubStyle(StyleBundle.FONT_SIZE, new Double(fontSize));
+		}
 	}
 
 	private Double getDouble(Object subStyle) {
@@ -366,8 +398,8 @@ public class GraphicsElement extends Element implements SVGConstants {
 		text.setStroke("green");
 		text.setFill("red");
 		text.setStrokeWidth(1.5);
-		text.setFontSize(20);
-		text.setFontWeight(BOLD);
+		text.setFontSize(new Double(20.));
+		text.setFontWeight(FontWeight.BOLD);
 		g.appendChild(text);
 		CMLUtil.debug(svg, fos, 2);
 		fos.close();		

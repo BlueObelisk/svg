@@ -17,7 +17,9 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +74,14 @@ public class SVGPath extends SVGElement {
 	 */
 	public SVGPath(SVGPath element) {
         super((SVGElement) element);
+	}
+	
+	/** constructor
+	 */
+	public SVGPath(GeneralPath generalPath) {
+        super(TAG);
+        String d = SVGPath.constructDString(generalPath);
+        this.setDString(d);
 	}
 	
 	
@@ -441,9 +451,12 @@ public class SVGPath extends SVGElement {
 		setD(pathPrimitives);
 	}
 	
-//	public void format(int places) {
-//		setD(getD().format(places));
-//	}
+	public void format(int places) {
+		super.format(places);
+		String d = getDString();
+		d = SVGPathPrimitive.formatD(d, places);
+		this.setDString(d);
+	}
 
 	public String getSignature() {
 		String sig = null;
@@ -475,6 +488,31 @@ public class SVGPath extends SVGElement {
 	private void setD(List<SVGPathPrimitive> primitives) {
 		String d = constructDString(primitives);
 		this.addAttribute(new Attribute(D, d));
+	}
+
+
+	public static String constructDString(GeneralPath generalPath) {
+		StringBuilder dd = new StringBuilder();
+		PathIterator pathIterator = generalPath.getPathIterator(new AffineTransform());
+		double[] coords = new double[6];
+		while (!pathIterator.isDone()) {
+			int segType = pathIterator.currentSegment(coords);
+			if (PathIterator.SEG_MOVETO == segType) {
+				dd.append(" M "+coords[0]+" "+coords[1]);
+			} else if (PathIterator.SEG_LINETO == segType) {
+				dd.append(" L "+coords[0]+" "+coords[1]);
+			} else if (PathIterator.SEG_QUADTO == segType) {
+				dd.append(" Q "+coords[0]+" "+coords[1]+" "+coords[2]+" "+coords[3]);
+			} else if (PathIterator.SEG_CUBICTO == segType) {
+				dd.append(" C "+coords[0]+" "+coords[1]+" "+coords[2]+" "+coords[3]+" "+coords[4]+" "+coords[5]);
+			} else if (PathIterator.SEG_CLOSE == segType) {
+				dd.append(" Z ");
+			} else {
+				throw new RuntimeException("UNKNOWN "+segType);
+			}
+			pathIterator.next();
+		}
+		return dd.toString();
 	}
 
 	public static String constructDString(List<SVGPathPrimitive> primitives) {

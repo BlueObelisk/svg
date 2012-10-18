@@ -99,6 +99,23 @@ public abstract class SVGPathPrimitive {
 		return primitiveList;
 	}
 	
+	public static String formatD(String d, int places) {
+		List<SVGPathPrimitive> primitiveList = parseD(d);
+		for (SVGPathPrimitive primitive : primitiveList) {
+			primitive.format(places);
+		}
+		d = createD(primitiveList);
+		return d;
+	}
+	
+	public static String createD(List<SVGPathPrimitive> primitiveList) {
+		StringBuilder sb = new StringBuilder();
+		for (SVGPathPrimitive primitive : primitiveList) {
+			sb.append(primitive.toString());
+		}
+		return sb.toString();
+	}
+	
 	public static String createSignature(List<SVGPathPrimitive> primitiveList) {
 		StringBuilder sig = new StringBuilder();
 		for (SVGPathPrimitive primitive : primitiveList) {
@@ -126,11 +143,15 @@ public abstract class SVGPathPrimitive {
 	}
 
 	public String toString() {
-		throw new RuntimeException("Must override toString() in SVGPathPrimitives");
+		throw new RuntimeException("Must override toString() in SVGPathPrimitive");
 	}
 	
 	protected String formatCoords(Real2 coords) {
 		return coords == null ? null : ((int)(1000*coords.getX()))/1000.+" "+(int)(1000*coords.getY())/1000.+" ";
+	}
+	
+	public void format(int places) {
+		coordArray.format(places);
 	}
 
 	public Real2 getFirstCoord() {

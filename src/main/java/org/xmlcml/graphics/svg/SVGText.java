@@ -1,19 +1,3 @@
-/**
- *    Copyright 2011 Peter Murray-Rust et. al.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
@@ -49,6 +33,8 @@ import org.xmlcml.euclid.Vector2;
  */
 public class SVGText extends SVGElement {
 	private static Logger LOG = Logger.getLogger(SVGText.class);
+	
+
 	public final static String TAG ="text";
 	
     public static String SUB0 = CMLConstants.S_UNDER+CMLConstants.S_LCURLY;
@@ -65,6 +51,8 @@ public class SVGText extends SVGElement {
 	private String rotate = null;
 	private double calculatedTextEndCoordinate = Double.NaN;
 	private List<SVGTSpan> tspans;
+
+	private FontWeight fontWeight;
 	
 	/** constructor
 	 */
@@ -176,7 +164,6 @@ public class SVGText extends SVGElement {
 		g2d.drawString(text, (int)xy.x, (int)xy.y);
 	}
 	
-	
 	public void applyTransform(Transform2 t2) {
 		//assume scale and translation only
 		Real2 xy = getXY();
@@ -208,8 +195,6 @@ public class SVGText extends SVGElement {
 			this.setFontSize(size);
 		}
 	}
-
-
 
     /** round to decimal places.
      * 
@@ -257,7 +242,12 @@ public class SVGText extends SVGElement {
 			}
 		}
 		if (text != null) {
-			this.appendChild(text);
+			try {
+				this.appendChild(text);
+			} catch (nu.xom.IllegalCharacterDataException e) {
+//				e.printStackTrace();
+				throw new RuntimeException("Cannot append text: "+text+" (char-"+(int)text.charAt(0)+")", e);
+			}
 		}
 		boundingBox = null;
 		calculatedTextEndCoordinate = Double.NaN;
@@ -265,7 +255,8 @@ public class SVGText extends SVGElement {
 	}
 
 	/** extent of text
-	 * defined as the point origin (i.e. does not include font)
+	 * defined as the point in the middle of the visual string (
+	 * e.g. near the middle of the crossbar in "H")
 	 * @return
 	 */
 	public Real2Range getBoundingBoxForCenterOrigin() {
@@ -682,4 +673,50 @@ public class SVGText extends SVGElement {
 		return tspans;
 	}
 	
+	public String createAndSetFontWeight() {
+		String f = super.getFontWeight();
+		if (f == null) {
+			FontWeight fw = FontWeight.NORMAL;
+			String fontFamily = this.getFontFamily();
+			if (fontFamily != null) {
+				if (fontFamily.toLowerCase().contains(FontWeight.BOLD.toString().toLowerCase())) {
+					fw = FontWeight.BOLD;
+				}
+			}
+			this.setFontWeight(fw);
+			f = fw.toString();
+		}
+		return f;
+	}
+	
+	
+	public String createAndSetFontStyle() {
+		String f = super.getFontStyle();
+		if (f == null) {
+			FontStyle fs = FontStyle.NORMAL;
+			String fontFamily = this.getFontFamily();
+			if (fontFamily != null) {
+				String ff = fontFamily.toLowerCase();
+				if (ff.contains("italic") || ff.contains("oblique")) {
+					fs = FontStyle.ITALIC;
+				}
+			}
+			this.setFontStyle(fs);
+			f = fs.toString();
+		}
+		return f;
+	}
+	
+	public String getString() {
+		String s = "";
+		List<SVGTSpan> tspans = getChildTSpans();
+		if (tspans == null|| tspans.size() == 0) {
+			s += toXML();
+		} else {
+			for (SVGTSpan tspan : tspans) {
+				s += tspan.toXML()+"\n";
+			}
+		}
+		return s;
+	}
 }
