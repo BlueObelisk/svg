@@ -1,11 +1,10 @@
 package org.xmlcml.graphics.svg;
 
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.EuclidTestUtils;
 import org.xmlcml.euclid.Real2Array;
@@ -50,6 +49,7 @@ public class SVGPathTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testCircle() {
 		SVGPath path1 = new SVGPath(
 				"M408.95 493.497 C408.95 492.438 407.805 491.779 406.889 492.308 C405.971 492.839 405.972 494.161 406.89 494.69 C407.807 495.217 408.95 494.557 408.95 493.497");
@@ -74,5 +74,22 @@ public class SVGPathTest {
 		Assert.assertNotNull("d", d);
 		Assert.assertEquals("d", "M 1.0 2.0 L 3.0 4.0 Q 5.0 6.0 7.0 8.0 C 9.0 10.0 11.0 12.0 13.0 14.0 Z", d.trim());
 	}
+
+	@Test
+	public void testFormat() {
+		String d = "M 1.1234 2.12345 L 3.1234567 4.12 C 5.123456 6.1 7.123456789 8.12345 9.12345 10.12345 Z";
+		SVGPath path = new SVGPath(d);
+		path.format(3);
+		Assert.assertEquals("format", "M1.123 2.123 L3.123 4.12 C5.123 6.1 7.123 8.122 9.123 10.123 Z", path.getDString().trim());
+	}
+
+	@Test
+	public void testFormat1() {
+		String d = "M 219.75799560546875 604.5350341796875 L 229.24200439453125 604.5350341796875";
+		SVGPath path = new SVGPath(d);
+		path.format(3);
+		Assert.assertEquals("format", "M219.758 604.535 L229.242 604.535", path.getDString().trim());
+	}
+
 
 }
