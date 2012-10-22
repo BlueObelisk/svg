@@ -44,7 +44,7 @@ public class TestSVGPathPrimitive {
 		Real2Array r2a = path.getCoords();
 		path.normalizeOrigin();
 		Assert.assertEquals("normalized path", 
-			"M2.043 0.945 L2.242 0.0 L1.412 0.0 L1.214 0.945 L2.043 0.945 ZM0.832 6.751 L1.855 1.861 L1.021 1.861 L0.0 6.751 L0.832 6.751 ",
-			path.getDString());
+			"M2.043 0.945 L2.242 0.0 L1.413 0.0 L1.215 0.945 L2.043 0.945 ZM0.832 6.751 L1.855 1.861 L1.021 1.861 L0.0 6.751 L0.832 6.751",
+			path.getDString().trim());
 	}
 }

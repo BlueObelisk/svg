@@ -3,11 +3,14 @@ package org.xmlcml.graphics.svg;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 
-public class CurvePrimitive extends SVGPathPrimitive {
+public class CubicPrimitive extends SVGPathPrimitive {
 
 	public final static String TAG = "C";
 
-	public CurvePrimitive(Real2Array coordArray) {
+	public CubicPrimitive(Real2Array coordArray) {
+		if (coordArray == null || coordArray.size() != 3) {
+			throw new RuntimeException("Bad coordArray: "+coordArray);
+		}
 		this.coordArray = coordArray;
 	}
 

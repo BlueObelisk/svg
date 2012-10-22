@@ -186,7 +186,7 @@ public class SVGPath extends SVGElement {
 		ensurePrimitives();
 		isPolyline = true;
 		for (SVGPathPrimitive primitive : primitiveList) {
-			if (primitive instanceof CurvePrimitive) {
+			if (primitive instanceof CubicPrimitive) {
 				isPolyline = false;
 				Real2Array curveCoords = primitive.getCoordArray();
 				allCoords.add(curveCoords);
@@ -367,7 +367,7 @@ public class SVGPath extends SVGElement {
 	}
 
 	private List<SVGPathPrimitive> createPathPrimitives() {
-		return SVGPathPrimitive.parseD(this.getDString());
+		return SVGPathPrimitive.parseDString(this.getDString());
 	}
 
 	/** get bounding box
@@ -454,7 +454,7 @@ public class SVGPath extends SVGElement {
 	public void format(int places) {
 		super.format(places);
 		String d = getDString();
-		d = SVGPathPrimitive.formatD(d, places);
+		d = SVGPathPrimitive.formatDString(d, places);
 		this.setDString(d);
 	}
 
@@ -559,7 +559,7 @@ public class SVGPath extends SVGElement {
 			int lCount = signature.replaceAll("[^L]", "").length();
 			if (lCount >= minL && maxC >= cCount) {
 				for (SVGPathPrimitive primitive : primitiveList) {
-					if (primitive instanceof CurvePrimitive) {
+					if (primitive instanceof CubicPrimitive) {
 						sb.append("L"+primitive.getLastCoord().toString());
 					} else {
 						sb.append(primitive.toString());
