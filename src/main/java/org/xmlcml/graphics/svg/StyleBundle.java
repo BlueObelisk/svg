@@ -32,6 +32,7 @@ public class StyleBundle implements CMLConstants {
 	private static Logger LOG = Logger.getLogger(StyleBundle.class);
 
 	public static final String CLIP_PATH = "clip-path";
+	public static final String DASHARRAY = "stroke-dasharray";
 	public static final String FILL = "fill";
 	public static final String FONT_FAMILY = "font-family";
 	public static final String FONT_SIZE = "font-size";
@@ -84,6 +85,7 @@ public class StyleBundle implements CMLConstants {
 	private Map<String, String> atts = new HashMap<String, String>();
 
 	static final String STYLE = "style";
+
 
 	StyleBundle() {
 	}
