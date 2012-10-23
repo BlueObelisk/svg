@@ -17,7 +17,9 @@
 package org.xmlcml.graphics.svg;
 
 import java.io.FileOutputStream;
+
 import java.io.IOException;
+import java.util.List;
 
 import nu.xom.Attribute;
 import nu.xom.Document;
@@ -332,6 +334,17 @@ public class GraphicsElement extends Element implements SVGConstants {
 	 */
 	public void setStrokeWidth(Double strokeWidth) {
 		setSubStyle(StyleBundle.STROKE_WIDTH, getDouble(strokeWidth));
+	}
+	
+	public String getStrokeDashArray() {
+		String dashes = (String) getSubStyle(StyleBundle.DASHARRAY);
+		return (dashes == null) ? null : dashes.toString();
+	}
+
+	public void setStrokeDashArray(String dashArray) {
+		setSubStyle(StyleBundle.DASHARRAY, dashArray);
+		addAttribute(new Attribute(StyleBundle.DASHARRAY, dashArray));
+		LOG.debug("DASH "+dashArray);
 	}
 
 	/**
