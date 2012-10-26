@@ -492,8 +492,12 @@ public class SVGPath extends SVGElement {
 
 
 	public static String constructDString(GeneralPath generalPath) {
-		StringBuilder dd = new StringBuilder();
 		PathIterator pathIterator = generalPath.getPathIterator(new AffineTransform());
+		return getPathAsDString(pathIterator);
+	}
+
+	public static String getPathAsDString(PathIterator pathIterator) {
+		StringBuilder dd = new StringBuilder();
 		double[] coords = new double[6];
 		while (!pathIterator.isDone()) {
 			int segType = pathIterator.currentSegment(coords);
