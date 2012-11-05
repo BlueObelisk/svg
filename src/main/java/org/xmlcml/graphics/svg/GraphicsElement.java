@@ -344,7 +344,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	public void setStrokeDashArray(String dashArray) {
 		setSubStyle(StyleBundle.DASHARRAY, dashArray);
 		addAttribute(new Attribute(StyleBundle.DASHARRAY, dashArray));
-		LOG.debug("DASH "+dashArray);
+		LOG.trace("DASH "+dashArray);
 	}
 
 	/**
