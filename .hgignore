@@ -3,6 +3,7 @@ foo
 ^.settings/
 ^.classpath$
 ^.hgignore~$
+^misc/.*
 ^target/.*
 /target/
 ^\.idea/

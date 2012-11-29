@@ -54,6 +54,7 @@ public class SVGPath extends SVGElement {
 	public final static String D = "d";
 	public final static String TAG ="path";
 	private static final double EPS1 = 0.000001;
+	private static final double MIN_COORD = .00001;
 	private GeneralPath path2;
 	private boolean isClosed = false;
 	private Real2Array coords = null; // for diagnostics
@@ -501,6 +502,7 @@ public class SVGPath extends SVGElement {
 		double[] coords = new double[6];
 		while (!pathIterator.isDone()) {
 			int segType = pathIterator.currentSegment(coords);
+			coords = normalizeSmallCoordsToZero(coords);
 			if (PathIterator.SEG_MOVETO == segType) {
 				dd.append(" M "+coords[0]+" "+coords[1]);
 			} else if (PathIterator.SEG_LINETO == segType) {
@@ -517,6 +519,15 @@ public class SVGPath extends SVGElement {
 			pathIterator.next();
 		}
 		return dd.toString();
+	}
+
+	private static double[] normalizeSmallCoordsToZero(double[] coords) {
+		for (int i = 0; i < coords.length; i++) {
+			if (!Double.isNaN(coords[i]) && Math.abs(coords[i]) < MIN_COORD) {
+				coords[i] = 0.0;
+			}
+		}
+		return coords;
 	}
 
 	public static String constructDString(List<SVGPathPrimitive> primitives) {
