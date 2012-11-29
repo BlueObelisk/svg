@@ -25,9 +25,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://bitbucket.org/wwmm/svg/src</url>
-		<connection>scm:hg:http://bitbucket.org/wwmm/svg</connection>
-		<developerConnection>scm:hg:https://bitbucket.org/wwmm/svg</developerConnection>
+		<url>https://bitbucket.org/petermr/svg/src</url>
+		<connection>scm:hg:http://bitbucket.org/petermr/svg</connection>
+		<developerConnection>scm:hg:https://bitbucket.org/petermr/svg</developerConnection>
 	</scm>
 
 	<developers>
@@ -106,7 +106,7 @@
 			<url>https://maven.ch.cam.ac.uk/m2repo</url>
 		</repository>
 	</repositories>
- 
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.xml-cml</groupId>

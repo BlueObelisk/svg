@@ -142,7 +142,7 @@ public abstract class SVGPathPrimitive {
 				tokenList.add(""+c);
 				numberStart = -1;
 			} else {
-				throw new RuntimeException("Unknown character in dString: "+c);
+				throw new RuntimeException("Unknown character in dString: "+c+" path: "+d);
 			}
 		}
 		addCurrentNumber(d, tokenList, numberStart, d.length());
