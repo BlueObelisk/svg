@@ -43,6 +43,7 @@ public class SVGText extends SVGElement {
     public static String SUP1 = CMLConstants.S_RCURLY+CMLConstants.S_CARET;
     
     public final static Double DEFAULT_FONT_WIDTH_FACTOR = 10.0;
+    public final static Double MIN_WIDTH = 0.001; // useful for non printing characters
     
 	// these are all when text is used for concatenation, etc.
 	private double estimatedHorizontallength = Double.NaN; 
@@ -282,6 +283,8 @@ public class SVGText extends SVGElement {
 	public Real2Range getBoundingBox() {
 		if (boundingBoxNeedsUpdating()) {
 			getChildTSpans();
+			Double width = null;
+			Double height = null;
 			if (tspans.size() > 0) {
 				boundingBox = tspans.get(0).getBoundingBox();
 				for (int i = 1; i < tspans.size(); i++) {
@@ -290,11 +293,27 @@ public class SVGText extends SVGElement {
 				}
 			} else {
 				double fontWidthFactor = 1.0;
-				double width = getEstimatedHorizontalLength(fontWidthFactor);
-				double height = this.getFontSize() * fontWidthFactor;
+				width = getEstimatedHorizontalLength(fontWidthFactor);
+				if (width == null || Double.isNaN(width)) {
+					width = MIN_WIDTH;
+					String text = this.getText();
+					if (text == null) {
+						setText("");
+					} else if (text.length() == 0) {
+						throw new RuntimeException("found empty text ");
+					} else if (text.contains("\n")) {
+						throw new RuntimeException("found LF "+""+((int)text.charAt(0)));
+					} else {
+						throw new RuntimeException("found strange Null text "+""+((int)text.charAt(0)));
+					}
+				}
+				height = this.getFontSize() * fontWidthFactor;
 				Real2 xy = this.getXY();
 				boundingBox = new Real2Range(xy, xy.plus(new Real2(width, -height)));
 			}	
+			if (!boundingBox.isValid()) {
+				throw new RuntimeException("Invalid bbox: "+width+"/"+height);
+			}
 			rotateBoundingBoxForRotatedText();
 				
 		}
