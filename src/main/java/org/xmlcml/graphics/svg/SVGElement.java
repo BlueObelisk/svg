@@ -132,6 +132,8 @@ public class SVGElement extends GraphicsElement {
 			newElement = new SVGPolygon();
 		} else if (tag.equals(SVGRect.TAG)) {
 			newElement = new SVGRect();
+		} else if (tag.equals(SVGScript.TAG)) {
+			newElement = new SVGScript();
 		} else if (tag.equals(SVGSVG.TAG)) {
 			newElement = new SVGSVG();
 		} else if (tag.equals(SVGText.TAG)) {

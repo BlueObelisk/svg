@@ -59,6 +59,9 @@ public class SVGUtil {
 		List<Element> elements = CMLUtil.getQueryElements(svgElement, xpath, SVGConstants.SVG_XPATH);
 		List<SVGElement> svgElements = new ArrayList<SVGElement>();
 		for (Element element : elements) {
+			if (!(element instanceof SVGElement)) {
+				throw new RuntimeException("Element was not SVGElement: "+element.toXML());
+			}
 			svgElements.add((SVGElement)element);
 		}
 		return svgElements;

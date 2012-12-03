@@ -34,9 +34,6 @@ public class SVGDefs extends SVGElement {
 		init();
 	}
 	
-	protected void init() {
-	}
-	
 	/** constructor
 	 */
 	public SVGDefs(SVGElement element) {
