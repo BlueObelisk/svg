@@ -1,5 +1,6 @@
 package org.xmlcml.graphics.svg;
 
+import java.awt.geom.AffineTransform;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -222,4 +223,5 @@ public class SVGUtil {
 		}
 		return r2r;
 	}
+	
 }
