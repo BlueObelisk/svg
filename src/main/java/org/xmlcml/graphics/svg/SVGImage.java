@@ -16,12 +16,21 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.imageio.ImageIO;
+
+import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 
+import org.apache.xerces.impl.dv.util.Base64;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
@@ -33,7 +42,24 @@ import org.xmlcml.euclid.Transform2;
  */
 public class SVGImage extends SVGElement {
 
+	private static final String DATA = "data";
+	private static final String BASE64 = "base64";
+	public static final String IMAGE_PNG = "image/png";
+	public static final String PNG = "PNG";
+	public static final String IMAGE_BMP = "image/bmp";
+	public static final String BMP = "BMP";
+	
+	private static final String XLINK_PREF = "xlink";
+	private static final String HREF = "href";
+	private static final String XLINK_NS = "http://www.w3.org/1999/xlink";
 	public final static String TAG ="image";
+	
+	private static Map<String, String> mimeType2ImageTypeMap;
+	static {
+		mimeType2ImageTypeMap = new HashMap<String, String>();
+		mimeType2ImageTypeMap.put(IMAGE_PNG, PNG);
+	}
+	
 	/** constructor
 	 */
 	public SVGImage() {
@@ -129,6 +155,44 @@ public class SVGImage extends SVGElement {
 		wh.transformBy(rotScale);
 		this.setWidth(wh.getX());
 		this.setHeight(wh.getY());
+	}
+
+	/**
+	<image x="0" y="0" transform="matrix(0.144,0,0,0.1439,251.521,271.844)" 
+			clip-path="url(#clipPath2)" width="1797" xlink:href="data:image/png;
+			base64,iVBORw0KGgoAAAANSUhEUgAABwUAAAV4CAMAAAB2DvLsAAADAFBMVEX////+/v56 
+			enpWVlZbW1taWlpZWVnHx8eRkZFVVVWMjIysrKxXV1dYWFhqamr5+fnMzMxeXl7c 
+			3NyUlJR/f3+3t7cAAACGhob29vYpKSliYmJPT083Nzf8/PyBgYENDQ3s7OwwMDD1 
+			    ...
+			    RERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE 
+			RPQP/R8CiIK+y8Q6KQAAAABJRU5ErkJggg==" height="1400"
+			 preserveAspectRatio="none" stroke-width="0" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+    */
+	
+	public void readImageData(BufferedImage bufferedImage, String mimeType) {
+		String type = mimeType2ImageTypeMap.get(mimeType);
+		if (type == null) {
+			throw new RuntimeException("Cannot convert mimeType: "+mimeType);
+		}
+		double x = bufferedImage.getMinX();
+		double y = bufferedImage.getMinY();
+		double height = bufferedImage.getHeight();
+		double width = bufferedImage.getWidth();
+		this.setX(x);
+		this.setY(y);
+		this.setWidth(width);
+		this.setHeight(height);
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			ImageIO.write(bufferedImage, type, baos);
+		} catch (IOException e) {
+			throw new RuntimeException("Cannot read image", e);
+		}
+		byte[] byteArray = baos.toByteArray();
+		String base64 = Base64.encode(byteArray);
+		String attValue = DATA+":"+mimeType+";"+BASE64+","+base64;
+		this.addAttribute(new Attribute(XLINK_PREF+":"+HREF, XLINK_NS, attValue));
 	}
 	
 	/** makes a new list composed of the images in the list
