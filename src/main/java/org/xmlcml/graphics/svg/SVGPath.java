@@ -17,6 +17,7 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
@@ -85,6 +86,13 @@ public class SVGPath extends SVGElement {
         this.setDString(d);
 	}
 	
+	public SVGPath(Shape shape) {
+		super(TAG);
+		PathIterator pathIterator = shape.getPathIterator(new AffineTransform());
+		String pathString = SVGPath.getPathAsDString(pathIterator);
+		this.setDString(pathString);
+	}
+
 	
 	/** constructor
 	 */
