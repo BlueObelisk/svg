@@ -1,5 +1,6 @@
 package org.xmlcml.graphics.svg;
 
+import java.awt.geom.GeneralPath;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,9 @@ public abstract class SVGPathPrimitive {
 	
 	public static List<SVGPathPrimitive> parseDString(String d) {
 		List<SVGPathPrimitive> primitiveList = new ArrayList<SVGPathPrimitive>();
+		if (d == null) {
+			return primitiveList;
+		}
 		List<String> tokenList = extractTokenList(d);
 		int itok = 0;
 		Real2 lastXY = null;
@@ -137,7 +141,7 @@ public abstract class SVGPathPrimitive {
 				if (numberStart == -1) {
 					numberStart = i;
 				}
-			} else if ("mMcClLzZ".indexOf(c) != -1) {
+			} else if ("mMcClLqQzZ".indexOf(c) != -1) {
 				addCurrentNumber(d, tokenList, numberStart, i);
 				tokenList.add(""+c);
 				numberStart = -1;
@@ -315,4 +319,6 @@ public abstract class SVGPathPrimitive {
 		Real2Array coordArray = getCoordArray();
 		return (coordArray) == null ? null : coordArray.getLastElement();
 	}
+
+	public abstract void operateOn(GeneralPath path2);
 }

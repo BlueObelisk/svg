@@ -1,6 +1,7 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.geom.GeneralPath;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -91,5 +92,30 @@ public class SVGPathTest {
 		Assert.assertEquals("format", "M219.758 604.535 L229.242 604.535", path.getDString().trim());
 	}
 
+	@Test
+	public void testPrimitives1() {
+		SVGPath svgPath = new SVGPath("M100 200L250,300");
+		List<SVGPathPrimitive> primitives = svgPath.ensurePrimitives();
+		Assert.assertEquals("prim", 2, primitives.size());
+		Assert.assertTrue("prim", primitives.get(0) instanceof MovePrimitive);
+		Assert.assertEquals("prim", 1, primitives.get(0).getCoordArray().size());
+		Assert.assertTrue("prim", primitives.get(1) instanceof LinePrimitive);
+		Assert.assertEquals("prim", 1, primitives.get(1).getCoordArray().size());
+	}
+	
+	@Test
+	public void testPrimitives2() {
+		SVGPath svgPath = new SVGPath("M100 200 L250,300 C100 290 240 110 400 230 Z");
+		List<SVGPathPrimitive> primitives = svgPath.ensurePrimitives();
+		Assert.assertEquals("prim", 4, primitives.size());
+		Assert.assertTrue("prim", primitives.get(0) instanceof MovePrimitive);
+		Assert.assertTrue("prim", primitives.get(1) instanceof LinePrimitive);
+		Assert.assertTrue("prim", primitives.get(2) instanceof CubicPrimitive);
+		Assert.assertEquals("prim", 3, primitives.get(2).getCoordArray().size());
+		Assert.assertTrue("prim", primitives.get(3) instanceof ClosePrimitive);
+		Assert.assertNull("prim", primitives.get(3).getCoordArray());
+
+	}
+	
 
 }

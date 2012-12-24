@@ -1,5 +1,7 @@
 package org.xmlcml.graphics.svg;
 
+import java.awt.geom.GeneralPath;
+
 public class UnknownPrimitive extends SVGPathPrimitive {
 
 	private String TAG = "?";
@@ -16,4 +18,10 @@ public class UnknownPrimitive extends SVGPathPrimitive {
 		return TAG;
 	}
 
+	@Override
+	public void operateOn(GeneralPath path) {
+		throw new RuntimeException("Cannot create path");
+	}
+
+	
 }
