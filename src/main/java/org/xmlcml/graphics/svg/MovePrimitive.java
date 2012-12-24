@@ -1,5 +1,7 @@
 package org.xmlcml.graphics.svg;
 
+import java.awt.geom.GeneralPath;
+
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 
@@ -16,6 +18,14 @@ public class MovePrimitive extends SVGPathPrimitive {
 		return TAG;
 	}
 	
+	@Override
+	public void operateOn(GeneralPath path) {
+		if (coordArray != null) {	
+			Real2 coord = coordArray.elementAt(0);
+			path.moveTo(coord.x, coord.y);
+		}
+	}
+
 	public String toString() {
 		return TAG + formatCoords(coordArray.get(0));
 	}

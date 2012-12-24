@@ -1,5 +1,7 @@
 package org.xmlcml.graphics.svg;
 
+import java.awt.geom.GeneralPath;
+
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 
@@ -20,4 +22,11 @@ public class LinePrimitive extends SVGPathPrimitive {
 		return TAG + formatCoords(coordArray.get(0));
 	}
 
+	@Override
+	public void operateOn(GeneralPath path) {
+		if (coordArray != null) {	
+			Real2 coord = coordArray.elementAt(0);
+			path.lineTo(coord.x, coord.y);
+		}
+	}
 }

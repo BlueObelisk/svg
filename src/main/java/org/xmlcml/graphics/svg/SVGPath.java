@@ -16,6 +16,7 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -27,7 +28,6 @@ import java.util.List;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
-import nu.xom.Nodes;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -167,7 +167,9 @@ public class SVGPath extends SVGElement {
 	}
 	
 	public void setDString(String d) {
-		this.addAttribute(new Attribute(D, d));
+		if (d != null) {
+			this.addAttribute(new Attribute(D, d));
+		}
 	}
 	
 	public String getDString() {
@@ -181,7 +183,10 @@ public class SVGPath extends SVGElement {
 //</g>
 	
 	protected void drawElement(Graphics2D g2d) {
-		GeneralPath path = createAndSetPath2D();
+		GeneralPath path = createPath2D();
+		Color stroke = g2d.getColor();
+//		g2d.setColor(this.getStroke());
+		g2d.setColor(Color.BLACK);
 		g2d.draw(path);
 	}
 
@@ -415,8 +420,10 @@ public class SVGPath extends SVGElement {
 		return 0.1;
 	}
 
+	@Deprecated
 	public GeneralPath createAndSetPath2D() {
 		String s = this.getDString().trim()+S_SPACE;
+		System.out.println(s);
 		path2 = new GeneralPath();
 		while (s.length() > 0) {
 			if (s.startsWith("M")) {
@@ -431,8 +438,17 @@ public class SVGPath extends SVGElement {
 				path2.closePath();
 				s = s.substring(1).trim();
 			} else {
-				throw new RuntimeException("Cannot create path: "+s.charAt(0));
+				throw new RuntimeException("Cannot create path: "+s);
 			}
+		}
+		return path2;
+	}
+	
+	public GeneralPath createPath2D() {
+		path2 = new GeneralPath();
+		ensurePrimitives();
+		for (SVGPathPrimitive pathPrimitive : primitiveList) {
+			pathPrimitive.operateOn(path2);
 		}
 		return path2;
 	}

@@ -1,5 +1,7 @@
 package org.xmlcml.graphics.svg;
 
+import java.awt.geom.GeneralPath;
+
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 
@@ -26,4 +28,14 @@ public class QuadPrimitive extends SVGPathPrimitive {
 		}
 		return s;
 	}
+	
+	@Override
+	public void operateOn(GeneralPath path) {
+		if (coordArray != null) {	
+			Real2 coord0 = coordArray.elementAt(0);
+			Real2 coord1 = coordArray.elementAt(1);
+			path.quadTo(coord0.x, coord0.y, coord1.x, coord1.y);
+		}
+	}
+
 }
