@@ -161,76 +161,76 @@ public abstract class SVGPathPrimitive {
 		}
 	}
 		
-	public static List<SVGPathPrimitive> parseD(String d) {
-		if (d == null) {
-			return null;
-		}
-		List<SVGPathPrimitive> primitiveList = new ArrayList<SVGPathPrimitive>();
-		d = d.trim();
-		int ii = 0;
-		StringBuilder dd = new StringBuilder(d);
-		Real2 lastXY = null;
-		while (ii < dd.length()) {
-			char cc = dd.charAt(ii);
-			Real2String r2s = null;
-			Real2 r2 = null;
-			SVGPathPrimitive pathPrimitive = null;
-			if (cc == ABS_MOVE || cc == REL_MOVE || cc == ABS_LINE || cc == REL_LINE ) {
-				ii++;
-				r2s = new Real2String(dd.substring(ii));
-				r2 = r2s.getReal2();
-				ii += r2s.idx;
-				if (cc == ABS_MOVE) {
-					pathPrimitive = new MovePrimitive(r2);
-					lastXY = r2;
-				} else if (cc == REL_MOVE) {
-					lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
-					pathPrimitive = new MovePrimitive(lastXY);
-				} else if (cc == ABS_LINE) {
-					pathPrimitive = new LinePrimitive(r2);
-					lastXY = r2;
-				} else if (cc == REL_LINE) {
-					lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
-					pathPrimitive = new LinePrimitive(lastXY);
-				}
-
-			} else if (cc == 'z' || cc == 'Z') {
-				ii++;
-				pathPrimitive = new ClosePrimitive();
-			} else if (cc == 'c' || cc == 'C') {
-				ii++;
-				Real2Array r2a = new Real2Array();
-				while (ii < dd.length()) {
-					char c = dd.charAt(ii);
-					if (Character.isLetter(c)) {
-						break;
-					} else {
-						r2s = new Real2String(dd.substring(ii));
-						r2 = r2s.getReal2();
-						r2a.add(r2);
-						ii += r2s.idx;
-						if (cc == 'C') {
-							lastXY = r2;
-						} else {
-							lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
-						}
-					}
-				}
-				pathPrimitive = new CubicPrimitive(r2a);
-			} else if (cc == 'H' || cc == 'l' ||
-					cc == 'V' || cc == 'v' ||
-					cc == 'S' || cc == 's' ||
-					cc == 'Q' || cc == 'q' ||
-					cc == 'T' || cc == 't' ||
-					cc == 'A' || cc == 'a') {
-				throw new RuntimeException("command ("+cc+") not yet implemented");
-			} else {
-				pathPrimitive = new UnknownPrimitive(cc);
-			}
-			primitiveList.add(pathPrimitive);
-		}
-		return primitiveList;
-	}
+//	public static List<SVGPathPrimitive> parseD(String d) {
+//		if (d == null) {
+//			return null;
+//		}
+//		List<SVGPathPrimitive> primitiveList = new ArrayList<SVGPathPrimitive>();
+//		d = d.trim();
+//		int ii = 0;
+//		StringBuilder dd = new StringBuilder(d);
+//		Real2 lastXY = null;
+//		while (ii < dd.length()) {
+//			char cc = dd.charAt(ii);
+//			Real2String r2s = null;
+//			Real2 r2 = null;
+//			SVGPathPrimitive pathPrimitive = null;
+//			if (cc == ABS_MOVE || cc == REL_MOVE || cc == ABS_LINE || cc == REL_LINE ) {
+//				ii++;
+//				r2s = new Real2String(dd.substring(ii));
+//				r2 = r2s.getReal2();
+//				ii += r2s.idx;
+//				if (cc == ABS_MOVE) {
+//					pathPrimitive = new MovePrimitive(r2);
+//					lastXY = r2;
+//				} else if (cc == REL_MOVE) {
+//					lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
+//					pathPrimitive = new MovePrimitive(lastXY);
+//				} else if (cc == ABS_LINE) {
+//					pathPrimitive = new LinePrimitive(r2);
+//					lastXY = r2;
+//				} else if (cc == REL_LINE) {
+//					lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
+//					pathPrimitive = new LinePrimitive(lastXY);
+//				}
+//
+//			} else if (cc == 'z' || cc == 'Z') {
+//				ii++;
+//				pathPrimitive = new ClosePrimitive();
+//			} else if (cc == 'c' || cc == 'C') {
+//				ii++;
+//				Real2Array r2a = new Real2Array();
+//				while (ii < dd.length()) {
+//					char c = dd.charAt(ii);
+//					if (Character.isLetter(c)) {
+//						break;
+//					} else {
+//						r2s = new Real2String(dd.substring(ii));
+//						r2 = r2s.getReal2();
+//						r2a.add(r2);
+//						ii += r2s.idx;
+//						if (cc == 'C') {
+//							lastXY = r2;
+//						} else {
+//							lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
+//						}
+//					}
+//				}
+//				pathPrimitive = new CubicPrimitive(r2a);
+//			} else if (cc == 'H' || cc == 'l' ||
+//					cc == 'V' || cc == 'v' ||
+//					cc == 'S' || cc == 's' ||
+//					cc == 'Q' || cc == 'q' ||
+//					cc == 'T' || cc == 't' ||
+//					cc == 'A' || cc == 'a') {
+//				throw new RuntimeException("command ("+cc+") not yet implemented");
+//			} else {
+//				pathPrimitive = new UnknownPrimitive(cc);
+//			}
+//			primitiveList.add(pathPrimitive);
+//		}
+//		return primitiveList;
+//	}
 	
 	public static String formatDString(String d, int places) {
 		List<SVGPathPrimitive> primitiveList = null;
@@ -248,7 +248,8 @@ public abstract class SVGPathPrimitive {
 	}
 	
 	public static String formatD(String d, int places) {
-		List<SVGPathPrimitive> primitiveList = SVGPathPrimitive.parseD(d);
+//		List<SVGPathPrimitive> primitiveList = SVGPathPrimitive.parseD(d);
+		List<SVGPathPrimitive> primitiveList = SVGPathPrimitive.parseDString(d);
 		for (SVGPathPrimitive primitive : primitiveList) {
 			primitive.format(places);
 		}
