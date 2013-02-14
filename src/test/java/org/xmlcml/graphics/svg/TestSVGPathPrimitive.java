@@ -22,15 +22,28 @@ public class TestSVGPathPrimitive {
 			" C331.779 214.634 331.609 214.794 331.39 214.914 C331.171 215.034 330.893 215.111 330.552 215.145" +
 			" C330.376 215.16 330 215.168 329.424 215.168 L328.176 215.168 L328.654 212.888";
 
+//	@Test
+//	public void testParseD() {
+//		List<SVGPathPrimitive> primitives = SVGPathPrimitive.parseD(dString);
+//		Assert.assertEquals("primitives", 31, primitives.size());
+//	}
+
 	@Test
-	public void testParseD() {
-		List<SVGPathPrimitive> primitives = SVGPathPrimitive.parseD(dString);
+	public void testParseDString() {
+		List<SVGPathPrimitive> primitives = SVGPathPrimitive.parseDString(dString);
 		Assert.assertEquals("primitives", 31, primitives.size());
 	}
 
+//	@Test
+//	public void testParseD1() {
+//		List<SVGPathPrimitive> primitiveList = SVGPathPrimitive.parseD(dString);
+//		String sig = SVGPathPrimitive.createSignature(primitiveList);
+//		Assert.assertEquals("signature", "MLLCCCLLLCCCCCCCLLLZMLCCCCCCCLL", sig);
+//	}
+
 	@Test
-	public void testParseD1() {
-		List<SVGPathPrimitive> primitiveList = SVGPathPrimitive.parseD(dString);
+	public void testParseDString1() {
+		List<SVGPathPrimitive> primitiveList = SVGPathPrimitive.parseDString(dString);
 		String sig = SVGPathPrimitive.createSignature(primitiveList);
 		Assert.assertEquals("signature", "MLLCCCLLLCCCCCCCLLLZMLCCCCCCCLL", sig);
 	}
@@ -40,11 +53,14 @@ public class TestSVGPathPrimitive {
 		String d = "M368.744 213.091 L368.943 212.146 L368.113 212.146 L367.915 213.091 L368.744 213.091 ZM367.532 218.898 L368.556 214.008 L367.722 214.008 L366.7 218.898 L367.532 218.898";
 		SVGPath path = new SVGPath();
 		path.setDString(d);
-		List<SVGPathPrimitive> primitives = SVGPathPrimitive.parseD(d);
+//		List<SVGPathPrimitive> primitives = SVGPathPrimitive.parseD(d);
+		List<SVGPathPrimitive> primitives = SVGPathPrimitive.parseDString(d);
 		Real2Array r2a = path.getCoords();
 		path.normalizeOrigin();
 		Assert.assertEquals("normalized path", 
-			"M2.043 0.945 L2.242 0.0 L1.413 0.0 L1.215 0.945 L2.043 0.945 ZM0.832 6.751 L1.855 1.861 L1.021 1.861 L0.0 6.751 L0.832 6.751",
+		    "M2.044 0.945 L2.242 0.0 L1.413 0.0 L1.215 0.945 L2.044 0.945 ZM0.831 6.752 L1.855 1.862 L1.021 1.862 L0.0 6.752 L0.831 6.752",
+//
+//			"M2.043 0.945 L2.242 0.0 L1.413 0.0 L1.215 0.945 L2.043 0.945 ZM0.832 6.751 L1.855 1.861 L1.021 1.861 L0.0 6.751 L0.832 6.751",
 			path.getDString().trim());
 	}
 }
