@@ -2,6 +2,9 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.geom.GeneralPath;
 
+import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Real2;
+
 public class UnknownPrimitive extends SVGPathPrimitive {
 
 	private String TAG = "?";
@@ -23,5 +26,22 @@ public class UnknownPrimitive extends SVGPathPrimitive {
 		throw new RuntimeException("Cannot create path");
 	}
 
-	
+	@Override
+	/**
+	 * @return null
+	 */
+	public Angle getAngle() {
+		return null;
+	}
+
+	@Override
+	/**
+	 * @return null
+	 *
+	 */
+	public Real2 getTranslation() {
+		return null;
+	}
+
+
 }

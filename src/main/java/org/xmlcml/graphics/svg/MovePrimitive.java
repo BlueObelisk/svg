@@ -2,6 +2,7 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.geom.GeneralPath;
 
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 
@@ -30,6 +31,12 @@ public class MovePrimitive extends SVGPathPrimitive {
 		return TAG + formatCoords(coordArray.get(0));
 	}
 	
-	
+	@Override
+	/**
+	 * @return null
+	 */
+	public Angle getAngle() {
+		return null;
+	}
 
 }

@@ -2,6 +2,7 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.geom.GeneralPath;
 
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 
 /**
@@ -28,4 +29,23 @@ public class ClosePrimitive extends SVGPathPrimitive {
 	public String toString() {
 		return TAG;
 	}
+	
+	@Override
+	/**
+	 * @return null
+	 */
+	public Angle getAngle() {
+		return null;
+	}
+
+	@Override
+	/**
+	 * @return null
+	 *
+	 */
+	public Real2 getTranslation() {
+		return null;
+	}
+
+
 }
