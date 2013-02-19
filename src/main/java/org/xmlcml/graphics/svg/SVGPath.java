@@ -219,7 +219,7 @@ public class SVGPath extends SVGElement {
 			} else if (primitive instanceof ClosePrimitive) {
 				isClosed = true;
 			} else {
-				Real2 r2 = primitive.getCoords();
+				Real2 r2 = primitive.getFirstCoord();
 				allCoords.add(r2);
 				firstCoords.add(primitive.getFirstCoord());
 			}
@@ -336,7 +336,7 @@ public class SVGPath extends SVGElement {
 			String ss = this.getDString().trim()+S_SPACE;
 			List<SVGPathPrimitive> primitives = this.createPathPrimitives();
 			for (SVGPathPrimitive primitive : primitives) {
-				Real2 coord = primitive.getCoords();
+				Real2 coord = primitive.getFirstCoord();
 				Real2Array coordArray = primitive.getCoordArray();
 				if (coord != null) {
 					coords.add(coord);

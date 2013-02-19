@@ -2,8 +2,10 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.geom.GeneralPath;
 
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.Vector2;
 
 public class QuadPrimitive extends SVGPathPrimitive {
 
@@ -37,5 +39,20 @@ public class QuadPrimitive extends SVGPathPrimitive {
 			path.quadTo(coord0.x, coord0.y, coord1.x, coord1.y);
 		}
 	}
+
+	@Override
+	/**
+	 * @return angle between start-control1 and control1-end
+	 */
+	public Angle getAngle() {
+		Angle angle = null;
+		if (zerothCoord != null) {
+			Vector2 vector0 = new Vector2(coordArray.elementAt(0).subtract(zerothCoord));
+			Vector2 vector1 = new Vector2(coordArray.elementAt(1).subtract(coordArray.elementAt(0)));
+			angle = vector1.getAngleMadeWith(vector0);
+		}
+		return angle;
+	}
+
 
 }

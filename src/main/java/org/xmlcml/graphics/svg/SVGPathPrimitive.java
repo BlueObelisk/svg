@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.RealArray;
@@ -30,6 +31,7 @@ public abstract class SVGPathPrimitive {
 	public static final char REL_CLOSE = 'z';
 	
 	protected Real2Array coordArray;
+	protected Real2 zerothCoord; // from preceding primitive
 	
 	public SVGPathPrimitive() {
 		
@@ -161,77 +163,6 @@ public abstract class SVGPathPrimitive {
 		}
 	}
 		
-//	public static List<SVGPathPrimitive> parseD(String d) {
-//		if (d == null) {
-//			return null;
-//		}
-//		List<SVGPathPrimitive> primitiveList = new ArrayList<SVGPathPrimitive>();
-//		d = d.trim();
-//		int ii = 0;
-//		StringBuilder dd = new StringBuilder(d);
-//		Real2 lastXY = null;
-//		while (ii < dd.length()) {
-//			char cc = dd.charAt(ii);
-//			Real2String r2s = null;
-//			Real2 r2 = null;
-//			SVGPathPrimitive pathPrimitive = null;
-//			if (cc == ABS_MOVE || cc == REL_MOVE || cc == ABS_LINE || cc == REL_LINE ) {
-//				ii++;
-//				r2s = new Real2String(dd.substring(ii));
-//				r2 = r2s.getReal2();
-//				ii += r2s.idx;
-//				if (cc == ABS_MOVE) {
-//					pathPrimitive = new MovePrimitive(r2);
-//					lastXY = r2;
-//				} else if (cc == REL_MOVE) {
-//					lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
-//					pathPrimitive = new MovePrimitive(lastXY);
-//				} else if (cc == ABS_LINE) {
-//					pathPrimitive = new LinePrimitive(r2);
-//					lastXY = r2;
-//				} else if (cc == REL_LINE) {
-//					lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
-//					pathPrimitive = new LinePrimitive(lastXY);
-//				}
-//
-//			} else if (cc == 'z' || cc == 'Z') {
-//				ii++;
-//				pathPrimitive = new ClosePrimitive();
-//			} else if (cc == 'c' || cc == 'C') {
-//				ii++;
-//				Real2Array r2a = new Real2Array();
-//				while (ii < dd.length()) {
-//					char c = dd.charAt(ii);
-//					if (Character.isLetter(c)) {
-//						break;
-//					} else {
-//						r2s = new Real2String(dd.substring(ii));
-//						r2 = r2s.getReal2();
-//						r2a.add(r2);
-//						ii += r2s.idx;
-//						if (cc == 'C') {
-//							lastXY = r2;
-//						} else {
-//							lastXY = (lastXY == null) ? r2 : lastXY.plus(r2);
-//						}
-//					}
-//				}
-//				pathPrimitive = new CubicPrimitive(r2a);
-//			} else if (cc == 'H' || cc == 'l' ||
-//					cc == 'V' || cc == 'v' ||
-//					cc == 'S' || cc == 's' ||
-//					cc == 'Q' || cc == 'q' ||
-//					cc == 'T' || cc == 't' ||
-//					cc == 'A' || cc == 'a') {
-//				throw new RuntimeException("command ("+cc+") not yet implemented");
-//			} else {
-//				pathPrimitive = new UnknownPrimitive(cc);
-//			}
-//			primitiveList.add(pathPrimitive);
-//		}
-//		return primitiveList;
-//	}
-	
 	public static String formatDString(String d, int places) {
 		List<SVGPathPrimitive> primitiveList = null;
 		try {
@@ -248,7 +179,6 @@ public abstract class SVGPathPrimitive {
 	}
 	
 	public static String formatD(String d, int places) {
-//		List<SVGPathPrimitive> primitiveList = SVGPathPrimitive.parseD(d);
 		List<SVGPathPrimitive> primitiveList = SVGPathPrimitive.parseDString(d);
 		for (SVGPathPrimitive primitive : primitiveList) {
 			primitive.format(places);
@@ -280,10 +210,6 @@ public abstract class SVGPathPrimitive {
 		}
 	}
 	
-	public Real2 getCoords() {
-		return coordArray == null ? null : coordArray.get(0);
-	}
-
 	public Real2Array getCoordArray() {
 		return coordArray;
 	}
@@ -303,23 +229,67 @@ public abstract class SVGPathPrimitive {
 		}
 	}
 
+	public Real2 getZerothCoord() {
+		return zerothCoord;
+	}
+
+	/** first coordinate in explicit coordinate array
+	 * thus "C110.88 263.1 110.64 262.8 110.7 262.44 " gives "110.88 263.1"
+	 * the zeroth coordinate will have been set by the preceding primitive
+	 * 
+	 * @return
+	 */
 	public Real2 getFirstCoord() {
-		Real2 coord = getCoords();
-		if (coord != null) {
-			return coord;
-		}
 		Real2Array coordArray = getCoordArray();
-		return (coordArray) == null ? null : coordArray.get(0);
+		return (coordArray  == null || coordArray.size() == 0) ? null : coordArray.get(0);
 	}
 	
 	public Real2 getLastCoord() {
-		Real2 coord = getCoords();
-		if (coord != null) {
-			return coord;
-		}
 		Real2Array coordArray = getCoordArray();
 		return (coordArray) == null ? null : coordArray.getLastElement();
 	}
 
 	public abstract void operateOn(GeneralPath path2);
+
+	/** the angle of change of direction (only for curves)
+	 * firstPoint must have been set with setFirstPoint()
+	 * @return change as Angle
+	 */
+	public abstract Angle getAngle();
+	
+	/** returns translation from first point to lastPoint
+	 * firstPoint must have been set with setFirstPoint()
+	 * @return translation
+	 *
+	 */
+	public Real2 getTranslation() {
+		Real2 trans = null;
+		if (zerothCoord != null && this.getLastCoord() != null) {
+			trans = this.getLastCoord().subtract(zerothCoord);
+		}
+		return trans;
+	}
+
+	/**
+	 * sets first points of primitives to last coord of precedingPrimitive
+	 * if last primitive (j) is Z, set firstCoord of primitive(0) to lastCoord of primitive(j-1) 
+	 * @param primitiveList
+	 */
+	public static void setFirstPoints(List<SVGPathPrimitive> primitiveList) {
+		if (primitiveList != null) {
+			int nprim = primitiveList.size();
+			for (int i = 1; i < nprim; i++) {
+				primitiveList.get(i).setFirstPoint(primitiveList.get(i-1).getLastCoord());
+			}
+			if (primitiveList.get(nprim-1) instanceof ClosePrimitive) {
+				if (nprim > 1) {
+					primitiveList.get(0).setFirstPoint(primitiveList.get(nprim-2).getLastCoord());
+				}
+			}
+		}
+	}
+
+	private void setFirstPoint(Real2 lastPoint) {
+		this.zerothCoord = lastPoint;
+	}
 }

@@ -2,8 +2,10 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.geom.GeneralPath;
 
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.Vector2;
 
 public class CubicPrimitive extends SVGPathPrimitive {
 
@@ -38,4 +40,19 @@ public class CubicPrimitive extends SVGPathPrimitive {
 		}
 		return s;
 	}
+	
+	@Override
+	/**
+	 * @return angle between start-control1 and control1-end
+	 */
+	public Angle getAngle() {
+		Angle angle = null;
+		if (zerothCoord != null) {
+			Vector2 vector01 = new Vector2(coordArray.elementAt(0).subtract(zerothCoord));
+			Vector2 vector12 = new Vector2(coordArray.elementAt(2).subtract(coordArray.elementAt(1)));
+			angle = vector12.getAngleMadeWith(vector01);
+		}
+		return angle;
+	}
+	
 }
