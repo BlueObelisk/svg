@@ -18,8 +18,10 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -153,6 +155,26 @@ public class SVGElement extends GraphicsElement {
 		}
         return newElement;
 		
+	}
+	
+	/** converts a SVG file to SVGElement
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static SVGElement readAndCreateSVG(File file) {
+		Element element = CMLUtil.parseQuietlyToDocument(file).getRootElement();
+		return (element == null) ? null : (SVGElement) readAndCreateSVG(element);
+	}
+	
+	/** converts a SVG file to SVGElement
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static SVGElement readAndCreateSVG(InputStream is) {
+		Element element = CMLUtil.parseQuietlyToDocument(is).getRootElement();
+		return (element == null) ? null : (SVGElement) readAndCreateSVG(element);
 	}
 	
 	protected static void createSubclassedChildren(Element oldElement, SVGElement newElement) {
