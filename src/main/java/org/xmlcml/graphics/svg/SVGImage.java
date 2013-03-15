@@ -30,6 +30,7 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 
+import org.apache.log4j.Logger;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
@@ -42,6 +43,8 @@ import org.xmlcml.euclid.Transform2;
  */
 public class SVGImage extends SVGElement {
 
+	private final static Logger LOG = Logger.getLogger(SVGImage.class);
+	
 	private static final String DATA = "data";
 	private static final String BASE64 = "base64";
 	public static final String IMAGE_PNG = "image/png";
@@ -100,8 +103,9 @@ public class SVGImage extends SVGElement {
 		return TAG;
 	}
 
-	/** extent of text
-	 * defined as the point origin (i.e. does not include font)
+	/**
+	 * we have to apply transformations HERE as the actual display image is transformed
+	 * by the viewer.  
 	 * @return
 	 */
 	public Real2Range getBoundingBox() {
@@ -110,6 +114,12 @@ public class SVGImage extends SVGElement {
 			Double width = getWidth();
 			Double height = getHeight();
 			boundingBox = new Real2Range(xy, xy.plus(new Real2(width, height)));
+			LOG.trace("BB0 "+boundingBox);
+			Transform2 t2 = this.getTransform2FromAttribute();
+			LOG.trace("T "+t2);
+			boundingBox = boundingBox.getTranformedRange(t2);
+			LOG.trace("BB1 "+boundingBox);
+			this.setBoundingBoxAttribute(3);
 		}
 		return boundingBox;
 	}
