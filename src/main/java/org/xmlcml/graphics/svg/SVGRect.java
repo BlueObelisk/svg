@@ -24,7 +24,6 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 
@@ -102,7 +101,9 @@ public class SVGRect extends SVGElement {
 		SVGRect rect = null;
 		if (r2r != null) {
 			Real2[] corners = r2r.getCorners();
-			rect = new SVGRect(corners[0], corners[1]);
+			if (corners != null && corners.length == 2) {
+				rect = new SVGRect(corners[0], corners[1]);
+			}
 		}
 		return rect;
 	}
@@ -120,9 +121,22 @@ public class SVGRect extends SVGElement {
 //  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="white" style="stroke-width:0.12;"/>
 //</g>
 	
+	@Deprecated //"use createFromReal2Range which deals with nulls"
 	public SVGRect(Real2Range bbox) {
 		this(bbox.getXRange().getMin(), bbox.getYRange().getMin(), bbox.getXRange().getRange(), bbox.getYRange().getRange());
 	}
+	
+//	public static SVGRect createSVGRect(Real2Range bbox) {
+//		SVGRect rect = null;
+//		if (bbox != null) {
+//			RealRange xRange = bbox.getXRange();
+//			RealRange yRange = bbox.getYRange();
+//			if (xRange != null && yRange != null) {
+//				rect = new SVGRect(xRange.getMin(), yRange.getMin(), xRange.getRange(), yRange.getRange());
+//			}
+//		}
+//		return rect;
+//	}
 
 	protected void drawElement(Graphics2D g2d) {
 		double x1 = this.getDouble("x");
