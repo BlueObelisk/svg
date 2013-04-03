@@ -238,6 +238,8 @@ public class SVGText extends SVGElement {
 				node.detach();
 			} else if (node instanceof SVGTSpan) {
 				// expected child
+			} else if (node instanceof SVGTitle) {
+				// expected child
 			} else {
 				LOG.debug("unexpected child of SVGText: "+node.getClass());
 			}

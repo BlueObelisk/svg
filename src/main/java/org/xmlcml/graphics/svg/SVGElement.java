@@ -18,10 +18,12 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +38,7 @@ import nu.xom.Nodes;
 import nu.xom.ParentNode;
 import nu.xom.ProcessingInstruction;
 import nu.xom.Text;
+import nu.xom.canonical.Canonicalizer;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.cml.base.CMLConstants;
@@ -76,7 +79,7 @@ public class SVGElement extends GraphicsElement {
 	public final static String TITLE = "title";
 	public final static String ID = "id";
 
-	private static final String BOUNDING_BOX = "boundingBox";
+	protected static final String BOUNDING_BOX = "boundingBox";
 	
 	private Element userElement;
 	private String strokeSave;
@@ -196,6 +199,27 @@ public class SVGElement extends GraphicsElement {
 				newElement.appendChild(newNode);
 			}
 		}
+	}
+	
+	public boolean isEqualTo(SVGElement element) {
+		boolean equals = false;
+		if (element.getClass().equals(this.getClass())) {
+			CMLUtil.equalsCanonically(element, this, true);
+		}
+		return equals;
+	}
+	
+	public String getCanonicalizedXML() {
+		OutputStream out = new ByteArrayOutputStream();
+		Canonicalizer canonicalizer = new Canonicalizer(out, false);
+		String s = null;
+		try {
+			canonicalizer.write(this);
+			s = out.toString();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return s;
 	}
 	
 	/**
