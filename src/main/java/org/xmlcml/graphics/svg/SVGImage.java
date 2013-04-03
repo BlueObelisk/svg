@@ -32,6 +32,7 @@ import nu.xom.Node;
 
 import org.apache.log4j.Logger;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.xmlcml.cml.base.CMLElement;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
@@ -123,6 +124,15 @@ public class SVGImage extends SVGElement {
 		}
 		return boundingBox;
 	}
+	
+	public void setBoundingBoxAttribute(Integer decimalPlaces) {
+		if (boundingBox != null) {
+			if (decimalPlaces != null) {
+				boundingBox.format(decimalPlaces);
+			}
+			CMLElement.addCMLXAttribute(this, BOUNDING_BOX, boundingBox.toString());
+		}
+	}
 
 	/** property of graphic bounding box
 	 * can be overridden
@@ -204,6 +214,11 @@ public class SVGImage extends SVGElement {
 		String attValue = DATA+":"+mimeType+";"+BASE64+","+base64;
 		this.addAttribute(new Attribute(XLINK_PREF+":"+HREF, XLINK_NS, attValue));
 	}
+	
+	public String getImageValue() {
+		return this.getAttributeValue(XLINK_PREF+":"+HREF, XLINK_NS);
+	}
+	
 	
 	/** makes a new list composed of the images in the list
 	 * 
