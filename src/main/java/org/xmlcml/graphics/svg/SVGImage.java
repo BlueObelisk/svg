@@ -215,8 +215,14 @@ public class SVGImage extends SVGElement {
 		this.addAttribute(new Attribute(XLINK_PREF+":"+HREF, XLINK_NS, attValue));
 	}
 	
+	/*
+	 * <image transform="matrix(0.06781766590473381,-0.0,-0.0,0.0678967742330725,33.93199920654297,33.12698745727539)"
+	 *  x="0.0" y="0.0" width="702.0" height="310.0" xlink:href="data:image/png;base64,iVBORw0KGgoAAAA..."
+	 * xmlns:xlink="http://www.w3.org/1999/xlink"/>
+	 */
 	public String getImageValue() {
-		return this.getAttributeValue(XLINK_PREF+":"+HREF, XLINK_NS);
+		String value = this.getAttributeValue(HREF, XLINK_NS);
+		return value;
 	}
 	
 	
