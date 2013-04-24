@@ -186,7 +186,9 @@ public class SVGElement extends GraphicsElement {
 				Node node = oldElement.getChild(i);
 				Node newNode = null;
 				if (node instanceof Text) {
-					newNode = new Text(node.getValue());
+					String value = node.getValue();
+//					LOG.debug(value+"/"+(int)value.charAt(0));
+					newNode = new Text(value);
 				} else if (node instanceof Comment) {
 					newNode = new Comment(node.getValue());
 				} else if (node instanceof ProcessingInstruction) {
