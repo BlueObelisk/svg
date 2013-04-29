@@ -17,12 +17,15 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -57,6 +60,7 @@ public class SVGImage extends SVGElement {
 	private static final String HREF = "href";
 	private static final String XLINK_NS = "http://www.w3.org/1999/xlink";
 	public final static String TAG ="image";
+	static Pattern IMG_SRC= Pattern.compile("data:(image/.*);base64,(.*)");
 	
 	private static Map<String, String> mimeType2ImageTypeMap;
 	static {
@@ -189,9 +193,9 @@ public class SVGImage extends SVGElement {
 			 preserveAspectRatio="none" stroke-width="0" xmlns:xlink="http://www.w3.org/1999/xlink"/>
     */
 	
-	public void readImageData(BufferedImage bufferedImage, String mimeType) {
-		String type = mimeType2ImageTypeMap.get(mimeType);
-		if (type == null) {
+	public String readImageDataIntoSrcValue(BufferedImage bufferedImage, String mimeType) {
+		String imageType = mimeType2ImageTypeMap.get(mimeType);
+		if (imageType == null) {
 			throw new RuntimeException("Cannot convert mimeType: "+mimeType);
 		}
 		double x = bufferedImage.getMinX();
@@ -203,16 +207,48 @@ public class SVGImage extends SVGElement {
 		this.setWidth(width);
 		this.setHeight(height);
 		
+		String base64 = convertBufferedImageToBase64(bufferedImage, imageType);
+		String attValue = DATA+":"+mimeType+";"+BASE64+","+base64;
+		this.addAttribute(new Attribute(XLINK_PREF+":"+HREF, XLINK_NS, attValue));
+		return attValue;
+	}
+
+	public static String convertBufferedImageToBase64(BufferedImage bufferedImage, String imageType) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
-			ImageIO.write(bufferedImage, type, baos);
+			ImageIO.write(bufferedImage, imageType, baos);
 		} catch (IOException e) {
 			throw new RuntimeException("Cannot read image", e);
 		}
 		byte[] byteArray = baos.toByteArray();
 		String base64 = Base64.encode(byteArray);
-		String attValue = DATA+":"+mimeType+";"+BASE64+","+base64;
-		this.addAttribute(new Attribute(XLINK_PREF+":"+HREF, XLINK_NS, attValue));
+		return base64;
+	}
+	
+	public static BufferedImage readSrcDataToBufferedImage(String srcValue) {
+//		src="data:image/png;base64,iVBORw0KGgoA..."
+		Matcher matcher = IMG_SRC.matcher(srcValue);
+		String mimeType = null;
+		String srcBase64 = null;
+		if (matcher.matches()) {
+			mimeType = matcher.group(1);
+			srcBase64 = matcher.group(2);
+			LOG.debug("base64 "+srcBase64.length());
+		} else {
+			throw new RuntimeException("Cannot convert img/src");
+		}
+
+		byte[] byteArray = Base64.decode(srcBase64);
+		LOG.debug("bytes "+byteArray.length);
+		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+		BufferedImage bufferedImage = null;
+		try {
+			bufferedImage = ImageIO.read(bais);
+			LOG.debug(bufferedImage);
+		} catch (IOException e) {
+			throw new RuntimeException("Cannot read base64 image", e);
+		}
+		return bufferedImage;
 	}
 	
 	/*
@@ -240,5 +276,5 @@ public class SVGImage extends SVGElement {
 		}
 		return imageList;
 	}
-	
+
 }
