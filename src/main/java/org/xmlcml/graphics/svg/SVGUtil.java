@@ -213,7 +213,7 @@ public class SVGUtil {
 		}
 	}
 	
-	public static Real2Range createBoundingBox(List<SVGElement> elementList) {
+	public static Real2Range createBoundingBox(List<? extends SVGElement> elementList) {
 		Real2Range r2r = null;
 		if (elementList != null && elementList.size() > 0) {
 			r2r = elementList.get(0).getBoundingBox();
@@ -224,4 +224,59 @@ public class SVGUtil {
 		return r2r;
 	}
 	
+	/** crude quick method to create list of non-Overlapping BoundingBoxes
+	 * use only for small number of paths
+	 * will only work if paths a
+	 * @return
+	 */
+	public static List<Real2Range> createNonOverlappingBoundingBoxList(List<? extends SVGElement> svgElementList) {
+		List<Real2Range> bboxList = new ArrayList<Real2Range>();
+		for (SVGElement element : svgElementList) {
+			Real2Range bbox = element.getBoundingBox();
+			if (bboxList.size() == 0) {
+				bboxList.add(bbox);
+			} else {
+				for (int i = 0; i < bboxList.size(); i++) {
+					Real2Range bbox1 = bboxList.get(i);
+					// merge into existing box
+					if (bbox.intersectionWith(bbox1) != null) {
+						bbox1 = bbox1.plus(bbox); 
+						bboxList.set(i, bbox1);
+						bbox = null;
+					}
+				}
+				if (bbox != null) {
+					bboxList.add(bbox);
+				}
+			}
+		}
+		contractOverLappingBoxes(bboxList);
+		return bboxList;
+	}
+
+	private static void contractOverLappingBoxes(List<Real2Range> bboxList) {
+		while (true) {
+			Real2Range bboxi = null;
+			int detach = -1;
+			outer:
+			for (int i = 1; i < bboxList.size(); i++) {
+				bboxi = bboxList.get(i);
+				for (int j = 0; j < i; j++) {
+					Real2Range bboxj = bboxList.get(j);
+					// merge into existing box
+					if (bboxi.intersectionWith(bboxj) != null) {
+						bboxj = bboxj.plus(bboxi); 
+						bboxList.set(j, bboxj);
+						detach = i;
+						break outer;
+					}
+				}
+			}
+			if (detach >= 0) {
+				bboxList.remove(detach);
+			} else {
+				break;
+			}
+		}
+	}
 }
