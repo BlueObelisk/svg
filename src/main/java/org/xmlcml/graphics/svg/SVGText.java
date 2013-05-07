@@ -18,6 +18,7 @@ import org.xmlcml.euclid.EuclidConstants;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Util;
@@ -740,4 +741,5 @@ public class SVGText extends SVGElement {
 		}
 		return s;
 	}
+
 }

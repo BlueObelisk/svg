@@ -50,6 +50,8 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealArray;
 import org.xmlcml.euclid.RealRange;
+import org.xmlcml.euclid.RealRange.Direction;
+import org.xmlcml.euclid.RealRangeArray;
 import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
 
@@ -1120,4 +1122,121 @@ public class SVGElement extends GraphicsElement {
 		Real2Range elementBox = (element == null) ? null : element.getBoundingBox();
 		return thisBbox != null && thisBbox.includes(elementBox);
 	}
+
+	public boolean isIncludedBy(RealRangeArray mask, Direction direction) {
+		Real2Range bbox = this.getBoundingBox();
+		RealRange range = Direction.HORIZONTAL.equals(direction) ? bbox.getXRange() : bbox.getYRange();
+		return mask.includes(range);
+	}
+
+	public boolean isIncludedBy(RealRange mask, Direction direction) {
+		Real2Range bbox = this.getBoundingBox();
+		RealRange range = Direction.HORIZONTAL.equals(direction) ? bbox.getXRange() : bbox.getYRange();
+		return mask.includes(range);
+	}
+
+	/** elements filtered by yrange
+	 * 
+	 * @param textList
+	 * @param yrange
+	 * @return
+	 */
+	public static List<? extends SVGElement> getElementListFilteredByRange(
+			List<? extends SVGElement> elemList, RealRange range, RealRange.Direction dir) {
+		List<SVGElement> elemList0 = new ArrayList<SVGElement>();
+		for (SVGElement elem : elemList) {
+			RealRange range0 = getRange(elem, dir);
+			if (range.includes(range0)) {
+				elemList0.add(elem);
+			}
+		}
+		return elemList0;
+	}
+
+	private static RealRange getRange(SVGElement elem, RealRange.Direction dir) {
+		Real2Range bbox = elem.getBoundingBox();
+		RealRange range = (RealRange.Direction.HORIZONTAL.equals(dir)) ? 
+				bbox.getXRange() : bbox.getYRange();
+		return range;
+	}
+
+	public static RealRangeArray getRealRangeArray(List<? extends SVGElement> elementList, RealRange.Direction dir) {
+//		List<? extends SVGElement> elementList0 = getElementListFilteredByRange(elementList, dir);
+		RealRangeArray realRangeArray = new RealRangeArray();
+		for (SVGElement element : elementList) {
+			RealRange range = getRange(element, dir);
+			realRangeArray.add(range);
+		}
+		return realRangeArray;
+	}
+	
+	/** returns elements which are included in mask
+	 * 
+	 * @param elementList
+	 * @param direction
+	 * @param mask
+	 * @return
+	 */
+	public static List<? extends SVGElement> filter(List<? extends SVGElement> elementList, Direction direction, RealRangeArray mask) {
+		List<SVGElement> eList = new ArrayList<SVGElement>();
+		for (SVGElement element : elementList) {
+			if (element.isIncludedBy(mask, direction)) {
+				eList.add(element);
+			}
+		}
+		return eList;
+	}
+
+	public static List<? extends SVGElement> filterHorizontally(List<? extends SVGElement> elementList, RealRangeArray horizontalMask) {
+		return filter(elementList, Direction.HORIZONTAL, horizontalMask);
+	}
+	
+	public static List<? extends SVGElement> filterVertically(List<? extends SVGElement> elementList, RealRangeArray verticalMask) {
+		return filter(elementList, Direction.VERTICAL, verticalMask);
+	}
+	
+	/**
+	 * Creates a mask (list of RealRanges) that mirror the elements added
+	 * Example
+	 *   SVGRect(new Real2(0., 10.), new Real2(30., 40.) 
+	 *   SVGRect(new Real2(40., 10.), new Real2(50., 40.) 
+	 *   SVGRect(new Real2(45., 10.), new Real2(55., 40.) 
+	 *   creates a horizontal mask RealRange(0., 30.),  RealRange(40., 55.),
+	 * @param elementList elements to create mask
+	 * @return RealRange array corresponding to (overlapped) ranges of elements
+	 */
+	public static RealRangeArray createMask(List<? extends SVGElement> elementList, Direction direction) {
+		RealRangeArray realRangeArray = new RealRangeArray();
+		for (SVGElement element : elementList) {
+			Real2Range bbox = element.getBoundingBox();
+			realRangeArray.add((Direction.HORIZONTAL.equals(direction) ? bbox.getXRange() : bbox.getYRange()));
+		}
+		realRangeArray.sortAndRemoveOverlapping();
+		return realRangeArray;
+	}
+
+	public static RealRangeArray createMask(List<SVGElement> elementList, Direction direction, double tolerance) {
+			RealRangeArray realRangeArray = new RealRangeArray();
+			for (SVGElement element : elementList) {
+				Real2Range bbox = element.getBoundingBox();
+				RealRange range = (Direction.HORIZONTAL.equals(direction) ? bbox.getXRange() : bbox.getYRange());
+				range.extendBothEndsBy(tolerance);
+				realRangeArray.add((Direction.HORIZONTAL.equals(direction) ? bbox.getXRange() : bbox.getYRange()));
+			}
+			realRangeArray.sortAndRemoveOverlapping();
+			return realRangeArray;
+	}
+	
+	public final static Real2Range createBoundingBox(List<? extends SVGElement> elementList) {
+		Real2Range bbox = null;
+		if (elementList != null && elementList.size() > 0) {
+			bbox = new Real2Range(elementList.get(0).getBoundingBox());
+			for (int i = 1; i < elementList.size(); i++) {
+				SVGElement element = elementList.get(i);
+				bbox = bbox.plus(element.getBoundingBox());
+			}
+		}
+		return bbox;
+	}
+
 }

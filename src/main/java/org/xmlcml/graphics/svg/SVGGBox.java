@@ -54,7 +54,6 @@ public class SVGGBox extends SVGG {
 			for (int i = 0; i < childSVGs.size(); i++) {
 				SVGGBox childBox = createSVGGBox((SVGG)childSVGs.get(i));
 				if (lastBox != null) {
-//					lastBox.debug("RRXXX");
 					SVGRect rect = lastBox.getRect();
 					LOG.trace("RECT "+rect);
 					Transform2 t2 = lastBox.getTransform2FromAttribute();
