@@ -1238,5 +1238,12 @@ public class SVGElement extends GraphicsElement {
 		}
 		return bbox;
 	}
+	
+
+	public RealRange getRealRange(Direction direction) {
+		Real2Range bbox = this.getBoundingBox();
+		return bbox == null ? null : bbox.getRealRange(direction);
+	}
+
 
 }

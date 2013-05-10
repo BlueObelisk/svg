@@ -56,6 +56,8 @@ public class SVGPath extends SVGElement {
 	public final static String TAG ="path";
 	private static final double EPS1 = 0.000001;
 	private static final double MIN_COORD = .00001;
+	public final static String ALL_PATH_XPATH = "//svg:path";
+	
 	private GeneralPath path2;
 	private boolean isClosed = false;
 	private Real2Array coords = null; // for diagnostics
@@ -637,7 +639,16 @@ public class SVGPath extends SVGElement {
 		}
 		return pathList;
 	}
-	
+
+	/** convenience method to extract list of svgPaths in element
+	 * 
+	 * @param svgElement
+	 * @return
+	 */
+	public static List<SVGPath> extractPaths(SVGElement svgElement) {
+		return SVGPath.extractPaths(SVGUtil.getQuerySVGElements(svgElement, ALL_PATH_XPATH));
+	}
+
 
 }
 //class Real2String {
