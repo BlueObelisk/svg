@@ -45,7 +45,9 @@ public class SVGText extends SVGElement {
     
     public final static Double DEFAULT_FONT_WIDTH_FACTOR = 10.0;
     public final static Double MIN_WIDTH = 0.001; // useful for non printing characters
-    
+
+	public final static String ALL_TEXT_XPATH = "//svg:text";
+
 	// these are all when text is used for concatenation, etc.
 	private double estimatedHorizontallength = Double.NaN; 
 	private double currentFontSize = Double.NaN;
@@ -673,6 +675,16 @@ public class SVGText extends SVGElement {
 		}
 		return textList;
 	}
+	
+	/** convenience method to extract list of svgPaths in element
+	 * 
+	 * @param svgElement
+	 * @return
+	 */
+	public static List<SVGText> extractTexts(SVGElement svgElement) {
+		return SVGText.extractTexts(SVGUtil.getQuerySVGElements(svgElement, ALL_TEXT_XPATH));
+	}
+
 	/** special routine to make sure characters are correctly oriented
 	 * 
 	 */
