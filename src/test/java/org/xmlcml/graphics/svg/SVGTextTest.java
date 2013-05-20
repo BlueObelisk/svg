@@ -475,19 +475,19 @@ public class SVGTextTest {
 		svg.appendChild(text.copy());
 		text.setText(".__pi4");
 		rotateText(text, new Angle(Math.PI/4.));
-		LOG.debug("Transform: "+text.toXML());
+		LOG.trace("Transform: "+text.toXML());
 		svg.appendChild(text.copy());
 		text.setText(".__pi2");
 		rotateText(text, new Angle(Math.PI/2.));
-		LOG.debug("Transform: "+text.toXML());
+		LOG.trace("Transform: "+text.toXML());
 		svg.appendChild(text.copy());
 		text.setText(".__3pi4");
 		rotateText(text, new Angle(3.*Math.PI/4.));
-		LOG.debug("Transform: "+text.toXML());
+		LOG.trace("Transform: "+text.toXML());
 		svg.appendChild(text.copy());
 		text.setText(".__pi");
 		rotateText(text, new Angle(Math.PI));
-		LOG.debug("Transform: "+text.toXML());
+		LOG.trace("Transform: "+text.toXML());
 		svg.appendChild(text.copy());
 		CMLUtil.outputQuietly(svg, new File("target/text3.svg"), 1);
 	}
