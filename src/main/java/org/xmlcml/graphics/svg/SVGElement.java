@@ -1043,7 +1043,7 @@ public class SVGElement extends GraphicsElement {
 	public static SVGRect drawBox(Real2Range box, SVGElement svgParent,
 			String stroke, String fill, double strokeWidth, double opacity) {
 		SVGRect svgBox = createGraphicalBox(box, stroke, fill, strokeWidth, opacity);
-		if (svgBox != null) {
+		if (svgBox != null && svgParent != null) {
 			svgParent.appendChild(svgBox);
 		}
 		return svgBox;

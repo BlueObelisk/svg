@@ -129,6 +129,14 @@ public class SVGG extends SVGElement {
 		return gList;
 	}
 
+	public void copyElementsFrom(List<? extends SVGElement> elementList) {
+		if (elementList != null) {
+			for (SVGElement element : elementList) {
+				this.appendChild(SVGElement.readAndCreateSVG(element));
+			}
+		}
+	}
+
 
 
 }

@@ -28,7 +28,7 @@ public class SVGImageTest {
 		BufferedImage bufferedImage = ImageIO.read(pngFile);
 		SVGImage svgImage = new SVGImage();
 		svgImage.readImageDataIntoSrcValue(bufferedImage, SVGImage.IMAGE_PNG);
-		svgImage.debug("IMG");
+//		svgImage.debug("IMG");
 	}
 
 	@Test
