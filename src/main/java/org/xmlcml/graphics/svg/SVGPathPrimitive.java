@@ -143,6 +143,8 @@ public abstract class SVGPathPrimitive {
 				if (numberStart == -1) {
 					numberStart = i;
 				}
+			} else if ("EeDd".indexOf(c) != -1) {  // floats
+				LOG.trace("processed E-notation");
 			} else if ("mMcClLqQzZ".indexOf(c) != -1) {
 				addCurrentNumber(d, tokenList, numberStart, i);
 				tokenList.add(""+c);
