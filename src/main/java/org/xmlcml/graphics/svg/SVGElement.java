@@ -159,7 +159,6 @@ public class SVGElement extends GraphicsElement {
 	        createSubclassedChildren(element, newElement);
 		}
         return newElement;
-		
 	}
 	
 	/** converts a SVG file to SVGElement
