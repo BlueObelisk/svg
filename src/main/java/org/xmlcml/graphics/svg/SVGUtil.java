@@ -12,6 +12,7 @@ import nu.xom.Node;
 import nu.xom.Nodes;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
@@ -277,6 +278,21 @@ public class SVGUtil {
 			} else {
 				break;
 			}
+		}
+	}
+
+	public final static String SVGX_NS = "http://www.xml-cml.org/schema/svgx";
+	public final static String SVGX_PREFIX = "svgx";
+
+	public static String getSVGXAttribute(SVGElement svgElement, String attName) {
+		Attribute attribute = svgElement.getAttribute(attName, SVGX_NS);
+		return (attribute == null) ? null : attribute.getValue();
+	}
+
+	public static void setSVGXAttribute(SVGElement svgElement, String attName, String value) {
+		if (attName != null && value != null) {
+			Attribute attribute = new Attribute(SVGX_PREFIX+CMLConstants.S_COLON+attName, SVGX_NS, value);
+			svgElement.addAttribute(attribute);
 		}
 	}
 }

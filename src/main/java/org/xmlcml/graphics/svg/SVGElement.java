@@ -897,12 +897,14 @@ public class SVGElement extends GraphicsElement {
 		setY(xy.getY());
 	}
 	
-	public double getWidth() {
-		return new Double(this.getAttributeValue("width")).doubleValue();
+	public Double getWidth() {
+		String w = this.getAttributeValue("width");
+		return (w == null) ? null : new Double(w);
 	}
 	
-	public double getHeight() {
-		return new Double(this.getAttributeValue("height")).doubleValue();
+	public Double getHeight() {
+		String h = this.getAttributeValue("height");
+		return (h == null) ? null : new Double(h);
 	}
 
 	public void setWidth(double w) {

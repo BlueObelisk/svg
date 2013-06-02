@@ -33,6 +33,8 @@ import org.xmlcml.euclid.Vector2;
  *
  */
 public class SVGText extends SVGElement {
+
+
 	private static Logger LOG = Logger.getLogger(SVGText.class);
 	
 
@@ -47,6 +49,12 @@ public class SVGText extends SVGElement {
     public final static Double MIN_WIDTH = 0.001; // useful for non printing characters
 
 	public final static String ALL_TEXT_XPATH = "//svg:text";
+
+
+	private static final String BOLD = "bold";
+	private static final String ITALIC = "italic";
+
+	public static final String FONT_NAME = "fontName";
 
 	// these are all when text is used for concatenation, etc.
 	private double estimatedHorizontallength = Double.NaN; 
@@ -739,6 +747,25 @@ public class SVGText extends SVGElement {
 			f = fs.toString();
 		}
 		return f;
+	}
+	
+	public boolean isBold() {
+		String fontWeight = this.getFontWeight();
+		return SVGText.BOLD.equalsIgnoreCase(fontWeight);
+	}
+	
+	public boolean isItalic() {
+		String fontStyle = this.getFontStyle();
+		return SVGText.ITALIC.equalsIgnoreCase(fontStyle);
+	}
+
+	/** normally only present when added by PDF2SVG
+	 * of form svgx:fontName="ABCDEF+FOOBar"
+	 * @return name (or null)
+	 */
+	public String getSVGXFontName() {
+		String fontName = SVGUtil.getSVGXAttribute(this, FONT_NAME);
+		return fontName; 
 	}
 	
 	public String getString() {
