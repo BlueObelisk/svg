@@ -55,6 +55,7 @@ public class SVGText extends SVGElement {
 	private static final String ITALIC = "italic";
 
 	public static final String FONT_NAME = "fontName";
+	public static final String WIDTH = "width";
 
 	// these are all when text is used for concatenation, etc.
 	private double estimatedHorizontallength = Double.NaN; 
@@ -766,6 +767,16 @@ public class SVGText extends SVGElement {
 	public String getSVGXFontName() {
 		String fontName = SVGUtil.getSVGXAttribute(this, FONT_NAME);
 		return fontName; 
+	}
+	
+	/** normally only present when added by PDF2SVG
+	 * of form svgx:width="234.0"
+	 * distinguish from getWidth which uses "width" attribute and is probably wrong for SVGText
+	 * @return width (or null)
+	 */
+	public Double getSVGXFontWidth() {
+		String width = SVGUtil.getSVGXAttribute(this, WIDTH);
+		return width == null ? null : new Double(width); 
 	}
 	
 	public String getString() {
