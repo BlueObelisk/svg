@@ -163,6 +163,7 @@ public class SVGText extends SVGElement {
     }
     
 	protected void drawElement(Graphics2D g2d) {
+		ensureCumulativeTransform();
 		double fontSize = this.getFontSize();
 		fontSize *= cumulativeTransform.getMatrixAsArray()[0] * 0.3;
 		fontSize = (fontSize < 8) ? 8 : fontSize;
@@ -493,8 +494,6 @@ public class SVGText extends SVGElement {
 		// TODO update for different orientation
 		double coordHoriz0 = (rotate0 == null) ? xy0.getX() : xy0.getY();
 		double coordHoriz1 = (rotate1 == null) ? xy1.getX() : xy1.getY();
-//		double coordHoriz1 = xy1.getX();
-//		double coordVert0 = xy0.getY();
 		double coordVert0 = this.getCurrentBaseY();
 		double coordVert1 = (rotate1 == null) ? xy1.getY() : xy1.getX();
 		double deltaVert = coordVert0 - coordVert1;

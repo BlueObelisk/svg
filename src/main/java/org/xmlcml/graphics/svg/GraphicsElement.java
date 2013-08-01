@@ -54,7 +54,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	private static final String BOLD = "bold";
 	private static final String CLASS = "class";
 	
-	protected Transform2 cumulativeTransform = new Transform2();
+	protected Transform2 cumulativeTransform = null/*new Transform2()*/;
 	protected boolean useStyleAttribute = false;
 	private StyleBundle styleBundle;
 		
@@ -84,6 +84,13 @@ public class GraphicsElement extends Element implements SVGConstants {
     
     public void setDefaultStyle() {
 //		setOpacity(1.0);
+    }
+    
+    protected Transform2 ensureCumulativeTransform() {
+    	if (cumulativeTransform == null) {
+    		cumulativeTransform = new Transform2();
+    	}
+    	return cumulativeTransform;
     }
     
     /**

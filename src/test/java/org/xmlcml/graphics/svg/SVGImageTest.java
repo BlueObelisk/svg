@@ -1,5 +1,7 @@
 package org.xmlcml.graphics.svg;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
@@ -118,6 +120,103 @@ public class SVGImageTest {
 	public void testPNGReadRasterJPGCanny1() {
 		transformPixels(SVG_TEST+"plots1.bmp", "target/plots1canny.png", CANNY);
 	}
+	
+	@Test
+	public void testAddCC0() {
+		BufferedImage targetBufferedImage = readBufferedImage(SVG_TEST+"plots1.bmp");
+		WritableRaster cc0Raster = readRaster(SVG_TEST+"cc0.png");
+		overpaint(targetBufferedImage, cc0Raster);
+		outputImage(targetBufferedImage, SVG_TEST+"plotscc0.png", SVGImage.PNG);
+	}
+
+	@Test
+	public void testAddPubdom() {
+		BufferedImage targetBufferedImage = readBufferedImage(SVG_TEST+"plots1.bmp");
+		WritableRaster cc0Raster = readRaster(SVG_TEST+"pubdom.png");
+		overpaint(targetBufferedImage, cc0Raster);
+		outputImage(targetBufferedImage, SVG_TEST+"plotspubdom.png", SVGImage.PNG);
+	}
+
+	@Test
+	public void testMonochrome2Pubdom() {
+		BufferedImage targetBufferedImage = readBufferedImage(SVG_TEST+"monochrome2.png");
+		WritableRaster cc0Raster = readRaster(SVG_TEST+"pubdom.png");
+		overpaint(targetBufferedImage, cc0Raster);
+		outputImage(targetBufferedImage, SVG_TEST+"monochrome2pubdom.png", SVGImage.PNG);
+	}
+
+	@Test
+	public void testMonochrome2Text0() {
+		BufferedImage targetBufferedImage = readBufferedImage(SVG_TEST+"monochrome2.png");
+		WritableRaster cc0Raster = readRaster(SVG_TEST+"pmrcc0.png");
+		overpaint(targetBufferedImage, cc0Raster);
+		outputImage(targetBufferedImage, SVG_TEST+"monochrome2pmrcc0.png", SVGImage.PNG);
+	}
+
+	@Test
+	public void testMonochrome2Text() {
+		BufferedImage targetBufferedImage = readBufferedImage(SVG_TEST+"monochrome2.png");
+		// height and weight depend on text
+		int height = 12;
+		WritableRaster cc0Raster = readRasterText("CC0 Peter Murray-Rust", SVG_TEST+"pmrcc0.png", height);
+		overpaint(targetBufferedImage, cc0Raster);
+		outputImage(targetBufferedImage, SVG_TEST+"monochrome2text.png", SVGImage.PNG);
+	}
+
+	// =================================================================
+	
+	private WritableRaster readRasterText(String text, String filename, int height) {
+		int width = text.length()*6;
+		int imageType = 6;
+		BufferedImage bufferedImage = new BufferedImage(width, height, imageType);
+		debugImage("new image ", bufferedImage);
+		Graphics2D g2d = bufferedImage.createGraphics();
+		g2d.setColor(Color.BLACK);
+		g2d.drawString(text, 0, height);
+		outputImage(bufferedImage, filename, SVGImage.PNG);
+		WritableRaster raster = bufferedImage.getRaster();
+		return raster;
+	}
+
+	private void overpaint(BufferedImage image, WritableRaster raster) {
+		debugImage("overpaint", image);
+		debugRaster("overpaint", raster);
+		try {
+			image.setData(raster);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			LOG.debug("AIOOBE: "+e);
+		}
+	}
+
+	private WritableRaster readRaster(String inputFile) {
+		BufferedImage bufferedImage = readBufferedImage(inputFile);
+		WritableRaster raster = bufferedImage.getRaster();
+		debugRaster("readRaster", raster);
+		return raster;
+	}
+
+	private void debugImage(String msg, BufferedImage image) {
+		LOG.debug(msg+" image w: "+image.getWidth()+" h: "+image.getHeight()+" type "+image.getType());
+	}
+
+	private void debugRaster(String msg, WritableRaster raster) {
+		LOG.debug(msg+" raster w: "+raster.getWidth()+" h: "+raster.getHeight());
+	}
+
+	private BufferedImage readBufferedImage(String inputFile) {
+		BufferedImage bufferedImage = null;
+		File imgFile = new File(inputFile);
+		try {
+			if (imgFile == null || !imgFile.exists() || imgFile.isDirectory()) {
+				throw new RuntimeException("File is null or does not exist or is Directory: "+inputFile);
+			}
+			bufferedImage = ImageIO.read(imgFile);
+		} catch (IOException e) {
+			throw new RuntimeException("Cannot read image", e);
+		}
+		debugImage("readBuffered", bufferedImage);
+		return bufferedImage;
+	}
 
 	private void outputImage(BufferedImage bufferedImage, String filename, String type) {
 		try {
@@ -131,17 +230,10 @@ public class SVGImageTest {
 		}
 	}
 
-
 	private void transformPixels(String inputFile, String outputFile, String method) {
-		int[] iArray = { 0, 0, 0, 255 };
-		File imgFile = new File(inputFile);
 		BufferedImage bufferedImage = null;
-		try {
-			bufferedImage = ImageIO.read(imgFile);
-		} catch (IOException e) {
-			throw new RuntimeException("Cannot read image", e);
-		}
-		WritableRaster raster = bufferedImage.getRaster();
+		int[] iArray = { 0, 0, 0, 255 };
+		WritableRaster raster = readRaster(inputFile);
 		if (method.equals(MONOCHROME)) {
 			makeMonochrome(iArray, raster);
 		} else if (method.equals(GRAYSCALE)) {
