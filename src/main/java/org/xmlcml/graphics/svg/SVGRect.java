@@ -139,6 +139,7 @@ public class SVGRect extends SVGElement {
 //	}
 
 	protected void drawElement(Graphics2D g2d) {
+		ensureCumulativeTransform();
 		double x1 = this.getDouble("x");
 		double y1 = this.getDouble("y");
 		Real2 xy1 = new Real2(x1, y1);

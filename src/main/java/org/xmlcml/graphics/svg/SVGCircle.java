@@ -105,6 +105,7 @@ public class SVGCircle extends SVGElement {
 	}
 	
 	protected void drawElement(Graphics2D g2d) {
+		ensureCumulativeTransform();
 		double x = this.getDouble("cx");
 		double y = this.getDouble("cy");
 		double r = this.getDouble("r");
@@ -173,6 +174,7 @@ public class SVGCircle extends SVGElement {
 	}
 
 	public Ellipse2D.Double createAndSetCircle2D() {
+		ensureCumulativeTransform();
 		double rad = this.getDouble("r");
 		double x1 = this.getDouble("cx");
 		double y1 = this.getDouble("cx");

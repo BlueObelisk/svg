@@ -86,6 +86,7 @@ public class SVGEllipse extends SVGElement {
 	}
 	
 	protected void drawElement(Graphics2D g2d) {
+		ensureCumulativeTransform();
 		Real2 xy0 = getCXY();
 		Real2 rxy = getRXY();
 		xy0 = transform(xy0, cumulativeTransform);

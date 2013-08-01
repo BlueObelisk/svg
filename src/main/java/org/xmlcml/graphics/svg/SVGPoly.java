@@ -151,6 +151,7 @@ public abstract class SVGPoly extends SVGElement {
 	}
 	
 	public Line2D.Double createAndSetLine2D() {
+		ensureCumulativeTransform();
 		double x1 = this.getDouble("x1");
 		double y1 = this.getDouble("y1");
 		Real2 xy1 = new Real2(x1, y1);
