@@ -5,8 +5,11 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 
@@ -75,49 +78,54 @@ public class SVGImageTest {
 	}
 
 	@Test
-	public void testPNGReadRaster() {
+	public void testPNGReadRaster() throws IOException {
 		transformPixels(SVG_TEST+"imageTest.png", "target/monochrome.png", MONOCHROME);
 	}
 
 	@Test
-	public void testPNGReadRaster1() {
+	public void testPNGReadRaster1() throws IOException {
 		transformPixels(SVG_TEST+"test.png", "target/monochrome1.png", MONOCHROME);
 	}
 
 	@Test
-	public void testPNGReadRasterGray() {
+	public void testPNGReadRasterGray() throws IOException {
 		transformPixels(SVG_TEST+"test.png", "target/gray1.png", GRAYSCALE);
 	}
 
 	@Test
-	public void testPNGReadRasterCanny() {
+	public void testPNGReadRasterCanny() throws IOException {
 		transformPixels(SVG_TEST+"test.png", "target/canny1.png", CANNY);
 	}
 
 	@Test
-	public void testPNGReadRasterCanny1() {
+	public void testPNGReadRasterCanny1() throws IOException {
 		transformPixels(SVG_TEST+"chem.bmp", "target/chem1.png", CANNY);
 	}
 
 	@Test
 	@Ignore // some unknown problem on hudson reading file
-	public void test1MiniCanny1() {
+	public void test1MiniCanny1() throws IOException {
 		transformPixels(SVG_TEST+"test1Mini.bmp", "target/test1Mini.png", CANNY);
 	}
 
 	@Test
 	public void testPNGReadRasterMonochromeCanny() {
-		transformPixels(SVG_TEST+"monochrome1.png", "target/monocanny1.png", CANNY);
+		try {
+			transformPixels(SVG_TEST+"monochrome1.png", "target/monocanny1.png", CANNY);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Test
-	public void testPNGReadRasterMonochromeCanny1() {
+	public void testPNGReadRasterMonochromeCanny1() throws IOException {
 		transformPixels(SVG_TEST+"plots1.bmp", "target/monoplots1.png", MONOCHROME);
 		transformPixels("target/monoplots1.png", "target/monocanny1.png", CANNY);
 	}
 
 	@Test
-	public void testPNGReadRasterJPGCanny1() {
+	public void testPNGReadRasterJPGCanny1() throws IOException {
 		transformPixels(SVG_TEST+"plots1.bmp", "target/plots1canny.png", CANNY);
 	}
 	
@@ -136,13 +144,30 @@ public class SVGImageTest {
 		overpaint(targetBufferedImage, cc0Raster);
 		outputImage(targetBufferedImage, SVG_TEST+"plotspubdom.png", SVGImage.PNG);
 	}
-
 	@Test
 	public void testMonochrome2Pubdom() {
 		BufferedImage targetBufferedImage = readBufferedImage(SVG_TEST+"monochrome2.png");
 		WritableRaster cc0Raster = readRaster(SVG_TEST+"pubdom.png");
 		overpaint(targetBufferedImage, cc0Raster);
 		outputImage(targetBufferedImage, SVG_TEST+"monochrome2pubdom.png", SVGImage.PNG);
+	}
+		
+	@Test
+	public void testFigshare() throws Exception {
+		InputStream is = new URL("http://previews.figshare.com/1138891/preview_1138891.jpg").openStream();
+		BufferedImage targetBufferedImage = readBufferedImage(is);
+		WritableRaster cc0Raster = readRaster(SVG_TEST+"ccby.png");
+		overpaint(targetBufferedImage, cc0Raster);
+		outputImage(targetBufferedImage, SVG_TEST+"figshare1138891.png", SVGImage.PNG);
+	}
+	
+	@Test
+	public void testMonochrome2PubdomStream() throws Exception {
+		FileInputStream fis = new FileInputStream(SVG_TEST+"monochrome2.png");
+		BufferedImage targetBufferedImage = readBufferedImage(fis);
+		WritableRaster cc0Raster = readRaster(SVG_TEST+"pubdom.png");
+		overpaint(targetBufferedImage, cc0Raster);
+		outputImage(targetBufferedImage, SVG_TEST+"monochrome2pubdomStream.png", SVGImage.PNG);
 	}
 
 	@Test
@@ -210,7 +235,8 @@ public class SVGImageTest {
 			if (imgFile == null || !imgFile.exists() || imgFile.isDirectory()) {
 				throw new RuntimeException("File is null or does not exist or is Directory: "+inputFile);
 			}
-			bufferedImage = ImageIO.read(imgFile);
+			FileInputStream fis = new FileInputStream(imgFile);
+			bufferedImage = readBufferedImage(fis);
 		} catch (IOException e) {
 			throw new RuntimeException("Cannot read image", e);
 		}
@@ -218,33 +244,55 @@ public class SVGImageTest {
 		return bufferedImage;
 	}
 
+	private BufferedImage readBufferedImage(File imgFile) throws IOException {
+		BufferedImage bufferedImage;
+		bufferedImage = ImageIO.read(imgFile);
+		return bufferedImage;
+	}
+
+	private BufferedImage readBufferedImage(InputStream is) throws IOException {
+		BufferedImage bufferedImage;
+		bufferedImage = ImageIO.read(is);
+		return bufferedImage;
+	}
+
 	private void outputImage(BufferedImage bufferedImage, String filename, String type) {
 		try {
 			FileOutputStream fos = new FileOutputStream(new File(filename));
-			if (!ImageIO.write(bufferedImage, type, fos)) {
-				throw new RuntimeException("Failed to find writer for "+type);
-			}
+			outputImage(bufferedImage, type, fos);
 			fos.close();
 		} catch (Exception e) {
-			throw new RuntimeException("Cannot write PNG", e);
+			throw new RuntimeException("Cannot write "+type, e);
 		}
 	}
 
-	private void transformPixels(String inputFile, String outputFile, String method) {
+	public void outputImage(BufferedImage bufferedImage, String type,
+			FileOutputStream fos) throws IOException {
+		if (!ImageIO.write(bufferedImage, type, fos)) {
+			throw new RuntimeException("Failed to find writer for "+type);
+		}
+	}
+
+	private void transformPixels(String inputFile, String outputFile, String method) throws IOException {
 		BufferedImage bufferedImage = null;
 		int[] iArray = { 0, 0, 0, 255 };
 		WritableRaster raster = readRaster(inputFile);
 		if (method.equals(MONOCHROME)) {
-			makeMonochrome(iArray, raster);
+			bufferedImage = createMonochromeImage(iArray, raster);
 		} else if (method.equals(GRAYSCALE)) {
-			makeGrayscale(iArray, raster);
+			bufferedImage = makeGrayscale(iArray, raster);
 		} else if (method.equals(CANNY)) {
-			bufferedImage = makeCanny(bufferedImage);
+			bufferedImage = makeCanny(new File(inputFile));
+		} else {
+			bufferedImage = null;
+		}
+		if (bufferedImage == null) {
+			throw new RuntimeException("Cannot create BufferedImage: "+method);
 		}
 		outputImage(bufferedImage, outputFile, SVGImage.PNG);
 	}
 
-	private void makeMonochrome(int[] iArray, WritableRaster raster) {
+	private BufferedImage createMonochromeImage(int[] iArray, WritableRaster raster) {
 		int cols = raster.getWidth();
 		int rows = raster.getHeight();
 		for (int row = 0; row < rows; row++) {
@@ -263,9 +311,11 @@ public class SVGImageTest {
 				raster.setPixel(col, row, iArray);
 			}
 		}
+		BufferedImage bufferedImage = new BufferedImage(cols, rows, BufferedImage.TYPE_BYTE_BINARY);
+		return bufferedImage;
 	}
 	
-	private void makeGrayscale(int[] iArray, WritableRaster raster) {
+	private BufferedImage makeGrayscale(int[] iArray, WritableRaster raster) {
 		int cols = raster.getWidth();
 		int rows = raster.getHeight();
 		for (int row = 0; row < rows; row++) {
@@ -279,11 +329,18 @@ public class SVGImageTest {
 				raster.setPixel(col, row, iArray);
 			}
 		}
+		BufferedImage bufferedImage = new BufferedImage(cols, rows, BufferedImage.TYPE_BYTE_GRAY);
+		return bufferedImage;
 	}
 	
-	private BufferedImage makeCanny(BufferedImage bufferedImage) {
+	private BufferedImage makeCanny(InputStream is) throws IOException {
+		BufferedImage bufferedImage = ImageIO.read(is);
 		CannyEdgeDetector detector = new CannyEdgeDetector();
 		return detector.transformBufferedImage(bufferedImage, 0.1f, 0.5f);
+	}
+	
+	private BufferedImage makeCanny(File file) throws IOException {
+		return makeCanny(new FileInputStream(file));
 	}
 	
 }
