@@ -16,10 +16,16 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.io.FileOutputStream;
-
 import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import nu.xom.Attribute;
 import nu.xom.Document;
@@ -53,10 +59,29 @@ public class GraphicsElement extends Element implements SVGConstants {
 	
 	private static final String BOLD = "bold";
 	private static final String CLASS = "class";
+	static Map<String, Color> colorMap;
+
+	static {
+		colorMap = new HashMap<String, Color>();
+		colorMap.put("black", new Color(0, 0, 0));
+		colorMap.put("white", new Color(255, 255, 255));
+		colorMap.put("red", new Color(255, 0, 0));
+		colorMap.put("green", new Color(0, 255, 0));
+		colorMap.put("blue", new Color(0, 0, 255));
+		colorMap.put("yellow", new Color(255, 255, 0));
+		colorMap.put("orange", new Color(255, 127, 0));
+		colorMap.put("#ff00ff", new Color(255, 0, 255));
+	}
+
 	
 	protected Transform2 cumulativeTransform = null/*new Transform2()*/;
 	protected boolean useStyleAttribute = false;
 	private StyleBundle styleBundle;
+	
+// save when drawing to Graphics2D	
+	private Color saveColor;
+	private Stroke saveStroke;
+	private AffineTransform savedAffineTransform;
 		
 	/** constructor.
 	 * 
@@ -504,5 +529,75 @@ public class GraphicsElement extends Element implements SVGConstants {
 	public void debug(String msg) {
 		CMLUtil.debug(this, msg);
 	}
+	
+	protected void saveGraphicsSettingsAndApplyTransform(Graphics2D g2d) {
+		this.processTransformToAffineTransform(g2d);
+		saveColor(g2d);
+		saveStroke(g2d);
+		ensureCumulativeTransform();
+	}
+
+	private void processTransformToAffineTransform(Graphics2D g2d) {
+		// all transforms done in SVG...  ???
+		this.savedAffineTransform = g2d.getTransform();
+		Transform2 transform2 = this.getCumulativeTransform();
+//		AffineTransform currentAffineTransform = (transform2 == null) ? null : transform2.getAffineTransform();
+//		LOG.debug(""+this.getClass().getName()+" saved "+savedAffineTransform+" CUM: "+transform2+" "+currentAffineTransform);
+//		g2d.transform(currentAffineTransform);
+	}
+	
+	private void resetAffineTransform(Graphics2D g2d) {
+		g2d.setTransform(savedAffineTransform);
+	}
+
+	protected void restoreGraphicsSettingsAndTransform(Graphics2D g2d) {
+		this.resetAffineTransform(g2d);
+		restoreColor(g2d);
+		restoreStroke(g2d);
+	}
+
+	protected void saveStroke(Graphics2D g2d) {
+		this.saveStroke = g2d.getStroke();
+	}
+
+	protected void saveColor(Graphics2D g2d) {
+		this.saveColor = g2d.getColor();
+	}
+
+	protected void restoreColor(Graphics2D g2d) {
+		g2d.setColor(this.saveColor);
+	}
+
+	protected void restoreStroke(Graphics2D g2d) {
+		g2d.setStroke(this.saveStroke);
+	}
+
+	protected void fill(Graphics2D g2d, Shape shape) {
+		String fill = this.getAttributeValue("fill");
+		if (fill != null) {
+			Color fillColor = colorMap.get(fill);
+			g2d.setColor(fillColor);
+			g2d.fill(shape);
+			restoreColor(g2d);
+		}
+	}
+
+	protected void drawStroke(Graphics2D g2d, Shape shape) {
+		String stroke = this.getAttributeValue("stroke");
+		if (stroke != null) {
+			Color strokeColor = colorMap.get(stroke);
+			Double strokeWidth = this.getStrokeWidth();
+			strokeWidth = (strokeWidth == null) ? 1.0 : strokeWidth;
+			strokeWidth = SVGElement.transform(strokeWidth, cumulativeTransform);
+			Stroke s = new BasicStroke((float) (double) strokeWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+			g2d.setStroke(s);
+			g2d.setColor(strokeColor);
+			g2d.draw(shape);
+			restoreColor(g2d);
+			restoreStroke(g2d);
+		}
+	}
+	
+
 }
 

@@ -18,6 +18,7 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -30,7 +31,6 @@ import nu.xom.Nodes;
 
 import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Euclid;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
@@ -174,9 +174,12 @@ public class SVGLine extends SVGElement {
 //</g>
 	
 	protected void drawElement(Graphics2D g2d) {
+		saveGraphicsSettingsAndApplyTransform(g2d);
+		ensureCumulativeTransform();
 		Line2D line = createAndSetLine2D();
-		applyAttributes(g2d);
-		g2d.draw(line);
+		fill(g2d, line);
+		drawStroke(g2d, line);
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
 	public void applyAttributes(Graphics2D g2d) {
@@ -200,7 +203,7 @@ public class SVGLine extends SVGElement {
 		xy2 = transform(xy2, cumulativeTransform);
 		float width = 5.0f;
 		String style = this.getAttributeValue("style");
-		if (style.startsWith("stroke-width:")) {
+		if (style != null && style.startsWith("stroke-width:")) {
 			style = style.substring("stroke-width:".length());
 			style = style.substring(0, (style+S_SEMICOLON).indexOf(S_SEMICOLON));
 			width = (float) new Double(style).doubleValue();

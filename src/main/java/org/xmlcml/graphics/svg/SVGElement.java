@@ -18,6 +18,7 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -87,6 +88,10 @@ public class SVGElement extends GraphicsElement {
 	private String strokeSave;
 	private String fillSave;
 
+	protected Real2Range boundingBox = null;
+	protected boolean boundingBoxCached = false;
+//	private AffineTransform savedAffineTransform;
+	
 	
 	/** constructor.
 	 * 
@@ -244,11 +249,13 @@ public class SVGElement extends GraphicsElement {
 	 * @param g2d
 	 */
 	protected void drawElement(Graphics2D g2d) {
+		saveGraphicsSettingsAndApplyTransform(g2d);
 		Elements gList = this.getChildElements();
 		for (int i = 0; i < gList.size(); i++) {
 			SVGElement svge = (SVGElement) gList.get(i);
 			svge.drawElement(g2d);
 		}
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 	
 	/**
@@ -503,24 +510,6 @@ public class SVGElement extends GraphicsElement {
 		}
 	}
 	
-	static Map<String, Color> colorMap;
-
-	protected Real2Range boundingBox = null;
-
-	protected boolean boundingBoxCached = false;
-	
-	static {
-		colorMap = new HashMap<String, Color>();
-		colorMap.put("black", new Color(0, 0, 0));
-		colorMap.put("white", new Color(255, 255, 255));
-		colorMap.put("red", new Color(255, 0, 0));
-		colorMap.put("green", new Color(0, 255, 0));
-		colorMap.put("blue", new Color(0, 0, 255));
-		colorMap.put("yellow", new Color(255, 255, 0));
-		colorMap.put("orange", new Color(255, 127, 0));
-		colorMap.put("#ff00ff", new Color(255, 0, 255));
-	}
-
 	/**
 	 * 
 	 * @param attName
@@ -528,7 +517,9 @@ public class SVGElement extends GraphicsElement {
 	 */
 	public Color getColor(String attName) {
 		String attVal = this.getAttributeValue(attName);
-		return getJava2DColor(attVal, this.getOpacity());
+		Double opacity = this.getOpacity();
+		Color color = getJava2DColor(attVal, opacity);
+		return color;
 	}
 
 	/**
@@ -548,7 +539,7 @@ public class SVGElement extends GraphicsElement {
 	 * @param opacity 0.0 to 1.0
 	 * @return java Color or null
 	 */
-	public static Color getJava2DColor(String colorS, double opacity) {
+	public static Color getJava2DColor(String colorS, Double opacity) {
 		Color color = null;
 		if ("none".equals(colorS)) {
 		} else if (colorS != null) {
@@ -570,6 +561,9 @@ public class SVGElement extends GraphicsElement {
 			}
 		}
 		if (color != null) {
+			if (opacity == null) {
+				opacity = 1.0;
+			}
 			color = (Double.isNaN(opacity)) ? color : new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (255.0 * opacity));
 		} else {
 			color = new Color(255, 255, 255, 0);
@@ -586,8 +580,20 @@ public class SVGElement extends GraphicsElement {
 	 */
 	public static Real2 transform(Real2 xy, Transform2 transform) {
 		xy.transformBy(transform);
-//		xy = xy.plus(new Real2(250, 250));
 		return xy;
+	}
+
+	/**
+	 * transforms xy
+	 * messy
+	 * @param xy is transformed
+	 * @param transform
+	 * @return transformed xy
+	 */
+	public static Double transform(Double d, Transform2 transform) {
+		RealArray ra = transform.getScales();
+		d = (ra == null) ? d : d * ra.get(0);
+		return d;
 	}
 
 	protected double getDouble(String attName) {

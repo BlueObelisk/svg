@@ -98,6 +98,7 @@ public class SVGMarker extends SVGElement {
 	}
 
 	protected void drawElement(Graphics2D g2d) {
+		saveGraphicsSettingsAndApplyTransform(g2d);
 //		double x1 = this.getDouble("x");
 //		double y1 = this.getDouble("y");
 //		Real2 xy1 = new Real2(x1, y1);
@@ -127,6 +128,7 @@ public class SVGMarker extends SVGElement {
 //		g2d.setColor(color);
 //		Line2D line = new Line2D.Double(xy1.x, xy1.y, xy2.x, xy2.y);
 //		g2d.draw(line);
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 	
 	public void applyTransform(Transform2 t2) {

@@ -16,9 +16,7 @@ import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
-import org.xmlcml.euclid.Vector2;
 
 public class SVGUtil {
 
@@ -295,4 +293,21 @@ public class SVGUtil {
 			svgElement.addAttribute(attribute);
 		}
 	}
+
+//	public static AffineTransform createAffineTransform(Transform2 transform2) {
+//		AffineTransform affineTransform = null;
+//		if (transform2 != null) {
+//			double[][] t2matrix = transform2.getMatrix();
+//			double[] array = new double[6];
+//			array[0] = t2matrix[0][0];
+//			array[1] = t2matrix[0][1];
+//			array[2] = t2matrix[0][2];
+//			array[3] = t2matrix[1][0];
+//			array[4] = t2matrix[1][1];
+//			array[5] = t2matrix[1][2];
+//			affineTransform = new AffineTransform(
+//					array[0], array[1], array[2], array[3], array[4], array[5]);
+//		}
+//		return affineTransform;
+//	}
 }

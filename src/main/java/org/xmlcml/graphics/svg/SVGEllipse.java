@@ -86,17 +86,17 @@ public class SVGEllipse extends SVGElement {
 	}
 	
 	protected void drawElement(Graphics2D g2d) {
-		ensureCumulativeTransform();
+		saveGraphicsSettingsAndApplyTransform(g2d);
 		Real2 xy0 = getCXY();
 		Real2 rxy = getRXY();
 		xy0 = transform(xy0, cumulativeTransform);
-		double rrx = rxy.getX() * cumulativeTransform.getMatrixAsArray()[0] * 0.5;
-		double rry = rxy.getY() * cumulativeTransform.getMatrixAsArray()[0] * 0.5;
+		double rrx = transform(rxy.getX(), cumulativeTransform) * 0.5;
+		double rry = transform(rxy.getY(), cumulativeTransform) * 0.5;
 		
-		Ellipse2D ellipse = new Ellipse2D.Double(xy0.x-rrx, xy0.y-rry, rrx+rrx, rry+rry);
-		Color color = this.getColor("fill");
-		g2d.setColor(color);
-		g2d.fill(ellipse);
+		Ellipse2D ellipse = new Ellipse2D.Double(xy0.x - rrx, xy0.y - rry, rrx + rrx, rry + rry);
+		fill(g2d, ellipse);
+		drawStroke(g2d, ellipse);
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 	
 	public Real2 getRXY() {

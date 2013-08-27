@@ -25,8 +25,13 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.log4j.Logger;
+
+
 public class HiddenGraphics {
 
+	private final static Logger LOG = Logger.getLogger(HiddenGraphics.class);
+	
 	private static final String PNG = "png";
 	private Dimension dimension;
 	private BufferedImage img;
@@ -48,6 +53,7 @@ public class HiddenGraphics {
 	public void setDimension(Dimension d) {
 		this.dimension = d;
 	}
+	
 	public Graphics2D createGraphics() {
 		img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
 		g = img.createGraphics();
@@ -60,17 +66,15 @@ public class HiddenGraphics {
 		this.type = type;
 	}
 	
-	public void write(String filename) throws IOException {
-		ImageIO.write(img, type, new File(filename));
+	public void write(File file) throws IOException {
+		LOG.debug("Writing: "+file.getAbsolutePath());
+		ImageIO.write(img, type, file);
 	}
-	public static void main(String[] args) throws IOException {
-		HiddenGraphics graphics = new HiddenGraphics();
-		Graphics2D g = graphics.createGraphics();
-		g.setColor(Color.GREEN);
-		g.fillOval(100, 170, 200, 200);
-		g.fillRect(165, 25, 70, 200);
-		g.fillRect(155, 25, 90, 20);
-		graphics.write("image.png");
+	
+	public BufferedImage createImage(SVGElement element) {
+		Graphics2D g2D = this.createGraphics();
+		element.draw(g2D);
+		return img;
 	}
 	
 }

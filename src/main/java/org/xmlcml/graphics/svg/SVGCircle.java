@@ -105,18 +105,17 @@ public class SVGCircle extends SVGElement {
 	}
 	
 	protected void drawElement(Graphics2D g2d) {
-		ensureCumulativeTransform();
+		saveGraphicsSettingsAndApplyTransform(g2d);
 		double x = this.getDouble("cx");
 		double y = this.getDouble("cy");
 		double r = this.getDouble("r");
 		Real2 xy0 = new Real2(x, y);
 		xy0 = transform(xy0, cumulativeTransform);
-		double rad = r * cumulativeTransform.getMatrixAsArray()[0] * 0.5;
-		
+		double rad = transform(r, cumulativeTransform);
 		Ellipse2D ellipse = new Ellipse2D.Double(xy0.x-rad, xy0.y-rad, rad+rad, rad+rad);
-		Color color = this.getColor("fill");
-		g2d.setColor(color);
-		g2d.fill(ellipse);
+		fill(g2d, ellipse);
+		drawStroke(g2d, ellipse);
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 	
 	/**
