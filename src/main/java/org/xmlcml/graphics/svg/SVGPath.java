@@ -195,11 +195,11 @@ public class SVGPath extends SVGElement {
 //</g>
 	
 	protected void drawElement(Graphics2D g2d) {
+		saveGraphicsSettingsAndApplyTransform(g2d);
 		GeneralPath path = createPath2D();
-		Color stroke = g2d.getColor();
-//		g2d.setColor(this.getStroke());
-		g2d.setColor(Color.BLACK);
-		g2d.draw(path);
+		fill(g2d, path);
+		drawStroke(g2d, path);
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
 	/** extract polyline if path is M followed by L's

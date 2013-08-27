@@ -72,14 +72,8 @@ public class SVGSVG extends SVGElement {
 		return TAG;
 	}
 
-	/** just draw first g element
-	 * 
-	 */
 	protected void drawElement(Graphics2D g2d) {
-		if (this.getChildElements().size() > 0) {
-			SVGElement g = (SVGElement) this.getChildElements().get(0);
-			g.drawElement(g2d);
-		}
+		super.drawElement(g2d);
 	}
 	
 	public void setId(String id) {

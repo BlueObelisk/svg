@@ -163,19 +163,20 @@ public class SVGText extends SVGElement {
     }
     
 	protected void drawElement(Graphics2D g2d) {
-		ensureCumulativeTransform();
+		saveGraphicsSettingsAndApplyTransform(g2d);
 		double fontSize = this.getFontSize();
 		fontSize *= cumulativeTransform.getMatrixAsArray()[0] * 0.3;
 		fontSize = (fontSize < 8) ? 8 : fontSize;
 		String text = this.getText();
-		Real2 xy = this.getXY();
-		xy = transform(xy, cumulativeTransform);
-		xy.plusEquals(new Real2(fontSize*0.65, -0.65*fontSize));
-		Color color = this.getColor("fill");
-		color = (color == null) ? Color.DARK_GRAY : color;
-		g2d.setColor(color);
-		g2d.setFont(new Font("SansSerif", Font.PLAIN, (int)fontSize));
-		g2d.drawString(text, (int)xy.x, (int)xy.y);
+		if (text != null) {
+			Real2 xy = this.getXY();
+			xy = transform(xy, cumulativeTransform);
+			xy.plusEquals(new Real2(fontSize*0.65, -0.65*fontSize));
+			saveColor(g2d);
+			g2d.drawString(text, (int)xy.x, (int)xy.y);
+			restoreColor(g2d);
+		}
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 	
 	public void applyTransform(Transform2 t2) {
