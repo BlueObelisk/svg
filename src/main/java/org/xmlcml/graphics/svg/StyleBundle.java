@@ -211,19 +211,19 @@ public class StyleBundle implements CMLConstants {
 		} else if (attName.equals(FONT_FAMILY)) {
 			fontFamily = (String) attVal; 
 		} else if (attName.equals(FONT_SIZE)) {
-			fontSize = getDouble(""+attVal); 
+			fontSize = getDouble(String.valueOf(attVal)); 
 		} else if (attName.equals(FONT_STYLE)) {
 			fontStyle = (String) attVal; 
 		} else if (attName.equals(FONT_WEIGHT)) {
 			fontWeight = (String) attVal; 
 		} else if (attName.equals(OPACITY)) {
-			opacity = getDouble(""+attVal); 
+			opacity = getDouble(String.valueOf(attVal)); 
 		} else if (attName.equals(STROKE)) {
 			stroke = (String) attVal;
 		} else if (attName.equals(STROKE_WIDTH)) {
-			strokeWidth = getDouble(""+attVal); 
+			strokeWidth = getDouble(String.valueOf(attVal)); 
 		} else {
-			atts.put(attName, ""+attVal);
+			atts.put(attName, String.valueOf(attVal));
 		}
 
 	}
@@ -277,7 +277,7 @@ public class StyleBundle implements CMLConstants {
 		for (String attName : StyleBundle.BUNDLE_ATTRIBUTES) {
 			Object attVal = this.getSubStyle(attName);
 			if (attVal != null) {
-				element.addAttribute(new Attribute(attName, ""+attVal));
+				element.addAttribute(new Attribute(attName, String.valueOf(attVal)));
 				this.removeStyle(attName);
 			}
 		}

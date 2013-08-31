@@ -42,13 +42,13 @@ public abstract class AbstractAnimate extends SVGElement {
 		this.setDur("5.0s");
 	}
 	public void setBegin(Double begin) {
-		this.setBegin(""+begin+"s");
+		this.setBegin(String.valueOf(begin+"s"));
 	}
 	public void setBegin(String begin) {
 		this.setAttribute(BEGIN, begin);
 	}
 	public void setDur(Double dur) {
-		this.setDur(""+dur);
+		this.setDur(String.valueOf(dur));
 	}
 	public void setDur(String dur) {
 		this.setAttribute(DUR, dur);
@@ -82,8 +82,8 @@ public abstract class AbstractAnimate extends SVGElement {
 	}
 	private void setFromTo(String name, double to, double from) {
 		this.setAttributeName(name);
-		this.setTo(""+to);
-		this.setFrom(""+from);
+		this.setTo(String.valueOf(to));
+		this.setFrom(String.valueOf(from));
 	}
 
 }

@@ -84,7 +84,7 @@ public class SVGG extends SVGElement {
 	 * @param width
 	 */
 	public void setWidth(double width) {
-		this.addAttribute(new Attribute("width", ""+width+"px"));
+		this.addAttribute(new Attribute("width", String.valueOf(width)+"px"));
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class SVGG extends SVGElement {
 	 * @param height
 	 */
 	public void setHeight(double height) {
-		this.addAttribute(new Attribute("height", ""+height+"px"));
+		this.addAttribute(new Attribute("height", String.valueOf(height)+"px"));
 	}
 
 	/**

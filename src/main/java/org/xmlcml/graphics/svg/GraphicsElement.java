@@ -406,7 +406,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	private Double getDouble(Object subStyle) {
 		Double d = null;
 		try {
-			d = new Double(""+subStyle);
+			d = new Double(String.valueOf(subStyle));
 		} catch (Exception e) {
 			// return null
 		}
@@ -492,7 +492,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 		} else {
 			convertToExplicitAttributes();
 			if (value != null) {
-				this.addAttribute(new Attribute(attName, ""+value));
+				this.addAttribute(new Attribute(attName, String.valueOf(value)));
 			} else {
 				Attribute att = this.getAttribute(attName);
 				if (att != null) {
@@ -542,7 +542,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 		this.savedAffineTransform = g2d.getTransform();
 		Transform2 transform2 = this.getCumulativeTransform();
 //		AffineTransform currentAffineTransform = (transform2 == null) ? null : transform2.getAffineTransform();
-//		LOG.debug(""+this.getClass().getName()+" saved "+savedAffineTransform+" CUM: "+transform2+" "+currentAffineTransform);
+//		LOG.debug(String.valueOf(this.getClass().getName())+" saved "+savedAffineTransform+" CUM: "+transform2+" "+currentAffineTransform);
 //		g2d.transform(currentAffineTransform);
 	}
 	

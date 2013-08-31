@@ -55,7 +55,8 @@ public class HiddenGraphics {
 	}
 	
 	public Graphics2D createGraphics() {
-		img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
+		// there may be ultra thin images for lines, etc.
+		img = new BufferedImage(Math.max(1, dimension.width), Math.max(1,  dimension.height), BufferedImage.TYPE_INT_ARGB);
 		g = img.createGraphics();
 		g.setBackground(backgroundColor);
 		g.clearRect(0, 0, dimension.width, dimension.height);

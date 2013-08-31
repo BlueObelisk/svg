@@ -129,11 +129,11 @@ public class SVGEllipse extends SVGElement {
 	}
 
 	public void setRX(double x) {
-		this.addAttribute(new Attribute("rx", ""+x));
+		this.addAttribute(new Attribute("rx", String.valueOf(x)));
 	}
 
 	public void setRY(double y) {
-		this.addAttribute(new Attribute("ry", ""+y));
+		this.addAttribute(new Attribute("ry", String.valueOf(y)));
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class SVGEllipse extends SVGElement {
 	 * @param rad the rad to set
 	 */
 	public void setRad(double rad) {
-		this.addAttribute(new Attribute("r", ""+rad));
+		this.addAttribute(new Attribute("r", String.valueOf(rad)));
 	}
 
 	/** extent of ellipse

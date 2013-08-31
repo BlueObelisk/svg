@@ -875,11 +875,11 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	public void setCX(double x) {
-		this.addAttribute(new Attribute(CX, ""+x));
+		this.addAttribute(new Attribute(CX, String.valueOf(x)));
 	}
 
 	public void setCY(double y) {
-		this.addAttribute(new Attribute(CY, ""+y));
+		this.addAttribute(new Attribute(CY, String.valueOf(y)));
 	}
 
 	public Real2 getCXY() {
@@ -887,11 +887,11 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	public void setX(double x) {
-		this.addAttribute(new Attribute(X, ""+x));
+		this.addAttribute(new Attribute(X, String.valueOf(x)));
 	}
 
 	public void setY(double y) {
-		this.addAttribute(new Attribute(Y, ""+y));
+		this.addAttribute(new Attribute(Y, String.valueOf(y)));
 	}
 	
 	public Real2 getXY() {
@@ -914,11 +914,11 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	public void setWidth(double w) {
-		this.addAttribute(new Attribute("width", ""+w));
+		this.addAttribute(new Attribute("width", String.valueOf(w)));
 	}
 	
 	public void setHeight(double h) {
-		this.addAttribute(new Attribute("height", ""+h));
+		this.addAttribute(new Attribute("height", String.valueOf(h)));
 	}
 	
 	public void setClassName(String name) {
