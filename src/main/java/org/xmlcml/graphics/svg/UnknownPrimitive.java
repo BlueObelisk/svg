@@ -10,7 +10,7 @@ public class UnknownPrimitive extends SVGPathPrimitive {
 	private String TAG = "?";
 
 	public UnknownPrimitive(char cc) {
-		this.TAG = ""+cc;
+		this.TAG = String.valueOf(cc);
 	}
 
 	public String getTag() {

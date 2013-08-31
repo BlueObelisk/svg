@@ -122,8 +122,8 @@ public class SVGCircle extends SVGElement {
 	 * @param x1 the x1 to set
 	 */
 	public void setXY(Real2 x1) {
-		this.addAttribute(new Attribute("cx", ""+x1.getX()));
-		this.addAttribute(new Attribute("cy", ""+x1.getY()));
+		this.addAttribute(new Attribute("cx", String.valueOf(x1.getX())));
+		this.addAttribute(new Attribute("cy", String.valueOf(x1.getY())));
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class SVGCircle extends SVGElement {
 	 * @param rad the rad to set
 	 */
 	public void setRad(double rad) {
-		this.addAttribute(new Attribute("r", ""+rad));
+		this.addAttribute(new Attribute("r", String.valueOf(rad)));
 	}
 	
 	/** get radius

@@ -75,11 +75,11 @@ public class SVGAnimateTransform extends AbstractAnimate {
 	}
 
  	public void setFrom(Real2 from) {
-		this.setFrom(""+from.getX()+","+from.getY());
+		this.setFrom(String.valueOf(from.getX())+","+from.getY());
 	}
 
 	public void setTo(Real2 to) {
-		this.setTo(""+to.getX()+","+to.getY());
+		this.setTo(String.valueOf(to.getX())+","+to.getY());
 	}
 
 	public void setAdditive(String value) {

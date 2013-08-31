@@ -578,7 +578,7 @@ public class SVGPath extends SVGElement {
 
 	public Real2 getOrigin() {
 		Real2Range r2r = this.getBoundingBox();
-		return new Real2(r2r.getXRange().getMin(), r2r.getYRange().getMin());
+		return new Real2(r2r.getXMin(), r2r.getYMin());
 	}
 
 	/** opposite corner to origin
@@ -587,7 +587,7 @@ public class SVGPath extends SVGElement {
 	 */
 	public Real2 getUpperRight() {
 		Real2Range r2r = this.getBoundingBox();
-		return new Real2(r2r.getXRange().getMax(), r2r.getYRange().getMax());
+		return new Real2(r2r.getXMax(), r2r.getYMax());
 	}
 
 	// there are some polylines which contain a small number of curves and may be transformable

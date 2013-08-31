@@ -318,9 +318,9 @@ public class SVGText extends SVGElement {
 					} else if (text.length() == 0) {
 						throw new RuntimeException("found empty text ");
 					} else if (text.contains("\n")) {
-						throw new RuntimeException("found LF "+""+((int)text.charAt(0)));
+						throw new RuntimeException("found LF "+String.valueOf(((int)text.charAt(0))));
 					} else {
-						throw new RuntimeException("found strange Null text "+""+((int)text.charAt(0)));
+						throw new RuntimeException("found strange Null text "+String.valueOf(((int)text.charAt(0))));
 					}
 				}
 				height = this.getFontSize() * fontWidthFactor;
@@ -507,7 +507,7 @@ public class SVGText extends SVGElement {
 		double spaceWidth = fontWidths[(int)C_SPACE] * maxFontSize * fontWidthFactor;
 		
 		// same size of font?
-		LOG.debug(""+this.getText()+"]["+text1.getText()+ " ...fonts... " + fontSize0+"/"+fontSize1);
+		LOG.debug(String.valueOf(this.getText())+"]["+text1.getText()+ " ...fonts... " + fontSize0+"/"+fontSize1);
 		// has vertical changed by more than the larger font size?
 		if (!Real.isEqual(coordVert0, coordVert1, maxFontSize * fontHeightFactor)) {
 			LOG.debug("changed vertical height "+coordVert0+" => "+coordVert1+" ... "+maxFontSize);
@@ -638,10 +638,10 @@ public class SVGText extends SVGElement {
 		this.setText(null);
 		double fontSize = fSize == null ? this.getFontSize() : fSize;
 		String[] tokens = textS.split(EuclidConstants.S_WHITEREGEX);
-		Double x0 = boundingBox.getXRange().getMin();
-		Double x1 = boundingBox.getXRange().getMax();
+		Double x0 = boundingBox.getXMin();
+		Double x1 = boundingBox.getXMax();
 		Double x = x0;
-		Double y0 = boundingBox.getYRange().getMin();
+		Double y0 = boundingBox.getYMin();
 		Double y = y0;
 		Double deltay = fontSize*1.2;
 		y += deltay;

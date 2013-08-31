@@ -66,10 +66,10 @@ public class SVGAnimate extends AbstractAnimate {
     	this.setTo(to);
 	}
 	public void setFrom(Double from) {
-		this.setFrom(""+from);
+		this.setFrom(String.valueOf(from));
 	}
 
 	public void setTo(Double to) {
-		this.setTo(""+to);
+		this.setTo(String.valueOf(to));
 	}
 }

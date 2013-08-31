@@ -242,7 +242,7 @@ public abstract class SVGPoly extends SVGElement {
 	private void addMonotonicity(Axis2 axis) {
 		Monotonicity mono = this.getMonotonicity(axis);
 		if (mono != null) {
-			this.addAttribute(new Attribute(MONOTONIC+axis, ""+mono));
+			this.addAttribute(new Attribute(MONOTONIC+axis, String.valueOf(mono)));
 		}
 	}
 	

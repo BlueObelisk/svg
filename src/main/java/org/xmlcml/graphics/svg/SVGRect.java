@@ -124,7 +124,7 @@ public class SVGRect extends SVGElement {
 	
 	@Deprecated //"use createFromReal2Range which deals with nulls"
 	public SVGRect(Real2Range bbox) {
-		this(bbox.getXRange().getMin(), bbox.getYRange().getMin(), bbox.getXRange().getRange(), bbox.getYRange().getRange());
+		this(bbox.getXMin(), bbox.getYMin(), bbox.getXRange().getRange(), bbox.getYRange().getRange());
 	}
 	
 //	public static SVGRect createSVGRect(Real2Range bbox) {

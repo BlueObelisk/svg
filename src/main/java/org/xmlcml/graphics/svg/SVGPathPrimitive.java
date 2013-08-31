@@ -147,7 +147,7 @@ public abstract class SVGPathPrimitive {
 				LOG.trace("processed E-notation");
 			} else if ("mMcClLqQzZ".indexOf(c) != -1) {
 				addCurrentNumber(d, tokenList, numberStart, i);
-				tokenList.add(""+c);
+				tokenList.add(String.valueOf(c));
 				numberStart = -1;
 			} else {
 				throw new RuntimeException("Unknown character in dString: "+c+" path: "+d);

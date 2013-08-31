@@ -128,8 +128,8 @@ public class SVGLine extends SVGElement {
 		if (x12 == null) {
 			System.err.println("null x2/y2 in line: ");
 		} else {
-			this.addAttribute(new Attribute("x"+(serial+1), ""+x12.getX()));
-			this.addAttribute(new Attribute("y"+(serial+1), ""+x12.getY()));
+			this.addAttribute(new Attribute("x"+(serial+1), String.valueOf(x12.getX())));
+			this.addAttribute(new Attribute("y"+(serial+1), String.valueOf(x12.getY())));
 		}
 	}
 	
@@ -152,8 +152,8 @@ public class SVGLine extends SVGElement {
 		if (x12 == null) {
 			System.err.println("null x2/y2 in line: ");
 		} else {
-			this.addAttribute(new Attribute("x"+serial, ""+x12.getX()));
-			this.addAttribute(new Attribute("y"+serial, ""+x12.getY()));
+			this.addAttribute(new Attribute("x"+serial, String.valueOf(x12.getX())));
+			this.addAttribute(new Attribute("y"+serial, String.valueOf(x12.getY())));
 		}
 	}
 	
@@ -369,7 +369,7 @@ public class SVGLine extends SVGElement {
 	}
 
 	public void setWidth(double width) {
-		this.addAttribute(new Attribute("stroke-width", ""+width));
+		this.addAttribute(new Attribute("stroke-width", String.valueOf(width)));
 	}
 
 	/**

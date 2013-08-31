@@ -168,7 +168,7 @@ public class SVGTextTest {
 ////			LOG.trace("-----------------------");
 //			length[i-1] = text0.getEstimatedHorizontalLength(fontWidthFactor);
 //			double dist = text.getX()-text0.getX();
-////			LOG.trace(""+Util.format(text0.getY(), 2) +" "+Util.format(text.getY(), 2)+"["+text0.getValue()+"] "+Util.format(dist, 1)+" "+length[i-1]+" "+dist/length[i-1]);
+////			LOG.trace(String.valueOf(Util.format(text0.getY(), 2)) +" "+Util.format(text.getY(), 2)+"["+text0.getValue()+"] "+Util.format(dist, 1)+" "+length[i-1]+" "+dist/length[i-1]);
 //		}
 		
 		double[] expectedLength = new double[]{
