@@ -279,17 +279,14 @@ public class SVGUtil {
 		}
 	}
 
-	public final static String SVGX_NS = "http://www.xml-cml.org/schema/svgx";
-	public final static String SVGX_PREFIX = "svgx";
-
 	public static String getSVGXAttribute(SVGElement svgElement, String attName) {
-		Attribute attribute = svgElement.getAttribute(attName, SVGX_NS);
+		Attribute attribute = svgElement.getAttribute(attName, SVGConstants.SVGX_NS);
 		return (attribute == null) ? null : attribute.getValue();
 	}
 
 	public static void setSVGXAttribute(SVGElement svgElement, String attName, String value) {
 		if (attName != null && value != null) {
-			Attribute attribute = new Attribute(SVGX_PREFIX+CMLConstants.S_COLON+attName, SVGX_NS, value);
+			Attribute attribute = new Attribute(SVGConstants.SVGX_PREFIX+CMLConstants.S_COLON+attName, SVGConstants.SVGX_NS, value);
 			svgElement.addAttribute(attribute);
 		}
 	}
