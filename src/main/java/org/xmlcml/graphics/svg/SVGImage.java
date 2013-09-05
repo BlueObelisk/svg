@@ -19,15 +19,21 @@ package org.xmlcml.graphics.svg;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -55,6 +61,8 @@ public class SVGImage extends SVGElement {
 	public static final String PNG = "PNG";
 	public static final String IMAGE_BMP = "image/bmp";
 	public static final String BMP = "BMP";
+	public static final String IMAGE_JPG = "image/jpeg";
+	public static final String JPG = "JPG";
 	
 	private static final String XLINK_PREF = "xlink";
 	private static final String HREF = "href";
@@ -276,5 +284,98 @@ public class SVGImage extends SVGElement {
 		}
 		return imageList;
 	}
+
+	public boolean writeImage(String filename, String mimeType) throws IOException {
+		boolean wrote = false;
+		Attribute xLinkAttribute = this.getAttribute(HREF, XLINK_NS);
+		if (xLinkAttribute != null) {
+			String xLinkValue = xLinkAttribute.getValue();
+			BufferedImage bufferedImage = readSrcDataToBufferedImage(xLinkValue);
+//			System.out.println("BI "+bufferedImage);
+			File imageFile = new File(filename);
+			SVGImage.writeBufferedImage(bufferedImage, mimeType, imageFile);
+			wrote = true;
+		}
+		return wrote;
+	}
+	
+	public static void writeBufferedImage(BufferedImage bufferedImage, String mimeType, File file) throws IOException {
+		boolean ok = SVGImage.checkIsKnownImageIOWriterMimeType(mimeType);
+		if (ok) {
+			LOG.debug("Writing: "+file.getAbsolutePath());
+			FileOutputStream fos = new FileOutputStream(file);
+			writeByWriter(bufferedImage, mimeType, fos);
+//			ok = writeByImageIO(bufferedImage, mimeType, file);
+//			if (!ok) {
+//				printKnownMimeTypes();
+//				throw new RuntimeException("Cannot write image: "+mimeType);
+//			}
+			fos.close();
+			
+		} else {
+			printKnownMimeTypes();
+			throw new RuntimeException("ImageIO unknown mimeType: "+mimeType);
+		}
+	}
+
+	private static boolean writeByImageIO(BufferedImage bufferedImage,
+			String mimeType, File file) throws IOException {
+		boolean ok;
+		String informalFormat = mimeType.startsWith("image/") ? mimeType.substring("image/".length()): mimeType;
+		ok = ImageIO.write(bufferedImage, informalFormat, file);
+		return ok;
+	}
+
+	private static void writeByWriter(BufferedImage bufferedImage,
+			String mimeType, FileOutputStream fos) throws IOException {
+		boolean ok = false;
+		ImageWriter imageWriter = getFirstKnownImageWriter(mimeType);
+	    ImageOutputStream ios = ImageIO.createImageOutputStream(fos);
+	    imageWriter.setOutput(ios);
+	    imageWriter.write(bufferedImage);
+	}
+
+	public static ImageWriter getFirstKnownImageWriter(String mimeType) {
+		ImageWriter imageWriter = null;
+		Iterator<ImageWriter> iterator = ImageIO.getImageWritersByMIMEType(mimeType);
+		while (iterator.hasNext()) {
+			imageWriter = iterator.next();
+			break;
+		}
+		return imageWriter;
+	}
+
+	public static ImageReader getFirstKnownImageReader(String mimeType) {
+		ImageReader imageReader = null;
+		Iterator<ImageReader> iterator = ImageIO.getImageReadersByMIMEType(mimeType);
+		while (iterator.hasNext()) {
+			imageReader = iterator.next();
+			break;
+		}
+		return imageReader;
+	}
+
+	private static void printKnownMimeTypes() {
+		System.err.println("Known reader mimeTypes:");
+		for (String knownMimeType : ImageIO.getReaderMIMETypes()) {
+			System.err.println(knownMimeType);
+		}
+		System.err.println("Known writer mimeTypes:");
+		for (String knownMimeType : ImageIO.getWriterMIMETypes()) {
+			System.err.println(knownMimeType);
+		}
+	}
+
+	private static boolean checkIsKnownImageIOWriterMimeType(String mimeType) {
+		boolean ok = false;
+		for (String knownMimeType : ImageIO.getWriterMIMETypes()) {
+			if (knownMimeType.equals(mimeType)) {
+				ok = true;
+				break;
+			}
+		}
+		return ok;
+	}
+	
 
 }

@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.euclid.Real2;
 
@@ -18,7 +19,7 @@ public class HiddenGraphicsTest {
 		g.fillOval(100, 170, 200, 200);
 		g.fillRect(165, 25, 70, 200);
 		g.fillRect(155, 25, 90, 20);
-		hg.write(new File("target/image.png"));
+		hg.write(SVGImage.IMAGE_PNG, new File("target/image.png"));
 	}
 	
 	@Test
@@ -32,7 +33,30 @@ public class HiddenGraphicsTest {
 		HiddenGraphics hg = new HiddenGraphics();
 		SVGElement g = createExampleSvg();
 		hg.createImage(g);
-		hg.write(new File("target/exampleSvg.png"));
+		hg.write(SVGImage.IMAGE_PNG, new File("target/exampleSvg.png"));
+	}
+	
+	@Test
+	// FIXME does not write sensible file
+	public void testHiddenGraphicsWriteBMP() throws Exception {
+		HiddenGraphics hg = new HiddenGraphics();
+		SVGElement g = createExampleSvg();
+		hg.createImage(g);
+		try {
+			hg.write(SVGImage.IMAGE_BMP, new File("target/exampleSvg.bmp"));
+			Assert.fail("throws Image cannot be encoded with comprression BI_RGB");
+		} catch (Exception e) {
+			Assert.assertTrue("failed", true);
+		}
+	}
+	
+	@Test
+	// FIXME does not write sensible file
+	public void testHiddenGraphicsWriteJPG() throws Exception {
+		HiddenGraphics hg = new HiddenGraphics();
+		SVGElement g = createExampleSvg();
+		hg.createImage(g);
+		hg.write(SVGImage.IMAGE_JPG, new File("target/exampleSvg.jpg"));
 	}
 	
 	private SVGElement createExampleSvg() {
