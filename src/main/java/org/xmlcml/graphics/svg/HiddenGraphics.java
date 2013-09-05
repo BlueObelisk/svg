@@ -67,9 +67,8 @@ public class HiddenGraphics {
 		this.type = type;
 	}
 	
-	public void write(File file) throws IOException {
-		LOG.debug("Writing: "+file.getAbsolutePath());
-		ImageIO.write(img, type, file);
+	public void write(String mimeType, File file) throws IOException {
+		SVGImage.writeBufferedImage(img, mimeType, file);
 	}
 	
 	public BufferedImage createImage(SVGElement element) {

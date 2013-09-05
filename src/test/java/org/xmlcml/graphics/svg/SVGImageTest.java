@@ -188,6 +188,13 @@ public class SVGImageTest {
 		outputImage(targetBufferedImage, SVG_TEST+"monochrome2text.png", SVGImage.PNG);
 	}
 
+	@Test
+	public void testReadSVG() throws Exception {
+		SVGElement element = SVGElement.readAndCreateSVG(new File(SVG_TEST+"plosGraph.svg"));
+		SVGImage svgImage = 
+				(SVGImage) SVGImage.extractImages(SVGUtil.getQuerySVGElements(element, "//*[local-name()='image']")).get(0);
+		svgImage.writeImage("target/testReadSvg.png", SVGImage.IMAGE_PNG);
+	}
 	// =================================================================
 	
 	private WritableRaster readRasterText(String text, String filename, int height) {
@@ -342,5 +349,6 @@ public class SVGImageTest {
 	private BufferedImage makeCanny(File file) throws IOException {
 		return makeCanny(new FileInputStream(file));
 	}
+	
 	
 }
