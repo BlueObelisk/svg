@@ -285,14 +285,16 @@ public class SVGImage extends SVGElement {
 		return imageList;
 	}
 
-	public boolean writeImage(String filename, String mimeType) throws IOException {
+	public boolean writeImage(String imageFilename, String mimeType) throws IOException {
+		return writeImage(new File(imageFilename), mimeType);
+	}
+
+	public boolean writeImage(File imageFile, String mimeType) throws IOException {
 		boolean wrote = false;
 		Attribute xLinkAttribute = this.getAttribute(HREF, XLINK_NS);
 		if (xLinkAttribute != null) {
 			String xLinkValue = xLinkAttribute.getValue();
 			BufferedImage bufferedImage = readSrcDataToBufferedImage(xLinkValue);
-//			System.out.println("BI "+bufferedImage);
-			File imageFile = new File(filename);
 			SVGImage.writeBufferedImage(bufferedImage, mimeType, imageFile);
 			wrote = true;
 		}
