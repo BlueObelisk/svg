@@ -1,6 +1,5 @@
 package org.xmlcml.graphics.svg;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -36,7 +35,9 @@ public class SVGText extends SVGElement {
 
 	private static Logger LOG = Logger.getLogger(SVGText.class);
 
-	private static final double _SVG2AWT_FONT_SCALE = 5.0;
+	// just in case there is a scaling problem
+	private static final double _SVG2AWT_FONT_SCALE = 1.0;
+	
 	public final static String TAG ="text";
 	
     public static String SUB0 = CMLConstants.S_UNDER+CMLConstants.S_LCURLY;
@@ -110,20 +111,20 @@ public class SVGText extends SVGElement {
 		this.setBoundingBoxCached(false);
 	}
 
-	public static void setDefaultStyle(SVGText text) {
+	public static void setDefaultStyle(SVGElement text) {
 		text.setStroke("none");
 		text.setFontSize(1.0);
 	}
 	
 	/** constructor
 	 */
-	public SVGText(SVGText element) {
+	public SVGText(SVGElement element) {
         super((SVGElement) element);
 	}
 	
 	/** constructor
 	 */
-	protected SVGText(SVGText element, String tag) {
+	protected SVGText(SVGElement element, String tag) {
         super((SVGElement) element, tag);
 	}
 	
@@ -163,31 +164,34 @@ public class SVGText extends SVGElement {
     
 	protected void drawElement(Graphics2D g2d) {
 		saveGraphicsSettingsAndApplyTransform(g2d);
-		String fill = this.getFill();
-		Color fillColor = getJava2DColor(fill); 
-		// doesn't do anything!
-		double fontSize = this.getFontSize();
-		fontSize *= cumulativeTransform.getMatrixAsArray()[0] * _SVG2AWT_FONT_SCALE;
-		fontSize = (fontSize < 8) ? 8 : fontSize;
-		BasicStroke stroke = (BasicStroke) g2d.getStroke();
-		Font font = g2d.getFont();
 		String text = this.getText();
 		if (text != null) {
+			String fill = this.getFill();
+			Color fillColor = getJava2DColor(fill); 
+			float fontSize = (float) (double) this.getFontSize();
+			fontSize *= cumulativeTransform.getMatrixAsArray()[0] * _SVG2AWT_FONT_SCALE;
+			Font font = g2d.getFont();
+			font = font.deriveFont(fontSize);
+			if (isItalic()) {
+				font = font.deriveFont(Font.ITALIC);
+			}
+			setTextAntialiasing(g2d, true);
 			Real2 xy = this.getXY();
 			xy = transform(xy, cumulativeTransform);
-			LOG.debug("XY "+xy);
-			// why?
-//			xy.plusEquals(new Real2(fontSize*0.65, -0.65*fontSize));
+			LOG.debug("CUM "+cumulativeTransform);
+			LOG.trace("XY "+xy);
+//			xy.plusEquals(new Real2(fontSize*0.65, -0.65*fontSize)); //?? why
 			saveColor(g2d);
 			if (fillColor != null) {
 				g2d.setColor(fillColor);
 			}
+			g2d.setFont(font);
 			g2d.drawString(text, (int)xy.x, (int)xy.y);
 			restoreColor(g2d);
 		}
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
-	
+
 	public void applyTransform(Transform2 t2) {
 		//assume scale and translation only
 		Real2 xy = getXY();

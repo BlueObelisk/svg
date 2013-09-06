@@ -44,7 +44,7 @@ public class SVGTextTest {
 	@Ignore
 	public void testSetup() {
 		Element element = JumboTestUtils.parseValidString(STRING1);
-		SVGText text = (SVGText) SVGElement.readAndCreateSVG(element);
+		SVGElement text = (SVGElement) SVGElement.readAndCreateSVG(element);
 		Assert.assertNotNull(text);
 		Assert.assertEquals("class", SVGText.class, text.getClass());
 		Assert.assertEquals("fontsize", 6.2023, text.getFontSize(), 0.0001);
@@ -113,7 +113,7 @@ public class SVGTextTest {
 	@Test
 	@Ignore
 	public void testSVGTextReal2String() {
-		SVGText text = new SVGText(new Real2(1., 2.), "string");
+		SVGElement text = new SVGText(new Real2(1., 2.), "string");
 		String expectedS = "<text style=' stroke : none; font-size : 7.654321;' " +
 				"x='1.0' y='2.0' xmlns='http://www.w3.org/2000/svg'>string</text>";
 		Element expected = JumboTestUtils.parseValidString(expectedS);
@@ -305,7 +305,7 @@ public class SVGTextTest {
 		SVGText text3 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"370.86\" y=\"342.36\">1.</text>"));
-		SVGText text4 = testConcatenate(fontWidthFactor, fontHeightFactor, false, 25.44, null, text2, text3);
+		SVGElement text4 = testConcatenate(fontWidthFactor, fontHeightFactor, false, 25.44, null, text2, text3);
 		
 		SVGText text5 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 			"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
@@ -315,13 +315,13 @@ public class SVGTextTest {
 		SVGText text7 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 		"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 		"improper=\"true\" x=\"316.08\" y=\"342.36\">2.</text>"));
-		SVGText text8 = testConcatenate(fontWidthFactor, fontHeightFactor, false, 25.44, null, text6, text7);
+		SVGElement text8 = testConcatenate(fontWidthFactor, fontHeightFactor, false, 25.44, null, text6, text7);
 		
 		SVGText text9 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 		"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 		"improper=\"true\" x=\"321.24\" y=\"342.36\">0</text>"));
 
-		SVGText text10 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 324.71, "2.0", text7, text9);
+		SVGElement text10 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 324.71, "2.0", text7, text9);
 		
 	}
 
@@ -396,12 +396,12 @@ public class SVGTextTest {
 		SVGText text2 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				"  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" " +
 				"improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"297.54\">.</text> "));
-		SVGText text02 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 295.92, "178.", text01, text2);
+		SVGElement text02 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 295.92, "178.", text01, text2);
 		
 		SVGText text3 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" " +
 				"improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"295.74\">616</text>"));
-		SVGText text03 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 286.03, "178.616", text01, text3);
+		SVGElement text03 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 286.03, "178.616", text01, text3);
 	}
 	
 	
@@ -435,32 +435,32 @@ public class SVGTextTest {
 		SVGText text2 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"32.94\" y=\"303.36\"> M</text> "));
-		SVGText text02 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 41.52, "75 M", text01, text2);
+		SVGElement text02 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 41.52, "75 M", text01, text2);
 		
 		SVGText text3 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"41.47\" y=\"303.36\">H</text>"));
-		SVGText text03 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 47.04, "75 MH", text01, text3);
+		SVGElement text03 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 47.04, "75 MH", text01, text3);
 		
 		SVGText text4 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"46.99\" y=\"303.36\">z,</text>"));
-		SVGText text04 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 53.02, "75 MHz,", text01, text4);
+		SVGElement text04 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 53.02, "75 MHz,", text01, text4);
 		
 		SVGText text5 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"55.11\" y=\"303.36\">CD</text>"));
-		SVGText text05 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 66.25, "75 MHz, CD", text01, text5);
+		SVGElement text05 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 66.25, "75 MHz, CD", text01, text5);
 		
 		SVGText text6 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"66.08\" y=\"303.36\">Cl</text>"));
-		SVGText text06 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 73.81, "75 MHz, CDCl", text01, text6);
+		SVGElement text06 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 73.81, "75 MHz, CDCl", text01, text6);
 		
 		SVGText text7 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:5.7091;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"73.26\" y=\"301.68\">3</text>"));
-		SVGText text07 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 76.45, "75 MHz, CDCl_{3", text01, text7);
+		SVGElement text07 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 76.45, "75 MHz, CDCl_{3", text01, text7);
 	}
 
 	@Test

@@ -134,7 +134,7 @@ public abstract class SVGPoly extends SVGElement {
 		saveGraphicsSettingsAndApplyTransform(g2d);
 		Line2D path = createAndSetLine2D();
 		fill(g2d, path);
-		drawStroke(g2d, path);
+		draw(g2d, path);
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
