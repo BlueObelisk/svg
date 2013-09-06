@@ -180,7 +180,7 @@ public class SVGUtil {
 			g.getAttribute("font-size").detach();
 			List<SVGElement> texts = SVGUtil.getQuerySVGElements(g, "./svg:text[not(@font-size)]");
 			for (SVGElement text : texts) {
-				((SVGText)text).setFontSize(fontSize);
+				((SVGElement)text).setFontSize(fontSize);
 			}
 		}
 	}

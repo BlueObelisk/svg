@@ -19,9 +19,11 @@ package org.xmlcml.graphics.svg;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -582,8 +584,8 @@ public class GraphicsElement extends Element implements SVGConstants {
 		}
 	}
 
-	protected void drawStroke(Graphics2D g2d, Shape shape) {
-		String stroke = this.getAttributeValue("stroke");
+	protected void draw(Graphics2D g2d, Shape shape) {
+		String stroke = this.getStroke();
 		if (stroke != null) {
 			Color strokeColor = colorMap.get(stroke);
 			Double strokeWidth = this.getStrokeWidth();
@@ -596,6 +598,96 @@ public class GraphicsElement extends Element implements SVGConstants {
 			restoreColor(g2d);
 			restoreStroke(g2d);
 		}
+	}
+	
+	protected void setAntialiasing(Graphics2D g2d, boolean on) {
+		g2d.setRenderingHint(
+		    RenderingHints.KEY_ANTIALIASING,
+		    (on ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF)
+	    );
+	}
+
+	protected void setTextAntialiasing(Graphics2D g2d, boolean on) {
+		g2d.setRenderingHint(
+		    RenderingHints.KEY_TEXT_ANTIALIASING,
+		    (on ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF)
+	    );
+	}
+
+	protected void setGraphicsFill(Graphics2D g2d) {
+		String fillS = this.getFill();
+		if (fillS != null) {
+			Color fillColor = GraphicsElement.getJava2DColor(fillS);
+			g2d.setColor(fillColor);
+		} else {
+			g2d.setColor(null);
+		}
+	}
+
+	protected void setGraphicsStroke(Graphics2D g2d) {
+		String strokeS = this.getStroke();
+		if (strokeS != null) {
+			Color strokeColor = GraphicsElement.getJava2DColor(strokeS);
+			g2d.setColor(strokeColor);
+		} else {
+			g2d.setColor(null);
+		}
+	}
+
+	protected void drawFill(Graphics2D g2d, GeneralPath path) {
+		setGraphicsStroke(g2d);
+		draw(g2d, path);
+		setGraphicsFill(g2d);
+		fill(g2d, path);
+	}
+
+	/**
+	 * translate SVG string to Java2D
+	 * opacity defaults to 1.0
+	 * @param color
+	 * @param colorS
+	 * @return
+	 */
+	public static Color getJava2DColor(String colorS) {
+		return getJava2DColor(colorS, 1.0);
+	}
+
+	/**
+	 * 
+	 * @param colorS common colors ("yellow"), etc or hexString
+	 * @param opacity 0.0 to 1.0
+	 * @return java Color or null
+	 */
+	public static Color getJava2DColor(String colorS, Double opacity) {
+		Color color = null;
+		if ("none".equals(colorS)) {
+		} else if (colorS != null) {
+			color = colorMap.get(colorS);
+			if (color == null) {
+				if (colorS.length() == 7 && colorS.startsWith(S_HASH)) {
+					try {
+						int red = Integer.parseInt(colorS.substring(1, 3), 16);
+						int green = Integer.parseInt(colorS.substring(3, 5), 16);
+						int blue = Integer.parseInt(colorS.substring(5, 7), 16);
+						color = new Color(red, green, blue, 0);
+					} catch (Exception e) {
+						throw new RuntimeException("Cannot parse: "+colorS);
+					}
+					colorS = colorS.substring(1);
+				} else {
+//					System.err.println("Unknown color: "+colorS);
+				}
+			}
+		}
+		if (color != null) {
+			if (opacity == null) {
+				opacity = 1.0;
+			}
+			color = (Double.isNaN(opacity)) ? color : new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (255.0 * opacity));
+		} else {
+			color = new Color(255, 255, 255, 0);
+		}
+		return color;
 	}
 	
 

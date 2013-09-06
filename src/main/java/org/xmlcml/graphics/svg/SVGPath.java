@@ -18,6 +18,7 @@ package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -134,16 +135,6 @@ public class SVGPath extends SVGElement {
 		path.setFill("none");
 	}
 	
-//	/** creates a list of primitives
-//	 * at present Move, Line, Curve, Z
-//	 * @param d
-//	 * @return
-//	 */
-//	public List<SVGPathPrimitive> parseD() {
-//		String d = getDString();
-//		return d == null ? null : SVGPathPrimitive.parseD(d);
-//	}
-	
 	/** creates a list of primitives
 	 * at present Move, Line, Curve, Z
 	 * @param d
@@ -196,10 +187,10 @@ public class SVGPath extends SVGElement {
 	
 	protected void drawElement(Graphics2D g2d) {
 		saveGraphicsSettingsAndApplyTransform(g2d);
-		applyTransformationToPrimitives(cumulativeTransform);
+		setAntialiasing(g2d, true);
 		GeneralPath path = createPath2D();
-		fill(g2d, path);
-		drawStroke(g2d, path);
+		path.transform(cumulativeTransform.getAffineTransform());
+		drawFill(g2d, path);
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 

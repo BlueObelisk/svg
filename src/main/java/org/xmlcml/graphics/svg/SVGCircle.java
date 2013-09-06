@@ -114,7 +114,7 @@ public class SVGCircle extends SVGElement {
 		double rad = transform(r, cumulativeTransform);
 		Ellipse2D ellipse = new Ellipse2D.Double(xy0.x-rad, xy0.y-rad, rad+rad, rad+rad);
 		fill(g2d, ellipse);
-		drawStroke(g2d, ellipse);
+		draw(g2d, ellipse);
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 	

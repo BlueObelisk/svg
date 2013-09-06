@@ -19,6 +19,7 @@ package org.xmlcml.graphics.svg;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -520,55 +521,6 @@ public class SVGElement extends GraphicsElement {
 		return color;
 	}
 
-	/**
-	 * translate SVG string to Java2D
-	 * opacity defaults to 1.0
-	 * @param color
-	 * @param colorS
-	 * @return
-	 */
-	public static Color getJava2DColor(String colorS) {
-		return getJava2DColor(colorS, 1.0);
-	}
-
-	/**
-	 * 
-	 * @param colorS common colors ("yellow"), etc or hexString
-	 * @param opacity 0.0 to 1.0
-	 * @return java Color or null
-	 */
-	public static Color getJava2DColor(String colorS, Double opacity) {
-		Color color = null;
-		if ("none".equals(colorS)) {
-		} else if (colorS != null) {
-			color = colorMap.get(colorS);
-			if (color == null) {
-				if (colorS.length() == 7 && colorS.startsWith(S_HASH)) {
-					try {
-						int red = Integer.parseInt(colorS.substring(1, 3), 16);
-						int green = Integer.parseInt(colorS.substring(3, 5), 16);
-						int blue = Integer.parseInt(colorS.substring(5, 7), 16);
-						color = new Color(red, green, blue, 0);
-					} catch (Exception e) {
-						throw new RuntimeException("Cannot parse: "+colorS);
-					}
-					colorS = colorS.substring(1);
-				} else {
-//					System.err.println("Unknown color: "+colorS);
-				}
-			}
-		}
-		if (color != null) {
-			if (opacity == null) {
-				opacity = 1.0;
-			}
-			color = (Double.isNaN(opacity)) ? color : new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (255.0 * opacity));
-		} else {
-			color = new Color(255, 255, 255, 0);
-		}
-		return color;
-	}
-	
 	/**
 	 * transforms xy
 	 * messy

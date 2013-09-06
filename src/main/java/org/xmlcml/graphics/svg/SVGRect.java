@@ -153,7 +153,7 @@ public class SVGRect extends SVGElement {
 		
 		Rectangle2D rect = new Rectangle2D.Double(xy1.x, xy1.y, xy2.x-xy1.x, xy2.y-xy1.y);
 		fill(g2d, rect);
-		drawStroke(g2d, rect);
+		draw(g2d, rect);
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 

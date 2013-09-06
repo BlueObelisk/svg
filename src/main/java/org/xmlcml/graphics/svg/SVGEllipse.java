@@ -95,7 +95,7 @@ public class SVGEllipse extends SVGElement {
 		
 		Ellipse2D ellipse = new Ellipse2D.Double(xy0.x - rrx, xy0.y - rry, rrx + rrx, rry + rry);
 		fill(g2d, ellipse);
-		drawStroke(g2d, ellipse);
+		draw(g2d, ellipse);
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 	

@@ -178,7 +178,7 @@ public class SVGLine extends SVGElement {
 		ensureCumulativeTransform();
 		Line2D line = createAndSetLine2D();
 		fill(g2d, line);
-		drawStroke(g2d, line);
+		draw(g2d, line);
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
