@@ -330,11 +330,14 @@ public class SVGImage extends SVGElement {
 
 	private static void writeByWriter(BufferedImage bufferedImage,
 			String mimeType, FileOutputStream fos) throws IOException {
-		boolean ok = false;
-		ImageWriter imageWriter = getFirstKnownImageWriter(mimeType);
-	    ImageOutputStream ios = ImageIO.createImageOutputStream(fos);
-	    imageWriter.setOutput(ios);
-	    imageWriter.write(bufferedImage);
+		if (bufferedImage != null) {
+			ImageWriter imageWriter = getFirstKnownImageWriter(mimeType);
+		    ImageOutputStream ios = ImageIO.createImageOutputStream(fos);
+		    imageWriter.setOutput(ios);
+		    imageWriter.write(bufferedImage);
+		} else {
+			LOG.error("NULL BufferedImage");
+		}
 	}
 
 	public static ImageWriter getFirstKnownImageWriter(String mimeType) {

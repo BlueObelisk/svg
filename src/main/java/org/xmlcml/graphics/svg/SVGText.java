@@ -1,5 +1,6 @@
 package org.xmlcml.graphics.svg;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -18,7 +19,6 @@ import org.xmlcml.euclid.EuclidConstants;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Util;
@@ -34,10 +34,9 @@ import org.xmlcml.euclid.Vector2;
  */
 public class SVGText extends SVGElement {
 
-
 	private static Logger LOG = Logger.getLogger(SVGText.class);
-	
 
+	private static final double _SVG2AWT_FONT_SCALE = 5.0;
 	public final static String TAG ="text";
 	
     public static String SUB0 = CMLConstants.S_UNDER+CMLConstants.S_LCURLY;
@@ -164,15 +163,25 @@ public class SVGText extends SVGElement {
     
 	protected void drawElement(Graphics2D g2d) {
 		saveGraphicsSettingsAndApplyTransform(g2d);
+		String fill = this.getFill();
+		Color fillColor = getJava2DColor(fill); 
+		// doesn't do anything!
 		double fontSize = this.getFontSize();
-		fontSize *= cumulativeTransform.getMatrixAsArray()[0] * 0.3;
+		fontSize *= cumulativeTransform.getMatrixAsArray()[0] * _SVG2AWT_FONT_SCALE;
 		fontSize = (fontSize < 8) ? 8 : fontSize;
+		BasicStroke stroke = (BasicStroke) g2d.getStroke();
+		Font font = g2d.getFont();
 		String text = this.getText();
 		if (text != null) {
 			Real2 xy = this.getXY();
 			xy = transform(xy, cumulativeTransform);
-			xy.plusEquals(new Real2(fontSize*0.65, -0.65*fontSize));
+			LOG.debug("XY "+xy);
+			// why?
+//			xy.plusEquals(new Real2(fontSize*0.65, -0.65*fontSize));
 			saveColor(g2d);
+			if (fillColor != null) {
+				g2d.setColor(fillColor);
+			}
 			g2d.drawString(text, (int)xy.x, (int)xy.y);
 			restoreColor(g2d);
 		}
