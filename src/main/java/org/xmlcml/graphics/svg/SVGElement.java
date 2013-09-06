@@ -17,8 +17,8 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,9 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import nu.xom.Attribute;
 import nu.xom.Comment;
@@ -938,6 +936,19 @@ public class SVGElement extends GraphicsElement {
 			aggregateBBfromSelfAndDescendants();
 		}
 		return boundingBox;
+	}
+	
+	public Dimension getDimension() {
+		Dimension dimension = null;
+		getBoundingBox();
+		if (boundingBox != null) {
+			RealRange xrange = boundingBox.getXRange();
+			RealRange yrange = boundingBox.getYRange();
+			if (xrange != null && yrange != null) {
+				dimension = new Dimension((int)xrange.getRange(), (int) yrange.getRange());
+			}
+		}
+		return dimension;
 	}
 
 	protected void aggregateBBfromSelfAndDescendants() {

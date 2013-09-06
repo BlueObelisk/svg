@@ -23,9 +23,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Range;
 
 
 public class HiddenGraphics {
@@ -71,8 +71,24 @@ public class HiddenGraphics {
 		SVGImage.writeBufferedImage(img, mimeType, file);
 	}
 	
+	public BufferedImage createImageTranslatedToOrigin(SVGElement element) {
+		// element is already shifted to origin?
+		LOG.debug("CUM: "+element.getCumulativeTransform());
+		LOG.debug("Before shift: "+element.toXML().substring(0, 300));
+		SVGElement elementCopy = SVGElement.readAndCreateSVG(element);
+//		Real2Range boundingBox = element.getBoundingBox();
+//		Real2 shift = new Real2(boundingBox.getXMin(), boundingBox.getYMin());
+//		Real2 shift = new Real2(-boundingBox.getXMin(), -boundingBox.getYMin());
+//		Real2 shift = new Real2(0., 0.);
+//		elementCopy.translate(shift);
+//		LOG.debug("CUM: "+elementCopy.getCumulativeTransform());
+//		LOG.debug("Shifted to orgin: "+elementCopy.toXML().substring(0, 300));
+		return createImage(elementCopy);
+	}
+		
 	public BufferedImage createImage(SVGElement element) {
 		Graphics2D g2D = this.createGraphics();
+//		System.out.println(element.toXML());
 		element.draw(g2D);
 		return img;
 	}

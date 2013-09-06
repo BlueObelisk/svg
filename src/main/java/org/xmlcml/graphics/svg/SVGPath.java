@@ -196,6 +196,7 @@ public class SVGPath extends SVGElement {
 	
 	protected void drawElement(Graphics2D g2d) {
 		saveGraphicsSettingsAndApplyTransform(g2d);
+		applyTransformationToPrimitives(cumulativeTransform);
 		GeneralPath path = createPath2D();
 		fill(g2d, path);
 		drawStroke(g2d, path);
@@ -516,7 +517,10 @@ public class SVGPath extends SVGElement {
 		Real2 xymin = new Real2(xr.getMin(), yr.getMin());
 		xymin = xymin.multiplyBy(-1.0);
 		Transform2 t2 = new Transform2(new Vector2(xymin));
-//		List<SVGPathPrimitive> primitives = this.parseD();
+		applyTransformationToPrimitives(t2);
+	}
+
+	private void applyTransformationToPrimitives(Transform2 t2) {
 		List<SVGPathPrimitive> primitives = this.parseDString();
 		for (SVGPathPrimitive primitive : primitives) {
 			primitive.transformBy(t2);
