@@ -178,9 +178,7 @@ public class SVGText extends SVGElement {
 			setTextAntialiasing(g2d, true);
 			Real2 xy = this.getXY();
 			xy = transform(xy, cumulativeTransform);
-			LOG.debug("CUM "+cumulativeTransform);
-			LOG.trace("XY "+xy);
-//			xy.plusEquals(new Real2(fontSize*0.65, -0.65*fontSize)); //?? why
+			LOG.trace("CUM "+cumulativeTransform+"XY "+xy);
 			saveColor(g2d);
 			if (fillColor != null) {
 				g2d.setColor(fillColor);
