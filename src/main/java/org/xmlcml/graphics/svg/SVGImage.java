@@ -241,18 +241,18 @@ public class SVGImage extends SVGElement {
 		if (matcher.matches()) {
 			mimeType = matcher.group(1);
 			srcBase64 = matcher.group(2);
-			LOG.debug("base64 "+srcBase64.length());
+			LOG.trace("base64 "+srcBase64.length());
 		} else {
 			throw new RuntimeException("Cannot convert img/src");
 		}
 
 		byte[] byteArray = Base64.decode(srcBase64);
-		LOG.debug("bytes "+byteArray.length);
+		LOG.trace("bytes "+byteArray.length);
 		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
 		BufferedImage bufferedImage = null;
 		try {
 			bufferedImage = ImageIO.read(bais);
-			LOG.debug(bufferedImage);
+			LOG.trace(bufferedImage);
 		} catch (IOException e) {
 			throw new RuntimeException("Cannot read base64 image", e);
 		}
