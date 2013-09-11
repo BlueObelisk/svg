@@ -5,8 +5,11 @@ import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
 
+import nu.xom.Document;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2;
 
 public class HiddenGraphicsTest {
@@ -57,6 +60,19 @@ public class HiddenGraphicsTest {
 		SVGElement g = createExampleSvg();
 		hg.createImage(g);
 		hg.write(SVGImage.IMAGE_JPG, new File("target/exampleSvg.jpg"));
+	}
+	
+	@Test
+	/** this one has a bad antialias locally
+	 * 
+	 */
+	public void testAntialias() throws Exception {
+		HiddenGraphics hg = new HiddenGraphics();
+		File file = Fixtures.IMAGE_G_2_2_SVG;
+		Document document = CMLUtil.parseQuietlyToDocument(file);
+		SVGElement svg = SVGElement.readAndCreateSVG(Fixtures.IMAGE_G_2_2_SVG);
+		hg.createImage(svg);
+		hg.write(SVGImage.IMAGE_PNG, new File("target/image.g.2.2.png"));
 	}
 	
 	private SVGElement createExampleSvg() {

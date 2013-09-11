@@ -164,7 +164,7 @@ public abstract class SVGPoly extends SVGElement {
 		xy2 = transform(xy2, cumulativeTransform);
 		float width = 5.0f;
 		String style = this.getAttributeValue("style");
-		if (style.startsWith("stroke-width:")) {
+		if (style != null && style.startsWith("stroke-width:")) {
 			style = style.substring("stroke-width:".length());
 			style = style.substring(0, (style+S_SEMICOLON).indexOf(S_SEMICOLON));
 			width = (float) new Double(style).doubleValue();
@@ -186,8 +186,13 @@ public abstract class SVGPoly extends SVGElement {
      * @return this
      */
     public void format(int places) {
-    	real2Array.format(places);
-    	setReal2Array(real2Array);
+    	getReal2Array();
+    	if (real2Array == null) {
+    		throw new RuntimeException("Null real2Array");
+    	} else {
+	    	real2Array.format(places);
+	    	setReal2Array(real2Array);
+    	}
     }
     
     public Real2 getLast() {
