@@ -1,4 +1,4 @@
-package org.xmlcml.graphics.svg;
+package org.xmlcml.graphics.svg.util;
 
 import java.util.List;
 
@@ -6,6 +6,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.graphics.svg.SVGPath;
+import org.xmlcml.graphics.svg.SVGPathPrimitive;
 
 public class TestSVGPathPrimitive {
 
