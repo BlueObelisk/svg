@@ -24,6 +24,7 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
@@ -33,8 +34,16 @@ import org.xmlcml.euclid.Transform2;
  * @author pm286
  *
  */
-public class SVGEllipse extends SVGElement {
+public class SVGEllipse extends SVGShape {
 
+
+	private final static Logger LOG = Logger.getLogger(SVGEllipse.class);
+
+	private static final String RX = "rx";
+	private static final String RY = "ry";
+	private static final String R = "r";
+
+	
 	public final static String TAG ="ellipse";
 
 	/** constructor
@@ -104,11 +113,11 @@ public class SVGEllipse extends SVGElement {
 	}
 	
 	public double getRX() {
-		return this.getCoordinateValueDefaultZero("rx");
+		return this.getCoordinateValueDefaultZero(RX);
 	}
 	
 	public double getRY() {
-		return this.getCoordinateValueDefaultZero("ry");
+		return this.getCoordinateValueDefaultZero(RY);
 	}
 	
 	public void applyTransform(Transform2 transform) {
@@ -129,11 +138,11 @@ public class SVGEllipse extends SVGElement {
 	}
 
 	public void setRX(double x) {
-		this.addAttribute(new Attribute("rx", String.valueOf(x)));
+		this.addAttribute(new Attribute(RX, String.valueOf(x)));
 	}
 
 	public void setRY(double y) {
-		this.addAttribute(new Attribute("ry", String.valueOf(y)));
+		this.addAttribute(new Attribute(RY, String.valueOf(y)));
 	}
 
 	/**
@@ -147,7 +156,7 @@ public class SVGEllipse extends SVGElement {
 	 * @param rad the rad to set
 	 */
 	public void setRad(double rad) {
-		this.addAttribute(new Attribute("r", String.valueOf(rad)));
+		this.addAttribute(new Attribute(R, String.valueOf(rad)));
 	}
 
 	/** extent of ellipse
@@ -163,6 +172,11 @@ public class SVGEllipse extends SVGElement {
 			boundingBox.add(center.plus(rad));
 		}
 		return boundingBox;
+	}
+
+	@Override
+	public String getGeometricHash() {
+		return getAttributeValue(CX)+" "+getAttributeValue(CY)+" "+getAttributeValue(RX)+" "+getAttributeValue(RY);
 	}
 	
 	

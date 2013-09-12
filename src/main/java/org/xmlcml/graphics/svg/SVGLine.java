@@ -43,7 +43,15 @@ import org.xmlcml.euclid.Transform2;
  * @author pm286
  *
  */
-public class SVGLine extends SVGElement {
+public class SVGLine extends SVGShape {
+
+	private static final String STYLE = "style";
+	private static final String X1 = "x1";
+	private static final String X2 = "x2";
+	private static final String Y1 = "y1";
+	private static final String Y2 = "y2";
+	private static final String X = "x";
+	private static final String Y = "y";
 
 	public final static String TAG ="line";
 
@@ -128,17 +136,17 @@ public class SVGLine extends SVGElement {
 		if (x12 == null) {
 			System.err.println("null x2/y2 in line: ");
 		} else {
-			this.addAttribute(new Attribute("x"+(serial+1), String.valueOf(x12.getX())));
-			this.addAttribute(new Attribute("y"+(serial+1), String.valueOf(x12.getY())));
+			this.addAttribute(new Attribute(X+(serial+1), String.valueOf(x12.getX())));
+			this.addAttribute(new Attribute(Y+(serial+1), String.valueOf(x12.getY())));
 		}
 	}
 	
 	public Real2 getXY(int serial) {
 		Real2 xy = null;
 		if (serial == 0) {
-			xy = new Real2(this.getDouble("x1"), this.getDouble("y1"));
+			xy = new Real2(this.getDouble(X1), this.getDouble(Y1));
 		} else if (serial == 1) {
-			xy = new Real2(this.getDouble("x2"), this.getDouble("y2"));
+			xy = new Real2(this.getDouble(X2), this.getDouble(Y2));
 		}
 		return xy;
 	}
@@ -152,8 +160,8 @@ public class SVGLine extends SVGElement {
 		if (x12 == null) {
 			System.err.println("null x2/y2 in line: ");
 		} else {
-			this.addAttribute(new Attribute("x"+serial, String.valueOf(x12.getX())));
-			this.addAttribute(new Attribute("y"+serial, String.valueOf(x12.getY())));
+			this.addAttribute(new Attribute(X+serial, String.valueOf(x12.getX())));
+			this.addAttribute(new Attribute(Y+serial, String.valueOf(x12.getY())));
 		}
 	}
 	
@@ -161,9 +169,9 @@ public class SVGLine extends SVGElement {
 	public Real2 getX12(int serial) {
 		Real2 xy = null;
 		if (serial == 1) {
-			xy = new Real2(this.getDouble("x1"), this.getDouble("y1"));
+			xy = new Real2(this.getDouble(X1), this.getDouble(Y1));
 		} else if (serial == 2) {
-			xy = new Real2(this.getDouble("x2"), this.getDouble("y2"));
+			xy = new Real2(this.getDouble(X2), this.getDouble(Y2));
 		}
 		return xy;
 	}
@@ -193,16 +201,16 @@ public class SVGLine extends SVGElement {
 
 	public Line2D.Double createAndSetLine2D() {
 		ensureCumulativeTransform();
-		double x1 = this.getDouble("x1");
-		double y1 = this.getDouble("y1");
+		double x1 = this.getDouble(X1);
+		double y1 = this.getDouble(Y1);
 		Real2 xy1 = new Real2(x1, y1);
 		xy1 = transform(xy1, cumulativeTransform);
-		double x2 = this.getDouble("x2");
-		double y2 = this.getDouble("y2");
+		double x2 = this.getDouble(X2);
+		double y2 = this.getDouble(Y2);
 		Real2 xy2 = new Real2(x2, y2);
 		xy2 = transform(xy2, cumulativeTransform);
 		float width = 5.0f;
-		String style = this.getAttributeValue("style");
+		String style = this.getAttributeValue(STYLE);
 		if (style != null && style.startsWith("stroke-width:")) {
 			style = style.substring("stroke-width:".length());
 			style = style.substring(0, (style+S_SEMICOLON).indexOf(S_SEMICOLON));
@@ -434,5 +442,10 @@ public class SVGLine extends SVGElement {
 				this.setXY(xy1, 0);
 			}
 		}
+	}
+	
+	@Override
+	public String getGeometricHash() {
+		return getAttributeValue(X1)+" "+getAttributeValue(Y1)+" "+getAttributeValue(X2)+" "+getAttributeValue(Y2);
 	}
 }

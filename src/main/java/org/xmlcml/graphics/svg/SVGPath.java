@@ -46,7 +46,7 @@ import org.xmlcml.euclid.Vector2;
  * @author pm286
  *
  */
-public class SVGPath extends SVGElement {
+public class SVGPath extends SVGShape {
 
 	private static Logger LOG = Logger.getLogger(SVGPath.class);
 	static {
@@ -487,6 +487,7 @@ public class SVGPath extends SVGElement {
 		this.setDString(d);
 	}
 
+	@Override
 	public String getSignature() {
 		String sig = null;
 		if (getDString() != null) {
@@ -644,48 +645,9 @@ public class SVGPath extends SVGElement {
 		return SVGPath.extractPaths(SVGUtil.getQuerySVGElements(svgElement, ALL_PATH_XPATH));
 	}
 
+	@Override
+	public String getGeometricHash() {
+		return getDString();
+	}
 
 }
-//class Real2String {
-//	String s;
-//	String grabbed;
-//	float x;
-//	float y;
-//	int idx = 0;
-//	
-//	public Real2String(String s) {
-//		this.s = s;
-//		x = grabDouble();
-//		y = grabDouble();
-//	}
-//	
-//	public Real2 getReal2() {
-//		return new Real2(x, y);
-//	}
-//	
-//	public int getCharactersGrabbed() {
-//		return idx;
-//	}
-//	
-//	private float grabDouble() {
-//		String ss = s.substring(idx)+" ";
-//		String sss = null;
-//		float x;
-//		int idx0 = ss.indexOf(CMLConstants.S_SPACE);
-//		if (idx0 != -1) {
-//			sss = ss.substring(0, idx0);
-//			idx += idx0+1;
-//		} else {
-//			sss = CMLConstants.S_EMPTY;
-//		}
-//		try {
-//			x = (float)new Double(sss.substring(0, idx0)).floatValue();
-//		} catch (Exception e) {
-//			throw new RuntimeException("bad double ["+sss+"] ... "+s);
-//		}
-//		SVGPath.extractPaths(new ArrayList<SVGElement>());
-//		return x;
-//	}
-	
-//}
-
