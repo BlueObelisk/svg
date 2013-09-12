@@ -39,8 +39,12 @@ import org.xmlcml.euclid.Util;
  * @author pm286
  *
  */
-public class SVGRect extends SVGElement {
+public class SVGRect extends SVGShape {
 
+	private static final String HEIGHT = "height";
+	private static final String WIDTH = "width";
+	private static final String Y = "y";
+	private static final String X = "x";
 	final public static String TAG ="rect";
 
 	/** constructor
@@ -142,12 +146,12 @@ public class SVGRect extends SVGElement {
 	protected void drawElement(Graphics2D g2d) {
 		saveGraphicsSettingsAndApplyTransform(g2d);
 		ensureCumulativeTransform();
-		double x1 = this.getDouble("x");
-		double y1 = this.getDouble("y");
+		double x1 = this.getDouble(X);
+		double y1 = this.getDouble(Y);
 		Real2 xy1 = new Real2(x1, y1);
 		xy1 = transform(xy1, cumulativeTransform);
-		double w = this.getDouble("width");
-		double h = this.getDouble("height");
+		double w = this.getDouble(WIDTH);
+		double h = this.getDouble(HEIGHT);
 		Real2 xy2 = new Real2(x1+w, y1+h);
 		xy2 = transform(xy2, cumulativeTransform);
 		
@@ -224,5 +228,10 @@ public class SVGRect extends SVGElement {
 			}
 		}
 		return rectList;
+	}
+	
+	@Override
+	public String getGeometricHash() {
+		return getAttributeValue(X)+" "+getAttributeValue(Y)+" "+getAttributeValue(WIDTH)+" "+getAttributeValue(HEIGHT);
 	}
 }

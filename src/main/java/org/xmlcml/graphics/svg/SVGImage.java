@@ -51,7 +51,7 @@ import org.xmlcml.euclid.Transform2;
  * @author pm286
  *
  */
-public class SVGImage extends SVGElement {
+public class SVGImage extends SVGShape {
 
 	private final static Logger LOG = Logger.getLogger(SVGImage.class);
 	
@@ -66,8 +66,10 @@ public class SVGImage extends SVGElement {
 	
 	private static final String XLINK_PREF = "xlink";
 	private static final String HREF = "href";
+	private static final String SRC = "src";
 	private static final String XLINK_NS = "http://www.w3.org/1999/xlink";
 	public final static String TAG ="image";
+	
 	static Pattern IMG_SRC= Pattern.compile("data:(image/.*);base64,(.*)");
 	
 	private static Map<String, String> mimeType2ImageTypeMap;
@@ -381,6 +383,10 @@ public class SVGImage extends SVGElement {
 		}
 		return ok;
 	}
-	
+
+	@Override
+	public String getGeometricHash() {
+		return getAttributeValue(SRC)+" "+getAttributeValue(HREF);
+	}
 
 }

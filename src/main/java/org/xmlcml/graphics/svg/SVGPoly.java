@@ -44,7 +44,7 @@ import org.xmlcml.euclid.Transform2;
  * @author pm286
  *
  */
-public abstract class SVGPoly extends SVGElement {
+public abstract class SVGPoly extends SVGShape {
 	@SuppressWarnings("unused")
 	private static Logger LOG = Logger.getLogger(SVGPoly.class);
 	
@@ -353,4 +353,8 @@ public abstract class SVGPoly extends SVGElement {
 		return pointList;
 	}
 
+	@Override
+	public String getGeometricHash() {
+		return String.valueOf(real2Array);
+	}
 }

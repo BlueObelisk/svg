@@ -26,6 +26,7 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
@@ -36,9 +37,15 @@ import org.xmlcml.euclid.Util;
  * @author pm286
  *
  */
-public class SVGCircle extends SVGElement {
+public class SVGCircle extends SVGShape {
 
+	private final static Logger LOG = Logger.getLogger(SVGCircle.class);
+	
+	private static final String R = "r";
+	private static final String CX = "cx";
+	private static final String CY = "cy";
 	public final static String TAG ="circle";
+	
 	private Ellipse2D.Double circle2;
 
 	public Ellipse2D.Double getCircle2() {
@@ -106,9 +113,9 @@ public class SVGCircle extends SVGElement {
 	
 	protected void drawElement(Graphics2D g2d) {
 		saveGraphicsSettingsAndApplyTransform(g2d);
-		double x = this.getDouble("cx");
-		double y = this.getDouble("cy");
-		double r = this.getDouble("r");
+		double x = this.getDouble(CX);
+		double y = this.getDouble(CY);
+		double r = this.getDouble(R);
 		Real2 xy0 = new Real2(x, y);
 		xy0 = transform(xy0, cumulativeTransform);
 		double rad = transform(r, cumulativeTransform);
@@ -122,8 +129,8 @@ public class SVGCircle extends SVGElement {
 	 * @param x1 the x1 to set
 	 */
 	public void setXY(Real2 x1) {
-		this.addAttribute(new Attribute("cx", String.valueOf(x1.getX())));
-		this.addAttribute(new Attribute("cy", String.valueOf(x1.getY())));
+		this.addAttribute(new Attribute(CX, String.valueOf(x1.getX())));
+		this.addAttribute(new Attribute(CY, String.valueOf(x1.getY())));
 	}
 
 	/**
@@ -159,7 +166,7 @@ public class SVGCircle extends SVGElement {
 	 * @param rad the rad to set
 	 */
 	public void setRad(double rad) {
-		this.addAttribute(new Attribute("r", String.valueOf(rad)));
+		this.addAttribute(new Attribute(R, String.valueOf(rad)));
 	}
 	
 	/** get radius
@@ -167,16 +174,16 @@ public class SVGCircle extends SVGElement {
 	 * @return Double.NaN if not set
 	 */
 	public double getRad() {
-		String r = this.getAttributeValue("r");
+		String r = this.getAttributeValue(R);
 		Double d = new Double(r);
 		return (d == null) ? Double.NaN : d.doubleValue();
 	}
 
 	public Ellipse2D.Double createAndSetCircle2D() {
 		ensureCumulativeTransform();
-		double rad = this.getDouble("r");
-		double x1 = this.getDouble("cx");
-		double y1 = this.getDouble("cx");
+		double rad = this.getDouble(R);
+		double x1 = this.getDouble(CX);
+		double y1 = this.getDouble(CX);
 		Real2 xy1 = new Real2(x1, y1);
 		xy1 = transform(xy1, cumulativeTransform);
 		float width = 5.0f;
@@ -273,5 +280,10 @@ public class SVGCircle extends SVGElement {
 			}
 		}
 		return circleList;
+	}
+
+	@Override
+	public String getGeometricHash() {
+		return getAttributeValue(CX)+" "+getAttributeValue(CY)+" "+getAttributeValue(R);
 	}
 }

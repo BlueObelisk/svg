@@ -40,6 +40,14 @@ import org.xmlcml.euclid.RealArray;
  *
  */
 public class SVGPolyline extends SVGPoly {
+	private static final String Y2 = "y2";
+
+	private static final String X2 = "x2";
+
+	private static final String Y1 = "y1";
+
+	private static final String X1 = "x1";
+
 	private static Logger LOG = Logger.getLogger(SVGPolyline.class);
 	
 	public final static String TAG ="polyline";
@@ -72,10 +80,10 @@ public class SVGPolyline extends SVGPoly {
 	public SVGPolyline(SVGLine line) {
         this();
         CMLElement.copyAttributesFromTo(line, this);
-        CMLElement.deleteAttribute(this, "x1");
-        CMLElement.deleteAttribute(this, "y1");
-        CMLElement.deleteAttribute(this, "x2");
-        CMLElement.deleteAttribute(this, "y2");
+        CMLElement.deleteAttribute(this, X1);
+        CMLElement.deleteAttribute(this, Y1);
+        CMLElement.deleteAttribute(this, X2);
+        CMLElement.deleteAttribute(this, Y2);
         this.real2Array = new Real2Array();
         this.real2Array.add(line.getXY(0));
         this.real2Array.add(line.getXY(1));
