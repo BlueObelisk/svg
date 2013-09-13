@@ -48,7 +48,8 @@ public class SVGText extends SVGElement {
     public final static Double DEFAULT_FONT_WIDTH_FACTOR = 10.0;
     public final static Double MIN_WIDTH = 0.001; // useful for non printing characters
 
-	public final static String ALL_TEXT_XPATH = "//svg:text";
+// 	public final static String ALL_TEXT_XPATH = "//svg:text";
+	public final static String ALL_TEXT_XPATH = ".//svg:text";
 
 
 	private static final String BOLD = "bold";
@@ -701,7 +702,7 @@ public class SVGText extends SVGElement {
 	 * @param svgElement
 	 * @return
 	 */
-	public static List<SVGText> extractTexts(SVGElement svgElement) {
+	public static List<SVGText> extractSelfAndDescendantTexts(SVGElement svgElement) {
 		return SVGText.extractTexts(SVGUtil.getQuerySVGElements(svgElement, ALL_TEXT_XPATH));
 	}
 
