@@ -188,6 +188,7 @@ public class SVGPath extends SVGShape {
 	protected void drawElement(Graphics2D g2d) {
 		saveGraphicsSettingsAndApplyTransform(g2d);
 		setAntialiasing(g2d, true);
+//		setAntialiasing(g2d, false);
 		GeneralPath path = createPath2D();
 		path.transform(cumulativeTransform.getAffineTransform());
 		drawFill(g2d, path);
@@ -424,30 +425,6 @@ public class SVGPath extends SVGShape {
 		return 0.1;
 	}
 
-//	@Deprecated
-//	public GeneralPath createAndSetPath2D() {
-//		String s = this.getDString().trim()+S_SPACE;
-//		System.out.println(s);
-//		path2 = new GeneralPath();
-//		while (s.length() > 0) {
-//			if (s.startsWith("M")) {
-//				Real2String r2s = new Real2String(s.substring(1));
-//				path2.moveTo((float)r2s.x, (float)r2s.y);
-//				s = r2s.s.trim();
-//			} else if (s.startsWith("L")) {
-//				Real2String r2s = new Real2String(s.substring(1));
-//				path2.lineTo((float)r2s.x, (float)r2s.y);
-//				s = r2s.s.trim();
-//			} else if (s.startsWith("z") || s.startsWith("Z")) {
-//				path2.closePath();
-//				s = s.substring(1).trim();
-//			} else {
-//				throw new RuntimeException("Cannot create path: "+s);
-//			}
-//		}
-//		return path2;
-//	}
-	
 	public GeneralPath createPath2D() {
 		path2 = new GeneralPath();
 		ensurePrimitives();

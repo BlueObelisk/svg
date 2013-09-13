@@ -75,6 +75,32 @@ public class HiddenGraphicsTest {
 		hg.write(SVGImage.IMAGE_PNG, new File("target/image.g.2.2.png"));
 	}
 	
+	@Test
+	/** 
+	 * 
+	 */
+	public void testImage3_2() throws Exception {
+		HiddenGraphics hg = new HiddenGraphics();
+		File file = Fixtures.IMAGE_G_3_2_SVG;
+		Document document = CMLUtil.parseQuietlyToDocument(file);
+		SVGElement svg = SVGElement.readAndCreateSVG(Fixtures.IMAGE_G_3_2_SVG);
+		hg.createImage(svg);
+		hg.write(SVGImage.IMAGE_PNG, new File("target/image.g.3.2.png"));
+	}
+	
+	@Test
+	/** simple tree
+	 * 
+	 */
+	public void testImage8_2() throws Exception {
+		HiddenGraphics hg = new HiddenGraphics();
+		File file = Fixtures.IMAGE_G_8_2_SVG;
+		Document document = CMLUtil.parseQuietlyToDocument(file);
+		SVGElement svg = SVGElement.readAndCreateSVG(Fixtures.IMAGE_G_8_2_SVG);
+		hg.createImage(svg);
+		hg.write(SVGImage.IMAGE_PNG, new File("target/image.g.8.2.png"));
+	}
+	
 	private SVGElement createExampleSvg() {
 		SVGSVG g = new SVGSVG();
 		SVGCircle circle;

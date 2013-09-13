@@ -16,6 +16,7 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,6 +83,11 @@ public class SVGPolygon extends SVGPoly {
 		return real2Array.size();
 	}
 
+	@Override
+	protected void drawElement(Graphics2D g2d) {
+		super.drawPolylineOrGon(g2d, true);
+	}
+	
 	/** makes a new list composed of the polygons in the list
 	 * 
 	 * @param elements
