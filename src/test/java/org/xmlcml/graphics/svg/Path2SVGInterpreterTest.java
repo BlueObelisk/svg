@@ -74,7 +74,7 @@ public class Path2SVGInterpreterTest {
 	@Test
 	public void bmcLogoTestInSitu() throws IOException {
 		SVGElement svgElement = createAndProcessElement(Fixtures.PATHS_BMCLOGO_SVG);
-		CMLUtil.debug(svgElement, new FileOutputStream("target/converted"+System.currentTimeMillis()+".svg"), 1);
+		SVGUtil.debug(svgElement, new FileOutputStream("target/converted"+System.currentTimeMillis()+".svg"), 1);
 		List<SVGElement> svgElements = SVGUtil.getQuerySVGElements(svgElement, "/*/*/svg:*");
 		Assert.assertEquals("converted", 23, svgElements.size());
 		Assert.assertTrue("0 "+svgElements.get(0).getClass().getSimpleName(), svgElements.get(0) instanceof SVGPolygon);

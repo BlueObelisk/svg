@@ -16,6 +16,8 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -151,6 +153,11 @@ public class SVGPolyline extends SVGPoly {
 	
 	public void setClosed(boolean isClosed) {
 		this.isClosed = isClosed;
+	}
+
+	@Override
+	protected void drawElement(Graphics2D g2d) {
+		super.drawPolylineOrGon(g2d, false);
 	}
 	
 	/** pass polyline or convert line.
@@ -361,9 +368,9 @@ public class SVGPolyline extends SVGPoly {
 //		pointList = null;
 	}
 	
-	public SVGPolygon createPolygon(double eps) {
+	public SVGPoly createPolygon(double eps) {
 		createLineList();
-		SVGPolygon polygon = null;
+		SVGPoly polygon = null;
 		if (real2Array == null) {
 			throw new RuntimeException("null real2Array");
 		}

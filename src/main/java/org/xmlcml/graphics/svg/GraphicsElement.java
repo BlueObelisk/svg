@@ -47,6 +47,8 @@ import org.xmlcml.euclid.Transform2;
  */
 public class GraphicsElement extends Element implements SVGConstants {
 
+	private static final String NONE = "none";
+	private static final String FILL = "fill";
 	private final static Logger LOG = Logger.getLogger(GraphicsElement.class);
 	
 	public enum FontWeight {
@@ -448,7 +450,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 		text.setFontSize(new Double(20.));
 		text.setFontWeight(FontWeight.BOLD);
 		g.appendChild(text);
-		CMLUtil.debug(svg, fos, 2);
+		SVGUtil.debug(svg, fos, 2);
 		fos.close();		
 	}
 	/**
@@ -575,21 +577,21 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
 	protected void fill(Graphics2D g2d, Shape shape) {
-		String fill = this.getAttributeValue("fill");
-		if (fill != null) {
+		String fill = this.getAttributeValue(FILL);
+		if (fill != null && !NONE.equalsIgnoreCase(fill)) {
 			Color fillColor = colorMap.get(fill);
 			g2d.setColor(fillColor);
 			g2d.fill(shape);
-			restoreColor(g2d);
 		}
+		restoreColor(g2d);
 	}
 
 	protected void draw(Graphics2D g2d, Shape shape) {
 		String stroke = this.getStroke();
-		if (stroke != null) {
-			Color strokeColor = colorMap.get(stroke);
+		if (stroke != null && !NONE.equalsIgnoreCase(stroke)) {
+			Color strokeColor = convertStroke(stroke);
 			Double strokeWidth = this.getStrokeWidth();
-			strokeWidth = (strokeWidth == null) ? 1.0 : strokeWidth;
+			strokeWidth = (strokeWidth == null) ? 0.3 : strokeWidth;
 			strokeWidth = SVGElement.transform(strokeWidth, cumulativeTransform);
 			Stroke s = new BasicStroke((float) (double) strokeWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 			g2d.setStroke(s);
@@ -600,6 +602,36 @@ public class GraphicsElement extends Element implements SVGConstants {
 		}
 	}
 	
+	private Color convertStroke(String stroke) {
+		Color strokeColor = null;
+		if (stroke == null) {
+			colorMap.get(stroke);
+		} else if (stroke.startsWith("#")) {
+			String hex = stroke.substring(1);
+			if (hex.length() == 6) {
+				Integer red = Integer.parseInt(hex.substring(0, 2), 16);
+				Integer green = Integer.parseInt(hex.substring(2, 4), 16);
+				Integer blue = Integer.parseInt(hex.substring(4, 6), 16);
+				strokeColor = new Color(red, green, blue);
+			} else if (hex.length() == 3) {
+				Integer red = Integer.parseInt(hex.substring(0, 1), 16);
+				Integer green = Integer.parseInt(hex.substring(1, 2), 16);
+				Integer blue = Integer.parseInt(hex.substring(2, 3), 16);
+				strokeColor = new Color(red*16, green*16, blue*16);
+			} else {
+				LOG.error("Cannot parse color: "+stroke);
+			}
+
+		} else {
+			strokeColor = colorMap.get(stroke); 
+			if (strokeColor == null) {
+				LOG.error("Cannot parse color: "+stroke);
+			}
+		}
+		if (strokeColor == null) strokeColor = Color.RED;
+		return strokeColor;
+	}
+
 	protected void setAntialiasing(Graphics2D g2d, boolean on) {
 		g2d.setRenderingHint(
 		    RenderingHints.KEY_ANTIALIASING,
@@ -660,7 +692,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	 */
 	public static Color getJava2DColor(String colorS, Double opacity) {
 		Color color = null;
-		if ("none".equals(colorS)) {
+		if (NONE.equals(colorS)) {
 		} else if (colorS != null) {
 			color = colorMap.get(colorS);
 			if (color == null) {

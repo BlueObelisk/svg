@@ -128,7 +128,7 @@ public class CompacterTest {
 		SVGSVG topG = compacter.compactChildAttributesIntoGroups(textList);
 		Assert.assertNotNull(topG);
 		Assert.assertEquals("g", 7, topG.query("//*[local-name()='g']").size());
-//		CMLUtil.debug(topG, new FileOutputStream("target/g.8.0.svg"), 1);
+//		SVGUtil.debug(topG, new FileOutputStream("target/g.8.0.svg"), 1);
 	}
 	
 	@Test
@@ -141,7 +141,7 @@ public class CompacterTest {
 		List<SVGG> gList = compacter.compactElements(elementList);
 		Assert.assertNotNull(gList);
 		Assert.assertEquals("gList", 15, gList.size());
-//		CMLUtil.debug(compacter.getTopG(), new FileOutputStream("target/page6elements.svg"), 1);
+//		SVGUtil.debug(compacter.getTopG(), new FileOutputStream("target/page6elements.svg"), 1);
 	}
 	
 	@Test
@@ -154,6 +154,6 @@ public class CompacterTest {
 		List<SVGG> gList = compacter.compactElements(elementList);
 		compacter.compactGroups(gList);
 		Assert.assertEquals("gList", 15, gList.size());
-//		CMLUtil.debug(compacter.getTopG(), new FileOutputStream("target/page6elsAtts.svg"), 1);
+//		SVGUtil.debug(compacter.getTopG(), new FileOutputStream("target/page6elsAtts.svg"), 1);
 	}
 }

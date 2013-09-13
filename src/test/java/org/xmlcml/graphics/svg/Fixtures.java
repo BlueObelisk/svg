@@ -10,6 +10,8 @@ public class Fixtures {
 	public static final File TEST_SVG = new File(RESOURCES_DIR, "org/xmlcml/graphics/svg");
 	public static final File IMAGES_DIR = new File(TEST_SVG, "images");
 	public static final File IMAGE_G_2_2_SVG = new File(IMAGES_DIR, "image.g.2.2.svg");
+	public static final File IMAGE_G_3_2_SVG = new File(IMAGES_DIR, "image.g.3.2.svg");
+	public static final File IMAGE_G_8_2_SVG = new File(IMAGES_DIR, "image.g.8.2.svg");
 	
 	public static final File PATHS_DIR = new File(RESOURCES_DIR, "org/xmlcml/graphics/svg/paths");
 	public static final File PATHS_BMCLOGO_SVG = new File(PATHS_DIR, "bmclogo.svg");

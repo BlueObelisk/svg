@@ -20,6 +20,7 @@ package org.xmlcml.graphics.svg;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +46,11 @@ import org.xmlcml.euclid.Transform2;
  *
  */
 public abstract class SVGPoly extends SVGShape {
+	private static final String X1 = "x1";
+	private static final String X2 = "x2";
+	private static final String Y1 = "y1";
+	private static final String Y2 = "y2";
+
 	@SuppressWarnings("unused")
 	private static Logger LOG = Logger.getLogger(SVGPoly.class);
 	
@@ -129,14 +135,8 @@ public abstract class SVGPoly extends SVGShape {
 //  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="black" style="stroke-width:0.36;"/>
 //  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="white" style="stroke-width:0.12;"/>
 //</g>
-	
-	protected void drawElement(Graphics2D g2d) {
-		saveGraphicsSettingsAndApplyTransform(g2d);
-		Line2D path = createAndSetLine2D();
-		fill(g2d, path);
-		draw(g2d, path);
-		restoreGraphicsSettingsAndTransform(g2d);
-	}
+
+	protected abstract void drawElement(Graphics2D g2d);
 
 	public void applyAttributes(Graphics2D g2d) {
 		if (g2d != null) {
@@ -154,7 +154,7 @@ public abstract class SVGPoly extends SVGShape {
 	
 	public Line2D.Double createAndSetLine2D() {
 		ensureCumulativeTransform();
-		double x1 = this.getDouble("x1");
+		double x1 = this.getDouble(X1);
 		double y1 = this.getDouble("y1");
 		Real2 xy1 = new Real2(x1, y1);
 		xy1 = transform(xy1, cumulativeTransform);
@@ -164,6 +164,7 @@ public abstract class SVGPoly extends SVGShape {
 		xy2 = transform(xy2, cumulativeTransform);
 		float width = 5.0f;
 		String style = this.getAttributeValue("style");
+		// does this work???
 		if (style != null && style.startsWith("stroke-width:")) {
 			style = style.substring("stroke-width:".length());
 			style = style.substring(0, (style+S_SEMICOLON).indexOf(S_SEMICOLON));
@@ -356,5 +357,26 @@ public abstract class SVGPoly extends SVGShape {
 	@Override
 	public String getGeometricHash() {
 		return String.valueOf(real2Array);
+	}
+
+	protected void drawPolylineOrGon(Graphics2D g2d, boolean closed) {
+		saveGraphicsSettingsAndApplyTransform(g2d);
+		getReal2Array();
+		GeneralPath poly = 
+		        new GeneralPath(GeneralPath.WIND_EVEN_ODD, real2Array.size());
+		Real2 xy0 = real2Array.elementAt(0);
+		xy0 = transform(xy0, cumulativeTransform);
+		poly.moveTo(xy0.getX(), xy0.getY());
+		for (int i = 1; i < real2Array.size(); i++) {
+			Real2 xy = real2Array.elementAt(i);
+			xy = transform(xy, cumulativeTransform);
+		    poly.lineTo(xy.getX(), xy.getY());
+		};
+		if (closed) {
+			poly.closePath();
+		}
+		fill(g2d, poly);
+		draw(g2d, poly);
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 }

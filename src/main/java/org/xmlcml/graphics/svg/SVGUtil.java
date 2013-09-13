@@ -1,6 +1,7 @@
 package org.xmlcml.graphics.svg;
 
-import java.awt.geom.AffineTransform;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -176,7 +177,7 @@ public class SVGUtil {
 		List<SVGElement> gs = SVGUtil.getQuerySVGElements(svg, "//svg:g[@font-size and svg:text[not(@font-size)]]");
 		for (SVGElement g : gs) {
 			Double fontSize = g.getFontSize();
-			System.out.println("FS "+fontSize);
+			LOG.trace("FS "+fontSize);
 			g.getAttribute("font-size").detach();
 			List<SVGElement> texts = SVGUtil.getQuerySVGElements(g, "./svg:text[not(@font-size)]");
 			for (SVGElement text : texts) {
@@ -288,6 +289,15 @@ public class SVGUtil {
 		if (attName != null && value != null) {
 			Attribute attribute = new Attribute(SVGConstants.SVGX_PREFIX+CMLConstants.S_COLON+attName, SVGConstants.SVGX_NS, value);
 			svgElement.addAttribute(attribute);
+		}
+	}
+
+	public static void debug(Element gChunk, FileOutputStream fileOutputStream,
+			int indent) {
+		try {
+			CMLUtil.debug(gChunk, fileOutputStream, indent);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

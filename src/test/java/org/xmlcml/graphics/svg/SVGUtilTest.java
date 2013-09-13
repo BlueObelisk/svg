@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 
 import javax.imageio.ImageIO;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.cml.base.CMLUtil;
@@ -18,6 +19,8 @@ import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Vector2;
 
 public class SVGUtilTest {
+
+	private final static Logger LOG = Logger.getLogger(SVGUtilTest.class);
 
 	@Test
 	public void testInterposeGBetweenChildren() {
@@ -47,7 +50,7 @@ public class SVGUtilTest {
 		Assert.assertEquals(matrix[4], 0.0, 0.000000001);
 		Assert.assertEquals(matrix[5], 0.0, 0.000000001);
 		svgG.setTransform(transform2);
-		System.out.println(svgG.toXML());
+		LOG.trace(svgG.toXML());
 	}
 	
 	@Test
@@ -56,7 +59,7 @@ public class SVGUtilTest {
 		SVGG svgG = new SVGG();
 		Transform2 transform2 = new Transform2(new Angle(0.3));
 		AffineTransform affineTransform = transform2.getAffineTransform();
-		System.out.println(affineTransform);
+		LOG.trace(affineTransform);
 		int width = 300;
 		int height = 300;
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -113,12 +116,12 @@ public class SVGUtilTest {
 		rect1.setTransform(t2);
 		g.appendChild(circle1);
 		g.appendChild(rect1);
-		CMLUtil.debug(svg, new FileOutputStream("target/concat0.svg"), 1);
+		SVGUtil.debug(svg, new FileOutputStream("target/concat0.svg"), 1);
 //		g.setTransform(new Transform2(new Vector2(100., 50.)));
 		BufferedImage img = new BufferedImage(width+1, height+1, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = (Graphics2D) img.getGraphics();
 		svg.draw(g2d);
-		CMLUtil.debug(svg, new FileOutputStream("target/concat0a.svg"), 1);
+		SVGUtil.debug(svg, new FileOutputStream("target/concat0a.svg"), 1);
 		ImageIO.write(img, "png", new File("target/concat0.png"));
 //		Transform2 transform2 = new Transform2(new Vector2(20., -70.));
 //		svgG.setTransform(transform2);

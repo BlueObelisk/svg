@@ -44,8 +44,11 @@ public class HiddenGraphics {
 	}
 	private void setDefaults() {
 		this.type = PNG;
-		this.setDimension(new Dimension(400, 400));
+		setDefaultDimension();
 		this.setBackgroundColor(Color.WHITE);
+	}
+	private void setDefaultDimension() {
+		this.setDimension(new Dimension(400, 400));
 	}
 	private void setBackgroundColor(Color color) {
 		this.backgroundColor = color;
@@ -53,8 +56,18 @@ public class HiddenGraphics {
 	public void setDimension(Dimension d) {
 		this.dimension = d;
 	}
-	
+
 	public Graphics2D createGraphics() {
+		return createGraphics(null);
+	}
+
+	public Graphics2D createGraphics(SVGElement element) {
+		if (element != null) {
+			Real2Range boundingBox = element.getBoundingBox();
+			this.setDimension(boundingBox.getDimension());
+		} else {
+			this.setDefaultDimension();
+		}
 		// there may be ultra thin images for lines, etc.
 		img = new BufferedImage(Math.max(1, dimension.width), Math.max(1,  dimension.height), BufferedImage.TYPE_INT_ARGB);
 		g = img.createGraphics();
@@ -87,8 +100,8 @@ public class HiddenGraphics {
 	}
 		
 	public BufferedImage createImage(SVGElement element) {
-		Graphics2D g2D = this.createGraphics();
-//		System.out.println(element.toXML());
+		Graphics2D g2D = this.createGraphics(element);
+		LOG.trace(element.toXML());
 		element.draw(g2D);
 		return img;
 	}

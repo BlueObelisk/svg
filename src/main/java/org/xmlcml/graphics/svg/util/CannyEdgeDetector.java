@@ -602,7 +602,7 @@ public class CannyEdgeDetector {
 		}
 		String root = args[0];
      	 File file = new File(root+".bmp");
-     	 System.out.println(file.exists());
+     	 LOG.trace(file.exists());
 		 //create the detector
 		 CannyEdgeDetector detector = new CannyEdgeDetector();
 		 //adjust its parameters as desired

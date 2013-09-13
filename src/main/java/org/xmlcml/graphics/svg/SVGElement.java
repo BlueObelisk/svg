@@ -618,7 +618,7 @@ public class SVGElement extends GraphicsElement {
 //		int indent = 2;
 //		SVGSVG svg = new SVGSVG();
 //		svg.appendChild(g);
-//		CMLUtil.debug(svg, fos, indent);
+//		SVGUtil.debug(svg, fos, indent);
 //		fos.close();
 //		LOG.debug("wrote SVG "+outfile);
 	}
@@ -698,7 +698,7 @@ public class SVGElement extends GraphicsElement {
 		text.setFontStyle(FontStyle.ITALIC);
 		text.setFontWeight(FontWeight.BOLD);
 		g.appendChild(text);
-		CMLUtil.debug(svg, fos, 2);
+		SVGUtil.debug(svg, fos, 2);
 		fos.close();		
 	}
 	
