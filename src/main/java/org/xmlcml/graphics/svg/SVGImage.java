@@ -71,6 +71,7 @@ public class SVGImage extends SVGShape {
 	public final static String TAG ="image";
 	
 	static Pattern IMG_SRC= Pattern.compile("data:(image/.*);base64,(.*)");
+	public final static String ALL_IMAGE_XPATH = ".//svg:image";
 	
 	private static Map<String, String> mimeType2ImageTypeMap;
 	static {
@@ -285,6 +286,15 @@ public class SVGImage extends SVGShape {
 			}
 		}
 		return imageList;
+	}
+
+	/** convenience method to extract list of svgPaths in element
+	 * 
+	 * @param svgElement
+	 * @return
+	 */
+	public static List<SVGImage> extractSelfAndDescendantImages(SVGElement svgElement) {
+		return SVGImage.extractImages(SVGUtil.getQuerySVGElements(svgElement, ALL_IMAGE_XPATH));
 	}
 
 	public boolean writeImage(String imageFilename, String mimeType) throws IOException {

@@ -13,14 +13,14 @@ import java.util.List;
 public abstract class SVGShape extends SVGElement {
 	
 	public static final String ALL_SHAPE_XPATH = "" +
-			"//svg:circle | " +
-			"//svg:ellipse | " +
-			"//svg:image | " +
-			"//svg:line | " +
-			"//svg:path | " +
-			"//svg:polygon | " +
-			"//svg:polyline | " +
-			"//svg:rect | " +
+			".//svg:circle | " +
+			".//svg:ellipse | " +
+			".//svg:image | " +
+			".//svg:line | " +
+			".//svg:path | " +
+			".//svg:polygon | " +
+			".//svg:polyline | " +
+			".//svg:rect" +
 			"";
 
 	protected SVGShape(String name) {
@@ -60,7 +60,7 @@ public abstract class SVGShape extends SVGElement {
 	 * @param svgElement
 	 * @return
 	 */
-	public static List<SVGShape> extractShapes(SVGElement svgElement) {
+	public static List<SVGShape> extractSelfAndDescendantShapes(SVGElement svgElement) {
 		return SVGShape.extractShapes(SVGUtil.getQuerySVGElements(svgElement, ALL_SHAPE_XPATH));
 	}
 
