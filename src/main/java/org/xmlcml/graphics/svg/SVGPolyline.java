@@ -17,16 +17,14 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.Graphics2D;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
+import nu.xom.ParentNode;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.cml.base.CMLElement;
@@ -34,7 +32,6 @@ import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealArray;
 
 /** draws a straight line.
  * 
@@ -42,13 +39,14 @@ import org.xmlcml.euclid.RealArray;
  *
  */
 public class SVGPolyline extends SVGPoly {
-	private static final String Y2 = "y2";
 
-	private static final String X2 = "x2";
-
-	private static final String Y1 = "y1";
+	
+	public final static String ALL_POLYLINE_XPATH = ".//svg:polyline";
 
 	private static final String X1 = "x1";
+	private static final String X2 = "x2";
+	private static final String Y1 = "y1";
+	private static final String Y2 = "y2";
 
 	private static Logger LOG = Logger.getLogger(SVGPolyline.class);
 	
@@ -321,20 +319,25 @@ public class SVGPolyline extends SVGPoly {
 		marker.addLine(line);
 		pointList.add(marker);
 	}
-	
-	public List<SVGPolyline> createLinesSplitAtPoint(int split) {
+
+	/** split polyline at given position.
+	 * 
+	 * @param splitPosition
+	 * @return
+	 */
+	public List<SVGPolyline> createLinesSplitAtPoint(int splitPosition) {
 		createLineList();
 		List<SVGPolyline> polylines = null;
-		if (split > 0 && split <= lineList.size() ) {
+		if (splitPosition > 0 && splitPosition <= lineList.size() ) {
 			polylines = new ArrayList<SVGPolyline>();
 			SVGPolyline polyline0 = new SVGPolyline();
 			polylines.add(polyline0);
-			for (int i = 0; i < split; i++) {
+			for (int i = 0; i < splitPosition; i++) {
 				polyline0.add(new SVGLine(lineList.get(i)));
 			}
 			SVGPolyline polyline1 = new SVGPolyline();
 			polylines.add(polyline1);
-			for (int i = split; i < lineList.size(); i++) {
+			for (int i = splitPosition; i < lineList.size(); i++) {
 				polyline1.add(new SVGLine(lineList.get(i)));
 			}
 		}
@@ -438,6 +441,16 @@ public class SVGPolyline extends SVGPoly {
 		}
 		return polylineList;
 	}
+	
+	/** convenience method to extract list of svgTexts in element
+	 * 
+	 * @param svgElement
+	 * @return
+	 */
+	public static List<SVGPolyline> extractSelfAndDescendantPolylines(SVGElement svgElement) {
+		return SVGPolyline.extractPolylines(SVGUtil.getQuerySVGElements(svgElement, ALL_POLYLINE_XPATH));
+	}
+
 
 	/** appends points in polyline into this
 	 * 'start' allows for skipping common point(s) 
@@ -453,5 +466,24 @@ public class SVGPolyline extends SVGPoly {
 		this.setReal2Array(real2Array);
 		createLineList(true);
 		createPointList();
+	}
+
+	/** replaces polyline by its split SVGLines.
+	 *  
+	 *  <p>
+	 *  inserts new lines at old position of polyline
+	 *  </p>
+	 * @param polyline
+	 */
+	public static void replacePolyLineBySplitLines(SVGPolyline polyline) {
+		List<SVGLine> lines = polyline.createLineList();
+		ParentNode parent = polyline.getParent();
+		if (parent != null) {
+			int index = parent.indexOf(polyline);
+			for (int i = lines.size()-1; i >= 0; i--) {
+				parent.insertChild(lines.get(i), index);
+			}
+			polyline.detach();
+		}
 	}
 }

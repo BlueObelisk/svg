@@ -331,6 +331,11 @@ public class Path2ShapeConverter {
 		return strings;
 	}
 	
+	/** iterates over allShapes and extracts all splitLines.
+	 * 
+	 * @param shapeList
+	 * @return
+	 */
 	public List<SVGLine> splitPolylinesToLines(List<SVGShape> shapeList) {
 		LOG.trace("minLines: "+minLinesInPolyline);
 		List<SVGLine> totalSplitLineList = new ArrayList<SVGLine>();
