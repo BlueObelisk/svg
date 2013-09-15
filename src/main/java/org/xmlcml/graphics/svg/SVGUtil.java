@@ -301,6 +301,14 @@ public class SVGUtil {
 		}
 	}
 
+	public static void debug(Element element, String filename, int indent) {
+		try {
+			debug(element, new FileOutputStream(filename), indent);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 //	public static AffineTransform createAffineTransform(Transform2 transform2) {
 //		AffineTransform affineTransform = null;
 //		if (transform2 != null) {

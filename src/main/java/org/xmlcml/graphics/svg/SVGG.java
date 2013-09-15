@@ -40,6 +40,8 @@ public class SVGG extends SVGElement {
 	private static Logger LOG = Logger.getLogger(SVGG.class);
 
 	public final static String TAG ="g";
+	public final static String ALL_G_XPATH = ".//svg:g";
+	
 	/** constructor
 	 */
 	public SVGG() {
@@ -128,6 +130,17 @@ public class SVGG extends SVGElement {
 		}
 		return gList;
 	}
+	
+	/** convenience method to extract list of svgGs in element
+	 * 
+	 * @param svgElement
+	 * @return
+	 */
+	public static List<SVGG> extractSelfAndDescendantGs(SVGElement svgElement) {
+		return SVGG.extractGs(SVGUtil.getQuerySVGElements(svgElement, ALL_G_XPATH));
+	}
+
+
 
 	public void copyElementsFrom(List<? extends SVGElement> elementList) {
 		if (elementList != null) {

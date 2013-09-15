@@ -1054,7 +1054,9 @@ public class SVGElement extends GraphicsElement {
 	}
 	
 	public void setId(String id) {
-		this.addAttribute(new Attribute(ID, id));
+		if (id != null) {
+			this.addAttribute(new Attribute(ID, id));
+		}
 	}
 	
 	public String getId() {

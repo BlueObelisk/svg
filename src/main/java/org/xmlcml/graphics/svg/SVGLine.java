@@ -45,6 +45,8 @@ import org.xmlcml.euclid.Transform2;
  */
 public class SVGLine extends SVGShape {
 
+	public final static String ALL_LINE_XPATH = ".//svg:line";
+	
 	private static final String STYLE = "style";
 	private static final String X1 = "x1";
 	private static final String X2 = "x2";
@@ -448,4 +450,14 @@ public class SVGLine extends SVGShape {
 	public String getGeometricHash() {
 		return getAttributeValue(X1)+" "+getAttributeValue(Y1)+" "+getAttributeValue(X2)+" "+getAttributeValue(Y2);
 	}
+
+	/** convenience method to extract list of svgTexts in element
+	 * 
+	 * @param svgElement
+	 * @return
+	 */
+	public static List<SVGLine> extractSelfAndDescendantLines(SVGElement svgElement) {
+		return SVGLine.extractLines(SVGUtil.getQuerySVGElements(svgElement, ALL_LINE_XPATH));
+	}
+
 }

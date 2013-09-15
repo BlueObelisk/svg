@@ -82,7 +82,7 @@ public class SVGSVG extends SVGElement {
 		return this.getAttributeValue("id");
 	}
 
-	public static SVGSVG wrapAndWriteAsSVG(SVGG svgg, File file) {
+	public static SVGSVG wrapAndWriteAsSVG(SVGElement svgg, File file) {
 		SVGSVG svgsvg = wrapAsSVG(svgg);
 		try {
 			LOG.trace("Writing SVG "+file.getAbsolutePath());
@@ -93,7 +93,7 @@ public class SVGSVG extends SVGElement {
 		return svgsvg;
 	}
 
-	public static SVGSVG wrapAsSVG(SVGG svgg) {
+	public static SVGSVG wrapAsSVG(SVGElement svgg) {
 		if (svgg.getParent() != null) {
 			svgg.detach();
 		}

@@ -331,6 +331,24 @@ public abstract class SVGPoly extends SVGShape {
 		return lineList;
 	}
 	
+	/** iterates over all polys and extracts lines.
+	 * <p>
+	 * uses poly.createLineList()
+	 * </p>
+	 * @param polyList list of polys
+	 * @return
+	 */
+	public static List<SVGLine> splitPolylinesToLines(List<? extends SVGPoly> polyList) {
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		for (SVGPoly poly : polyList) {
+			List<SVGLine> lines = poly.createLineList();
+			lineList.addAll(lines);
+		}
+		return lineList;
+	}
+
+
+	
 	private void copyNonSVGAttributes(SVGPoly svgPoly, SVGLine line) {
 		for (int i = 0; i < svgPoly.getAttributeCount(); i++) {
 			Attribute attribute = svgPoly.getAttribute(i);
@@ -378,5 +396,12 @@ public abstract class SVGPoly extends SVGShape {
 		fill(g2d, poly);
 		draw(g2d, poly);
 		restoreGraphicsSettingsAndTransform(g2d);
+	}
+
+	public static void replacePolyLinesBySplitLines(SVGElement svgElement) {
+		List<SVGPolyline> polylineList = SVGPolyline.extractSelfAndDescendantPolylines(svgElement);
+		for (SVGPolyline polyline : polylineList) {
+			SVGPolyline.replacePolyLineBySplitLines(polyline);
+		}		
 	}
 }
