@@ -316,7 +316,7 @@ public class SVGImage extends SVGShape {
 	public static void writeBufferedImage(BufferedImage bufferedImage, String mimeType, File file) throws IOException {
 		boolean ok = SVGImage.checkIsKnownImageIOWriterMimeType(mimeType);
 		if (ok) {
-			LOG.debug("Writing: "+file.getAbsolutePath());
+			LOG.trace("Writing: "+file.getAbsolutePath());
 			FileOutputStream fos = new FileOutputStream(file);
 			writeByWriter(bufferedImage, mimeType, fos);
 //			ok = writeByImageIO(bufferedImage, mimeType, file);
