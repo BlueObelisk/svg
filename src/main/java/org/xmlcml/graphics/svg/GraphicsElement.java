@@ -138,7 +138,7 @@ public class GraphicsElement extends Element implements SVGConstants {
         copyAttributesChildrenElements(element);
     }
 
-	private void copyAttributesChildrenElements(GraphicsElement element) {
+	protected void copyAttributesChildrenElements(GraphicsElement element) {
 		copyAttributesFrom(element);
         copyChildrenFrom(element);
         copyNamespaces(element);
