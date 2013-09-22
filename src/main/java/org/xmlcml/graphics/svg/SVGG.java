@@ -17,6 +17,7 @@
 package org.xmlcml.graphics.svg;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,14 +141,26 @@ public class SVGG extends SVGElement {
 		return SVGG.extractGs(SVGUtil.getQuerySVGElements(svgElement, ALL_G_XPATH));
 	}
 
-
-
 	public void copyElementsFrom(List<? extends SVGElement> elementList) {
 		if (elementList != null) {
 			for (SVGElement element : elementList) {
 				this.appendChild(SVGElement.readAndCreateSVG(element));
 			}
 		}
+	}
+
+	/** Convenience method to return the SVGG (<g>) indicated by the path
+	 * 
+	 * @param svgFile
+	 * @param xPath (returns a list)
+	 * @param index // index in list (Java counting from 0, not XPath)
+	 * @return null if not found
+	 */
+	public final static SVGG createSVGGChunk(File svgFile, String xPath, int index) {
+		SVGElement svgElement = SVGElement.readAndCreateSVG(svgFile);
+		List<SVGElement> elementList = SVGG.generateElementList(svgElement, xPath);
+		SVGG graphic = (elementList.size() == 0) ? null : (SVGG) elementList.get(index);
+		return graphic;
 	}
 
 
