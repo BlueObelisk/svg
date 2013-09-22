@@ -190,17 +190,18 @@ public class SVGText extends SVGElement {
 	}
 
 	public void applyTransform(Transform2 t2) {
-		//assume scale and translation only
+		// transform the position and scale
 		Real2 xy = getXY();
 		xy.transformBy(t2);
 		this.setXY(xy);
 		transformFontSize(t2);
-		//rotate text? // not tested
 		Angle angle = t2.getAngleOfRotation();
+		//rotate characters to preserve relative orientation
 		if (angle != null && !angle.isEqualTo(0.0, EPS)) {
+			angle = angle.multiplyBy(-1.0);
 			Transform2 t = Transform2.getRotationAboutPoint(angle, xy);
+			t = t.concatenate(t2);
 			this.setTransform(t);
-			LOG.trace("text: "+this.toXML());
 		}
 	}
 
@@ -213,8 +214,9 @@ public class SVGText extends SVGElement {
 		// transform fontSize
 		if (fontSize != null) {
 			Real2 ff = new Real2(fontSize, 1.0);
-			ff.transformBy(t2);
-//			double size = ff.getX(); // old
+			Transform2 rotMat = new Transform2(t2);
+			rotMat.setTranslation(new Real2(0.0,0.0));
+			ff.transformBy(rotMat);
 			double size = Math.max(ff.getX(), ff.getY()); // takes account of rotation
 			LOG.trace("FS "+ff+" .. "+size);
 			this.setFontSize(size);

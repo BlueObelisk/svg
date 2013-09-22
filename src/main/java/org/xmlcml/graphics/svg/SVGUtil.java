@@ -18,6 +18,7 @@ import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.euclid.Vector2;
 
 public class SVGUtil {
 
@@ -307,6 +308,24 @@ public class SVGUtil {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static SVGSVG createSVGSVG(List<? extends SVGElement> elementList) {
+		SVGSVG svg = new SVGSVG();
+		Real2Range boundingBox = SVGElement.createBoundingBox(elementList);
+		if (boundingBox != null) {
+			svg.setWidth(boundingBox.getXRange().getRange());
+			svg.setHeight(boundingBox.getYRange().getRange());
+			Real2 origin = boundingBox.getCorners()[0];
+			Transform2 t2 = new Transform2(new Vector2(origin.multiplyBy(-1.0)));
+			SVGG g = new SVGG();
+			svg.appendChild(g);
+			g.setTransform(t2);
+			for (SVGElement element : elementList) {
+				g.appendChild(SVGElement.readAndCreateSVG(element));
+			}
+		}
+		return svg;
 	}
 
 //	public static AffineTransform createAffineTransform(Transform2 transform2) {
