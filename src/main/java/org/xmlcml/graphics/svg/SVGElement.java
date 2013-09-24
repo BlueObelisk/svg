@@ -63,6 +63,8 @@ import org.xmlcml.euclid.Transform2;
 public class SVGElement extends GraphicsElement {
 	private static Logger LOG = Logger.getLogger(GraphicsElement.class);
 
+	public final static String ALL_ELEMENT_XPATH = "//svg:element";
+
 	public final static String SVG_CLASS = "class";
 	public final static String IMPROPER = "improper";
 	public final static String IMPROPER_TRUE = "true";
@@ -1215,6 +1217,10 @@ public class SVGElement extends GraphicsElement {
 	public RealRange getRealRange(Direction direction) {
 		Real2Range bbox = this.getBoundingBox();
 		return bbox == null ? null : bbox.getRealRange(direction);
+	}
+
+	public static List<SVGElement> extractSelfAndDescendantElements(SVGG g) {
+		return SVGUtil.getQuerySVGElements(g, ALL_ELEMENT_XPATH);
 	}
 
 

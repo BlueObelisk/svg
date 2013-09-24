@@ -382,6 +382,9 @@ public class SVGPolyline extends SVGPoly {
 				Real2Array real2Array1 = new Real2Array(real2Array);
 				real2Array1.deleteElement(real2Array.size()-1);
 				polygon = new SVGPolygon(real2Array1);
+			} else if (this.isClosed()) {
+				Real2Array real2Array1 = new Real2Array(real2Array);
+				polygon = new SVGPolygon(real2Array1);
 			}
 		}
 		return polygon;
@@ -485,5 +488,14 @@ public class SVGPolyline extends SVGPoly {
 			}
 			polyline.detach();
 		}
+	}
+
+	/** number of lines.
+	 * 
+	 * @return
+	 */
+	public int size() {
+		getReal2Array();
+		return real2Array.size() - 1;
 	}
 }
