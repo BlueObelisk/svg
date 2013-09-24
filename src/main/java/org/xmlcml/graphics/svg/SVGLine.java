@@ -460,4 +460,7 @@ public class SVGLine extends SVGShape {
 		return SVGLine.extractLines(SVGUtil.getQuerySVGElements(svgElement, ALL_LINE_XPATH));
 	}
 
+	public String toString() {
+		return (euclidLine == null) ? null : euclidLine.toString();
+	}
 }

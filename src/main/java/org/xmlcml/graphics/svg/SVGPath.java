@@ -613,6 +613,11 @@ public class SVGPath extends SVGShape {
 		return pathList;
 	}
 
+	@Override
+	public String getGeometricHash() {
+		return getDString();
+	}
+
 	/** convenience method to extract list of svgPaths in element
 	 * 
 	 * @param svgElement
@@ -622,9 +627,8 @@ public class SVGPath extends SVGShape {
 		return SVGPath.extractPaths(SVGUtil.getQuerySVGElements(svgElement, ALL_PATH_XPATH));
 	}
 
-	@Override
-	public String getGeometricHash() {
-		return getDString();
+	public static List<SVGPath> extractSelfAndDescendantPaths(SVGG g) {
+		return SVGPath.extractPaths(SVGUtil.getQuerySVGElements(g, ALL_PATH_XPATH));
 	}
 
 }

@@ -40,6 +40,8 @@ import org.xmlcml.euclid.Util;
 public class SVGCircle extends SVGShape {
 
 	private final static Logger LOG = Logger.getLogger(SVGCircle.class);
+
+	public final static String ALL_CIRCLE_XPATH = ".//svg:circle";
 	
 	private static final String R = "r";
 	private static final String CX = "cx";
@@ -285,5 +287,9 @@ public class SVGCircle extends SVGShape {
 	@Override
 	public String getGeometricHash() {
 		return getAttributeValue(CX)+" "+getAttributeValue(CY)+" "+getAttributeValue(R);
+	}
+
+	public static List<SVGCircle> extractSelfAndDescendantCircles(SVGG g) {
+		return SVGCircle.extractCircles(SVGUtil.getQuerySVGElements(g, ALL_CIRCLE_XPATH));
 	}
 }

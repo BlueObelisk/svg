@@ -41,6 +41,8 @@ import org.xmlcml.euclid.Util;
  */
 public class SVGRect extends SVGShape {
 
+	public final static String ALL_RECT_XPATH = ".//svg:rect";
+
 	private static final String HEIGHT = "height";
 	private static final String WIDTH = "width";
 	private static final String Y = "y";
@@ -233,5 +235,9 @@ public class SVGRect extends SVGShape {
 	@Override
 	public String getGeometricHash() {
 		return getAttributeValue(X)+" "+getAttributeValue(Y)+" "+getAttributeValue(WIDTH)+" "+getAttributeValue(HEIGHT);
+	}
+
+	public static List<SVGRect> extractSelfAndDescendantRects(SVGG g) {
+		return SVGRect.extractRects(SVGUtil.getQuerySVGElements(g, ALL_RECT_XPATH));
 	}
 }

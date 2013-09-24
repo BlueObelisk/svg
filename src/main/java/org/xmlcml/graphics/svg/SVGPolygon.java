@@ -32,6 +32,8 @@ import org.xmlcml.euclid.Real2Array;
  */
 public class SVGPolygon extends SVGPoly {
 
+	public final static String ALL_POLYGON_XPATH = ".//svg:polygon";
+
 	public final static String TAG ="polygon";
 	
 	/** constructor
@@ -79,7 +81,9 @@ public class SVGPolygon extends SVGPoly {
 		return TAG;
 	}
 
+	
 	public int size() {
+		getReal2Array();
 		return real2Array.size();
 	}
 
@@ -101,5 +105,9 @@ public class SVGPolygon extends SVGPoly {
 			}
 		}
 		return polygonList;
+	}
+
+	public static List<SVGPolygon> extractSelfAndDescendantPolygons(SVGG g) {
+		return SVGPolygon.extractPolygons(SVGUtil.getQuerySVGElements(g, ALL_POLYGON_XPATH));
 	}
 }
