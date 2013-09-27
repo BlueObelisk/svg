@@ -213,7 +213,11 @@ public class SVGUtil {
 			element.setBoundingBoxCached(cached);
 		}
 	}
-	
+	/** creates an inclusive bounding box for a list of SVGElements.
+	 * 
+	 * @param elementList
+	 * @return bbox; null if empty list or all elements have null bboxes
+	 */
 	public static Real2Range createBoundingBox(List<? extends SVGElement> elementList) {
 		Real2Range r2r = null;
 		if (elementList != null && elementList.size() > 0) {
@@ -223,6 +227,51 @@ public class SVGUtil {
 			}
 		}
 		return r2r;
+	}
+	
+	/** find all elements completely within a bounding box.
+	 * 
+	 * uses Real2Range.includes(Real2Range)
+	 * 
+	 * @param boundingBox outer container
+	 * @param elementList elements to be examined
+	 * @return empty list if parameters are null or no elements fit criterion
+	 */
+	public static List<SVGElement> findElementsWithin(Real2Range boundingBox, List <? extends SVGElement> elementList) {
+		List<SVGElement> includedList = new ArrayList<SVGElement>();
+		if (boundingBox != null && elementList != null) {
+			for (SVGElement element : elementList) {
+				Real2Range bbox = element.getBoundingBox();
+				if (boundingBox.includes(bbox)) {
+					includedList.add(element);
+				}
+			}
+		} 
+		return includedList;
+	}
+	
+	
+	/** find all elements completely within a bounding box.
+	 * 
+	 * uses Real2Range.includes(Real2Range)
+	 * 
+	 * @param boundingBox outer container
+	 * @param elementList elements to be examined
+	 * @return empty list if parameters are null or no elements fit criterion
+	 */
+	public static List<SVGElement> findElementsIntersecting(Real2Range boundingBox, List <? extends SVGElement> elementList) {
+		List<SVGElement> includedList = new ArrayList<SVGElement>();
+		if (boundingBox != null && elementList != null) {
+			for (SVGElement element : elementList) {
+				Real2Range bbox = element.getBoundingBox();
+				// the signature for Real2Range is messy
+				Real2Range intersect = boundingBox.intersectionWith(bbox);
+				if (intersect != null && intersect.isValid()) {
+					includedList.add(element);
+				}
+			}
+		} 
+		return includedList;
 	}
 	
 	/** crude quick method to create list of non-Overlapping BoundingBoxes

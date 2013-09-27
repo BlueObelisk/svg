@@ -6,15 +6,18 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Vector2;
 
@@ -130,7 +133,62 @@ public class SVGUtilTest {
 //		svgG.draw(g2d);
 //		ImageIO.write(img, "png", new File("target/rect1.png"));
 	}
+	
+	@Test
+	public void testBoundingBoxIncludes() {
+		List<SVGElement> elementList = new ArrayList<SVGElement>();
+		SVGRect rect1 = new SVGRect(new Real2(100., 200.), new Real2(150., 250.));
+		elementList.add(rect1);
+		rect1.setId("r1");
+		SVGRect rect2 = new SVGRect(new Real2(300., 400.), new Real2(350., 450.));
+		elementList.add(rect2);
+		rect2.setId("r2");
+		Assert.assertEquals("list", 2, elementList.size());
+		List<SVGElement> includedList = SVGUtil.findElementsWithin(new Real2Range(new RealRange(0., 400.), new RealRange(0., 500.)), elementList);
+		Assert.assertEquals("both", 2, includedList.size());
+		includedList = SVGUtil.findElementsWithin(new Real2Range(new RealRange(50., 200.), new RealRange(0., 500.)), elementList);
+		Assert.assertEquals("r1", 1, includedList.size());
+		includedList = SVGUtil.findElementsWithin(new Real2Range(new RealRange(200., 500.), new RealRange(0., 500.)), elementList);
+		Assert.assertEquals("r2", 1, includedList.size());
+		includedList = SVGUtil.findElementsWithin(new Real2Range(new RealRange(200., 250.), new RealRange(0., 500.)), elementList);
+		Assert.assertEquals("neither", 0, includedList.size());
+		// edges - this is bad practice as it includes FP equality
+		includedList = SVGUtil.findElementsWithin(new Real2Range(new RealRange(100., 350.), new RealRange(200., 450.)), elementList);
+		Assert.assertEquals("both just", 2, includedList.size());
+	}
 
+	
+	@Test
+	public void testBoundingBoxIntersectsWith() {
+		List<SVGElement> elementList = new ArrayList<SVGElement>();
+		SVGRect rect1 = new SVGRect(new Real2(100., 200.), new Real2(150., 250.));
+		elementList.add(rect1);
+		rect1.setId("r1");
+		SVGRect rect2 = new SVGRect(new Real2(300., 400.), new Real2(350., 450.));
+		elementList.add(rect2);
+		rect2.setId("r2");
+		Assert.assertEquals("list", 2, elementList.size());
+		List<SVGElement> includedList = SVGUtil.findElementsIntersecting(new Real2Range(new RealRange(0., 400.), new RealRange(0., 500.)), elementList);
+		Assert.assertEquals("both", 2, includedList.size());
+		includedList = SVGUtil.findElementsIntersecting(new Real2Range(new RealRange(50., 200.), new RealRange(0., 500.)), elementList);
+		Assert.assertEquals("r1", 1, includedList.size());
+		includedList = SVGUtil.findElementsIntersecting(new Real2Range(new RealRange(50., 320.), new RealRange(0., 500.)), elementList);
+		Assert.assertEquals("both", 2, includedList.size());
+		includedList = SVGUtil.findElementsIntersecting(new Real2Range(new RealRange(120., 500.), new RealRange(0., 500.)), elementList);
+		Assert.assertEquals("both", 2, includedList.size());
+		includedList = SVGUtil.findElementsIntersecting(new Real2Range(new RealRange(120., 500.), new RealRange(220., 420.)), elementList);
+		Assert.assertEquals("both", 2, includedList.size());
+		includedList = SVGUtil.findElementsIntersecting(new Real2Range(new RealRange(120., 320.), new RealRange(220., 420.)), elementList);
+		Assert.assertEquals("both", 2, includedList.size());
+		includedList = SVGUtil.findElementsIntersecting(new Real2Range(new RealRange(200., 250.), new RealRange(400., 500.)), elementList);
+		Assert.assertEquals("none", 0, includedList.size());
+		// edges - this is bad practice as it includes FP equality
+		includedList = SVGUtil.findElementsIntersecting(new Real2Range(new RealRange(150., 300.), new RealRange(250., 400.)), elementList);
+		Assert.assertEquals("both just", 2, includedList.size());
+	}
+
+	// ================================================================
+	
 	private SVGRect createRect(Real2 xy0, Real2 xy1, String fill, String stroke, double strokeWidth) {
 		SVGRect rect = new SVGRect(xy0, xy1);
 		if (fill != null) rect.setFill(fill);
