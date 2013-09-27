@@ -348,7 +348,7 @@ public class SVGImage extends SVGShape {
 		    imageWriter.setOutput(ios);
 		    imageWriter.write(bufferedImage);
 		} else {
-			LOG.error("NULL BufferedImage");
+			LOG.trace("NULL BufferedImage");
 		}
 	}
 
