@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.Nodes;
@@ -13,6 +14,7 @@ import nu.xom.Text;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.cml.base.CMLConstants;
+import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.EuclidConstants;
 import org.xmlcml.euclid.Real;
@@ -33,6 +35,8 @@ import org.xmlcml.euclid.Vector2;
  */
 public class SVGText extends SVGElement {
 
+	private static final String X = "x";
+
 	private static Logger LOG = Logger.getLogger(SVGText.class);
 
 	// just in case there is a scaling problem
@@ -47,6 +51,7 @@ public class SVGText extends SVGElement {
     
     public final static Double DEFAULT_FONT_WIDTH_FACTOR = 10.0;
     public final static Double MIN_WIDTH = 0.001; // useful for non printing characters
+	private final static Double SCALE1000 = 0.001; // width multiplied by 1000
 
 	public final static String ALL_TEXT_XPATH = ".//svg:text";
 
@@ -55,6 +60,14 @@ public class SVGText extends SVGElement {
 
 	public static final String FONT_NAME = "fontName";
 	public static final String WIDTH = "width";
+
+	/** rough average of width of "n" */
+	private static final Double N_SPACE = 0.55;
+	public static final Double SPACE_FACTOR = 0.1; //extra space that denotes a space
+	private Double SPACE_WIDTH1000 = /*274.0*/ 200.;
+	public final static Double DEFAULT_SPACE_FACTOR = 0.05;
+
+	private static final double MIN_FONT_SIZE = 0.01;
 
 	// these are all when text is used for concatenation, etc.
 	private double estimatedHorizontallength = Double.NaN; 
@@ -151,14 +164,19 @@ public class SVGText extends SVGElement {
         return new SVGText(this, TAG);
     }
 
-    public double getX() {
-    	String s = this.getAttributeValue("x");
-    	return (s != null) ? new Double(s).doubleValue()  : 0.0;
+    @Override
+    public Double getX() {
+    	Double x = null;
+    	String s = this.getAttributeValue(X);
+    	if (s != null) {
+    		x = new Double(s);
+    	}
+    	return x;
     }
 
-    public double getY() {
+    public Double getY() {
     	String s = this.getAttributeValue("y");
-    	return (s != null) ? new Double(s).doubleValue() : 0.0;
+    	return (s != null) ? new Double(s) : null;
     }
     
 	protected void drawElement(Graphics2D g2d) {
@@ -791,6 +809,90 @@ public class SVGText extends SVGElement {
 		return width == null ? null : new Double(width); 
 	}
 	
+	/** adds svgx:width attribute.
+	 * <p>
+	 * Only use when constructing new characters, such as spaces and deconstructing
+	 * ligatures.
+	 * </p>
+	 * of form svgx:width="234.0"
+	 * distinguish from getWidth which uses "width" attribute and is probably wrong for SVGText
+	 * @return width (or null)
+	 */
+	public void setSVGXFontWidth(Double width) {
+		if (width != null) {
+			Attribute widthAtt = SVGUtil.getSVGXAttributeAttribute(this, WIDTH);
+			if (widthAtt == null) {
+				widthAtt.detach();
+			}
+		} else {
+			SVGUtil.setSVGXAttribute(this, WIDTH, String.valueOf(width));
+		}
+	}
+	
+	public Double getScaledWidth() {
+		Double scaledWidth = null;
+		Double width = this.getSVGXFontWidth();
+		Double fontSize = this.getFontSize();
+		if (width != null && fontSize != null) {
+			scaledWidth = width * SCALE1000 * fontSize;
+		}
+		return scaledWidth;
+	}
+
+	/** get separattion between two characters.
+	 * 
+	 * This is from the end of "this" to the start of nextText.
+	 * 
+	 * @param nextText
+	 * @return
+	 */
+	public Double getSeparation(SVGText nextText) {
+		Double separation = null;
+		Double x = this.getX();
+		Double xNext = nextText == null ? null : nextText.getX();
+		Double scaledWidth = this.getScaledWidth();
+		if (x != null && xNext != null && scaledWidth != null) {
+			separation = xNext - (x + scaledWidth); 
+		}
+		return separation;
+	}
+	
+	/** will be zero if fontSize is zero.
+	 * 
+	 * @return
+	 */
+	public Double getScaledWidthOfEnSpace() {
+		Double fontSize = this.getFontSize();
+		return fontSize == null ? null : N_SPACE * this.getFontSize();
+	}
+	
+
+	public Double getEnSpaceCount(SVGText nextText) {
+		Double separation = getSeparation(nextText);
+		Double enSpace = getScaledWidthOfEnSpace();
+		return (separation == null || enSpace == null || Math.abs(enSpace) < MIN_FONT_SIZE) ? null : (Double) (separation / enSpace);
+	}
+
+	/**
+	 * @param newCharacters
+	 * @param endOfLastCharacterX
+	 * @param templateText to copy attributes from
+	 */
+	public SVGText createSpaceCharacterAfter() {
+		SVGText spaceText = new SVGText();
+		CMLUtil.copyAttributes(this, spaceText);
+		spaceText.setText(" ");
+		spaceText.setX(this.getCalculatedTextEndX());
+		spaceText.setSVGXFontWidth(SPACE_WIDTH1000);
+		return spaceText;
+	}
+
+	public Double getCalculatedTextEndX() {
+		Double scaledWidth = this.getScaledWidth(); 
+		Double x = this.getX();
+		return (x == null || scaledWidth == null) ? null : x + scaledWidth;
+	}
+
 	public String getString() {
 		String s = "";
 		List<SVGTSpan> tspans = getChildTSpans();
@@ -803,5 +905,4 @@ public class SVGText extends SVGElement {
 		}
 		return s;
 	}
-
 }

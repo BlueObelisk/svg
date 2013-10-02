@@ -152,6 +152,7 @@ public class SVGImageTest {
 	}
 		
 	@Test
+	@Ignore // requires Internet
 	public void testFigshare() throws Exception {
 		InputStream is = null;
 		try {

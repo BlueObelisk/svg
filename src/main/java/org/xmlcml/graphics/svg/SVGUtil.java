@@ -289,7 +289,7 @@ public class SVGUtil {
 				for (int i = 0; i < bboxList.size(); i++) {
 					Real2Range bbox1 = bboxList.get(i);
 					// merge into existing box
-					if (bbox.intersectionWith(bbox1) != null) {
+					if (bbox != null && bbox1 != null && bbox.intersectionWith(bbox1) != null) {
 						bbox1 = bbox1.plus(bbox); 
 						bboxList.set(i, bbox1);
 						bbox = null;
@@ -331,8 +331,13 @@ public class SVGUtil {
 	}
 
 	public static String getSVGXAttribute(SVGElement svgElement, String attName) {
-		Attribute attribute = svgElement.getAttribute(attName, SVGConstants.SVGX_NS);
+		Attribute attribute = getSVGXAttributeAttribute(svgElement, attName);
 		return (attribute == null) ? null : attribute.getValue();
+	}
+
+	public static Attribute getSVGXAttributeAttribute(SVGElement svgElement, String attName) {
+		Attribute attribute = svgElement.getAttribute(attName, SVGConstants.SVGX_NS);
+		return attribute;
 	}
 
 	public static void setSVGXAttribute(SVGElement svgElement, String attName, String value) {
