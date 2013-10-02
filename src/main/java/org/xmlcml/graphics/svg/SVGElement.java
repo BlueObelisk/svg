@@ -792,19 +792,19 @@ public class SVGElement extends GraphicsElement {
 		return t2;
 	}
 
-	public double getX() {
+	public Double getX() {
 		return this.getCoordinateValueDefaultZero(X);
 	}
 
-	public double getY() {
+	public Double getY() {
 		return this.getCoordinateValueDefaultZero(Y);
 	}
 
-	public double getCX() {
+	public Double getCX() {
 		return this.getCoordinateValueDefaultZero(CX);
 	}
 
-	public double getCY() {
+	public Double getCY() {
 		return this.getCoordinateValueDefaultZero(CY);
 	}
 	
@@ -847,7 +847,9 @@ public class SVGElement extends GraphicsElement {
 	}
 	
 	public Real2 getXY() {
-		return new Real2(this.getX(), this.getY());
+		Double x = this.getX();
+		Double y = this.getY();
+		return new Real2(x, y);
 	}
 	
 	public void setXY(Real2 xy) {

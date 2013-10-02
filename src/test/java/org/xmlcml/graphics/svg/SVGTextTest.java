@@ -36,7 +36,7 @@ import org.xmlcml.euclid.Vector2;
 public class SVGTextTest {
 	private static Logger LOG = Logger.getLogger(SVGTextTest.class);
 
-	static String STRING1 ="<text transform='translate(3,335.28) scale(1.0001,-0.99988) '" +
+	static String STRING1 ="<text x='0' y='0' transform='translate(3,335.28) scale(1.0001,-0.99988) '" +
 		" style='font-size:6.2023;stroke:none;fill:black;'" +
 		">ppm</text>";
 	

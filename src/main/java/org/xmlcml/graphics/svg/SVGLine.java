@@ -122,11 +122,11 @@ public class SVGLine extends SVGShape {
 		throw new RuntimeException("Cannot define getXY() for lines");
 	}
 	
-	public double getX() {
+	public Double getX() {
 		throw new RuntimeException("Cannot define getY() for lines");
 	}
 	
-	public double getY() {
+	public Double getY() {
 		throw new RuntimeException("Cannot define getY() for lines");
 	}
 	
