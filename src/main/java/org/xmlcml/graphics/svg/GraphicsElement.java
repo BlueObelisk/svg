@@ -36,9 +36,9 @@ import nu.xom.Node;
 import nu.xom.Nodes;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.xml.XMLUtil;
 
 /** base class for lightweight generic SVG element.
  * no checking - i.e. can take any name or attributes
@@ -531,7 +531,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
 	public void debug(String msg) {
-		CMLUtil.debug(this, msg);
+		XMLUtil.debug(this, msg);
 	}
 	
 	protected void saveGraphicsSettingsAndApplyTransform(Graphics2D g2d) {

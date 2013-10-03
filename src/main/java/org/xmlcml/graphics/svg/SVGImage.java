@@ -41,7 +41,6 @@ import nu.xom.Node;
 
 import org.apache.log4j.Logger;
 import org.apache.xerces.impl.dv.util.Base64;
-import org.xmlcml.cml.base.CMLElement;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
@@ -145,7 +144,8 @@ public class SVGImage extends SVGShape {
 			if (decimalPlaces != null) {
 				boundingBox.format(decimalPlaces);
 			}
-			CMLElement.addCMLXAttribute(this, BOUNDING_BOX, boundingBox.toString());
+//			CMLElement.addCMLXAttribute(this, BOUNDING_BOX, boundingBox.toString());
+			SVGUtil.setSVGXAttribute(this, BOUNDING_BOX, boundingBox.toString());
 		}
 	}
 

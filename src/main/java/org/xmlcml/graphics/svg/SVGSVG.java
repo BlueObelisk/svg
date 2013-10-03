@@ -24,8 +24,8 @@ import nu.xom.Attribute;
 import nu.xom.Node;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.xml.XMLConstants;
 
 /** container for SVG
  * "svg"
@@ -103,7 +103,7 @@ public class SVGSVG extends SVGElement {
 	}
 
 	public static String createFileName(String id) {
-		return id + CMLConstants.S_PERIOD+svgSuffix ;
+		return id + XMLConstants.S_PERIOD+svgSuffix ;
 	}
 
 	public void setDur(Double d) {

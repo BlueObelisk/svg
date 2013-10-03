@@ -9,7 +9,6 @@ import nu.xom.Attribute;
 import nu.xom.ParentNode;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
@@ -23,6 +22,7 @@ import org.xmlcml.graphics.svg.SVGPathPrimitive;
 import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.StyleBundle;
+import org.xmlcml.xml.XMLUtil;
 
 /** converts a SVGPath or list of SVGPaths to SVGShape(s).
  * 
@@ -278,7 +278,7 @@ public class Path2ShapeConverter {
 			LOG.trace("Deleted "+(primitiveCount - newPrimitiveCount)+" redundant moves");
 			String newD = SVGPath.constructDString(newPrimitives);
 			SVGPath newPath = new SVGPath(newD);
-			CMLUtil.copyAttributes(path,  newPath);
+			XMLUtil.copyAttributesFromTo(path,  newPath);
 			newPath.setDString(newD);
 			path.getParent().replaceChild(path,  newPath);
 			LOG.trace(">>>"+d+"\n>>>"+newD);
@@ -304,7 +304,7 @@ public class Path2ShapeConverter {
 			 int index = parent.indexOf(path);
 			 for (String newDString : newDStringList) {
 				 SVGPath newPath = new SVGPath();
-				 CMLUtil.copyAttributes(path, newPath);
+				 XMLUtil.copyAttributesFromTo(path, newPath);
 				 newPath.setDString(newDString);
 				 parent.insertChild(newPath, ++index);
 				 splitPathList.add(newPath);

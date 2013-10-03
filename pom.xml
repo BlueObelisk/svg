@@ -67,11 +67,13 @@
             <artifactId>euclid-dev</artifactId>
             <version>1.1-SNAPSHOT</version>
         </dependency>
+        <!-- testing dependency
         <dependency>
             <groupId>org.xml-cml</groupId>
             <artifactId>cmlxom</artifactId>
             <version>3.2-SNAPSHOT</version>
         </dependency>
+        -->
         <dependency>
             <version>1.1-SNAPSHOT</version>
             <groupId>org.xml-cml</groupId>

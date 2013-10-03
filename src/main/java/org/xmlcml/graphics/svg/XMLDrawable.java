@@ -23,7 +23,7 @@ import java.io.IOException;
  * @author pm286
  *
  */
-public interface CMLDrawable {
+public interface XMLDrawable {
 	
 	/**
 	 * @return element

@@ -13,8 +13,6 @@ import nu.xom.Nodes;
 import nu.xom.Text;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
-import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.EuclidConstants;
 import org.xmlcml.euclid.Real;
@@ -24,6 +22,8 @@ import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Util;
 import org.xmlcml.euclid.Vector2;
+import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
 
 /** draws text.
  * 
@@ -44,10 +44,10 @@ public class SVGText extends SVGElement {
 	
 	public final static String TAG ="text";
 	
-    public static String SUB0 = CMLConstants.S_UNDER+CMLConstants.S_LCURLY;
-    public static String SUP0 = CMLConstants.S_CARET+CMLConstants.S_LCURLY;
-    public static String SUB1 = CMLConstants.S_RCURLY+CMLConstants.S_UNDER;
-    public static String SUP1 = CMLConstants.S_RCURLY+CMLConstants.S_CARET;
+    public static String SUB0 = XMLConstants.S_UNDER+XMLConstants.S_LCURLY;
+    public static String SUP0 = XMLConstants.S_CARET+XMLConstants.S_LCURLY;
+    public static String SUB1 = XMLConstants.S_RCURLY+XMLConstants.S_UNDER;
+    public static String SUP1 = XMLConstants.S_RCURLY+XMLConstants.S_CARET;
     
     public final static Double DEFAULT_FONT_WIDTH_FACTOR = 10.0;
     public final static Double MIN_WIDTH = 0.001; // useful for non printing characters
@@ -565,9 +565,9 @@ public class SVGText extends SVGElement {
 				}
 				linker = null;
 				if (nspaces == 0) {
-					linker = CMLConstants.S_EMPTY;
+					linker = XMLConstants.S_EMPTY;
 				} else if (nspaces == 1) {
-					linker = CMLConstants.S_SPACE;
+					linker = XMLConstants.S_SPACE;
 				}
 			} else {
 				LOG.debug("slight vertical change: "+coordVert0+" => "+coordVert1);
@@ -880,7 +880,7 @@ public class SVGText extends SVGElement {
 	 */
 	public SVGText createSpaceCharacterAfter() {
 		SVGText spaceText = new SVGText();
-		CMLUtil.copyAttributes(this, spaceText);
+		XMLUtil.copyAttributesFromTo(this, spaceText);
 		spaceText.setText(" ");
 		spaceText.setX(this.getCalculatedTextEndX());
 		spaceText.setSVGXFontWidth(SPACE_WIDTH1000);

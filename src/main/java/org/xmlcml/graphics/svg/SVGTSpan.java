@@ -27,13 +27,13 @@ import nu.xom.Node;
 import nu.xom.Text;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Util;
+import org.xmlcml.xml.XMLConstants;
 
 /** draws text.
  * 

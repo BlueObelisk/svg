@@ -31,7 +31,6 @@ import nu.xom.Element;
 import nu.xom.Node;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.euclid.Axis.Axis2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
@@ -39,6 +38,7 @@ import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealArray;
 import org.xmlcml.euclid.RealArray.Monotonicity;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.xml.XMLConstants;
 
 /** draws a straight line.
  * 
@@ -125,7 +125,7 @@ public abstract class SVGPoly extends SVGShape {
 	public Real2Array getReal2Array() {
 		if (real2Array == null) {
 			real2Array = Real2Array.createFromPairs(
-					this.getAttributeValue("points"), CMLConstants.S_COMMA+S_PIPE+S_SPACE);
+					this.getAttributeValue("points"), XMLConstants.S_COMMA+S_PIPE+S_SPACE);
 		}
 		return real2Array;
 	}
@@ -304,7 +304,7 @@ public abstract class SVGPoly extends SVGShape {
 		}
 		if (lineList == null) {
 			if (pointsAtt != null) {
-				real2Array = Real2Array.createFromPairs(pointsAtt.getValue(), CMLConstants.S_SPACE);
+				real2Array = Real2Array.createFromPairs(pointsAtt.getValue(), XMLConstants.S_SPACE);
 			}
 			String id = this.getId();
 			lineList = new ArrayList<SVGLine>();

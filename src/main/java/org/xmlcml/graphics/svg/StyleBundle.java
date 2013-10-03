@@ -24,9 +24,9 @@ import java.util.Map;
 import nu.xom.Attribute;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
+import org.xmlcml.xml.XMLConstants;
 
-public class StyleBundle implements CMLConstants {
+public class StyleBundle implements XMLConstants {
 
 
 	private static Logger LOG = Logger.getLogger(StyleBundle.class);
