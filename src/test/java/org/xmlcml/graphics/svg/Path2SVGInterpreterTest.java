@@ -8,7 +8,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.xmlcml.cml.base.CMLUtil;
+import org.xmlcml.xml.XMLUtil;
 
 import util.Path2ShapeConverter;
 

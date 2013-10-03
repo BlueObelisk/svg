@@ -24,12 +24,12 @@ import nu.xom.Element;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.cml.testutil.JumboTestUtils;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.RealRange.Direction;
 import org.xmlcml.euclid.RealRangeArray;
+import org.xmlcml.xml.XMLConstants;
 
 public class SVGElementTest {
 
@@ -38,11 +38,11 @@ public class SVGElementTest {
 	@Test
 	@Ignore
 	public final void testcreateSVGElement() {
-		Element oldElement =JumboTestUtils.parseValidFile(GRAPHICS_RESOURCE + CMLConstants.U_S
+		Element oldElement =JumboTestUtils.parseValidFile(GRAPHICS_RESOURCE + XMLConstants.U_S
 				+ "image12.svg");
 		SVGElement newSvg = SVGElement.readAndCreateSVG(oldElement);
 		Assert.assertEquals("class", SVGSVG.class, newSvg.getClass());
-		JumboTestUtils.assertEqualsCanonically("copy",JumboTestUtils.parseValidFile(GRAPHICS_RESOURCE + CMLConstants.U_S
+		JumboTestUtils.assertEqualsCanonically("copy",JumboTestUtils.parseValidFile(GRAPHICS_RESOURCE + XMLConstants.U_S
 				+ "image12.svg"), newSvg, true);
 	}
 

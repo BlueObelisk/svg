@@ -19,7 +19,6 @@ package org.xmlcml.graphics.svg;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,9 +40,6 @@ import nu.xom.Text;
 import nu.xom.canonical.Canonicalizer;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
-import org.xmlcml.cml.base.CMLElement;
-import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
@@ -54,6 +50,8 @@ import org.xmlcml.euclid.RealRange.Direction;
 import org.xmlcml.euclid.RealRangeArray;
 import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
 
 /** base class for lightweight generic SVG element.
  * no checking - i.e. can take any name or attributes
@@ -173,7 +171,7 @@ public class SVGElement extends GraphicsElement {
 	 * @return
 	 */
 	public static SVGElement readAndCreateSVG(File file) {
-		Element element = CMLUtil.parseQuietlyToDocument(file).getRootElement();
+		Element element = XMLUtil.parseQuietlyToDocument(file).getRootElement();
 		return (element == null) ? null : (SVGElement) readAndCreateSVG(element);
 	}
 	
@@ -183,7 +181,7 @@ public class SVGElement extends GraphicsElement {
 	 * @return
 	 */
 	public static SVGElement readAndCreateSVG(InputStream is) {
-		Element element = CMLUtil.parseQuietlyToDocument(is).getRootElement();
+		Element element = XMLUtil.parseQuietlyToDocument(is).getRootElement();
 		return (element == null) ? null : (SVGElement) readAndCreateSVG(element);
 	}
 	
@@ -213,7 +211,7 @@ public class SVGElement extends GraphicsElement {
 	public boolean isEqualTo(SVGElement element) {
 		boolean equals = false;
 		if (element.getClass().equals(this.getClass())) {
-			CMLUtil.equalsCanonically(element, this, true);
+			XMLUtil.equalsCanonically(element, this, true);
 		}
 		return equals;
 	}
@@ -356,8 +354,8 @@ public class SVGElement extends GraphicsElement {
 			List<Transform2> transformList = new ArrayList<Transform2>();
 			String s = transformAttributeValue.trim();
 			while (s.length() > 0) {
-				int lb = s.indexOf(CMLConstants.S_LBRAK);
-				int rb = s.indexOf(CMLConstants.S_RBRAK);
+				int lb = s.indexOf(XMLConstants.S_LBRAK);
+				int rb = s.indexOf(XMLConstants.S_RBRAK);
 				if (lb == -1 || rb == -1 || rb < lb) {
 					throw new RuntimeException("Unbalanced or missing brackets in transform");
 				}
@@ -814,7 +812,8 @@ public class SVGElement extends GraphicsElement {
 			if (decimalPlaces != null) {
 				r2r.format(decimalPlaces);
 			}
-			CMLElement.addCMLXAttribute(this, BOUNDING_BOX, r2r.toString());
+//			CMLElement.addCMLXAttribute(this, BOUNDING_BOX, r2r.toString());
+			SVGUtil.setSVGXAttribute(this, BOUNDING_BOX, r2r.toString());
 		}
 	}
 
@@ -908,7 +907,7 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	protected void aggregateBBfromSelfAndDescendants() {
-		Nodes childNodes = this.query("./svg:*", CMLConstants.SVG_XPATH);
+		Nodes childNodes = this.query("./svg:*", XMLConstants.SVG_XPATH);
 		if (childNodes.size() > 0) {
 			boundingBox = new Real2Range();
 		}
@@ -1041,7 +1040,7 @@ public class SVGElement extends GraphicsElement {
 	 * @return
 	 */
 	public static List<SVGElement> generateElementList(Element element, String xpath) {
-		Nodes childNodes = element.query(xpath, CMLConstants.SVG_XPATH);
+		Nodes childNodes = element.query(xpath, XMLConstants.SVG_XPATH);
 		List<SVGElement> elementList = new ArrayList<SVGElement>();
 		for (int i = 0; i < childNodes.size(); i++) {
 			elementList.add((SVGElement) childNodes.get(i));

@@ -18,9 +18,9 @@ package org.xmlcml.graphics.svg;
 
 import nu.xom.XPathContext;
 
-import org.xmlcml.cml.base.CMLConstants;
+import org.xmlcml.xml.XMLConstants;
 
-public interface SVGConstants extends CMLConstants {
+public interface SVGConstants extends XMLConstants {
 
 	/** standard namespace for SVG
 	 * 
@@ -32,7 +32,7 @@ public interface SVGConstants extends CMLConstants {
 	public final static String SVGX_PREFIX = "svgx";
 
 
-    /** XPathContext for CML.
+    /** XPathContext for SVG.
      */
     XPathContext SVG_XPATH = new XPathContext("svg", SVG_NAMESPACE);
     

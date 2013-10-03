@@ -29,7 +29,6 @@ import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.Nodes;
 
-import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real;
@@ -37,6 +36,7 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.xml.XMLConstants;
 
 /** draws a straight line.
  * 
@@ -368,7 +368,7 @@ public class SVGLine extends SVGShape {
 
 	public static List<SVGLine> findHorizontalOrVerticalLines(SVGElement svgElement, double eps) {
 		List<SVGLine> horizontalVerticalList = new ArrayList<SVGLine>();
-		Nodes lines = svgElement.query(".//svg:line", CMLConstants.SVG_XPATH);
+		Nodes lines = svgElement.query(".//svg:line", XMLConstants.SVG_XPATH);
 		for (int i = 0; i < lines.size(); i++) {
 			SVGLine line = (SVGLine) lines.get(i);
 			if (line.isHorizontal(eps) || line.isVertical(eps)) {

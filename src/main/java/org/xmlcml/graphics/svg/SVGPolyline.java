@@ -27,11 +27,11 @@ import nu.xom.Node;
 import nu.xom.ParentNode;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLElement;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.xml.XMLUtil;
 
 /** draws a straight line.
  * 
@@ -79,11 +79,16 @@ public class SVGPolyline extends SVGPoly {
 	 */
 	public SVGPolyline(SVGLine line) {
         this();
-        CMLElement.copyAttributesFromTo(line, this);
-        CMLElement.deleteAttribute(this, X1);
-        CMLElement.deleteAttribute(this, Y1);
-        CMLElement.deleteAttribute(this, X2);
-        CMLElement.deleteAttribute(this, Y2);
+//        CMLElement.copyAttributesFromTo(line, this);
+//        CMLElement.deleteAttribute(this, X1);
+//        CMLElement.deleteAttribute(this, Y1);
+//        CMLElement.deleteAttribute(this, X2);
+//        CMLElement.deleteAttribute(this, Y2);
+        XMLUtil.copyAttributesFromTo(line, this);
+        XMLUtil.deleteAttribute(this, X1);
+        XMLUtil.deleteAttribute(this, Y1);
+        XMLUtil.deleteAttribute(this, X2);
+        XMLUtil.deleteAttribute(this, Y2);
         this.real2Array = new Real2Array();
         this.real2Array.add(line.getXY(0));
         this.real2Array.add(line.getXY(1));

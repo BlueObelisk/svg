@@ -9,8 +9,8 @@ import nu.xom.Document;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.xml.XMLUtil;
 
 public class HiddenGraphicsTest {
 
@@ -69,7 +69,7 @@ public class HiddenGraphicsTest {
 	public void testAntialias() throws Exception {
 		HiddenGraphics hg = new HiddenGraphics();
 		File file = Fixtures.IMAGE_G_2_2_SVG;
-		Document document = CMLUtil.parseQuietlyToDocument(file);
+		Document document = XMLUtil.parseQuietlyToDocument(file);
 		SVGElement svg = SVGElement.readAndCreateSVG(Fixtures.IMAGE_G_2_2_SVG);
 		hg.createImage(svg);
 		hg.write(SVGImage.IMAGE_PNG, new File("target/image.g.2.2.png"));
@@ -82,7 +82,7 @@ public class HiddenGraphicsTest {
 	public void testImage3_2() throws Exception {
 		HiddenGraphics hg = new HiddenGraphics();
 		File file = Fixtures.IMAGE_G_3_2_SVG;
-		Document document = CMLUtil.parseQuietlyToDocument(file);
+		Document document = XMLUtil.parseQuietlyToDocument(file);
 		SVGElement svg = SVGElement.readAndCreateSVG(Fixtures.IMAGE_G_3_2_SVG);
 		hg.createImage(svg);
 		hg.write(SVGImage.IMAGE_PNG, new File("target/image.g.3.2.png"));
@@ -95,7 +95,7 @@ public class HiddenGraphicsTest {
 	public void testImage8_2() throws Exception {
 		HiddenGraphics hg = new HiddenGraphics();
 		File file = Fixtures.IMAGE_G_8_2_SVG;
-		Document document = CMLUtil.parseQuietlyToDocument(file);
+		Document document = XMLUtil.parseQuietlyToDocument(file);
 		SVGElement svg = SVGElement.readAndCreateSVG(Fixtures.IMAGE_G_8_2_SVG);
 		hg.createImage(svg);
 		hg.write(SVGImage.IMAGE_PNG, new File("target/image.g.8.2.png"));

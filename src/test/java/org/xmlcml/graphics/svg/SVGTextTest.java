@@ -25,13 +25,13 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.cml.testutil.JumboTestUtils;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Vector2;
+import org.xmlcml.xml.XMLUtil;
 
 public class SVGTextTest {
 	private static Logger LOG = Logger.getLogger(SVGTextTest.class);
@@ -489,7 +489,7 @@ public class SVGTextTest {
 		rotateText(text, new Angle(Math.PI));
 		LOG.trace("Transform: "+text.toXML());
 		svg.appendChild(text.copy());
-		CMLUtil.outputQuietly(svg, new File("target/text3.svg"), 1);
+		XMLUtil.outputQuietly(svg, new File("target/text3.svg"), 1);
 	}
 
 	private void rotateText(SVGText text, Angle angle) {

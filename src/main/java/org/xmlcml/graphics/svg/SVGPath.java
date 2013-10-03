@@ -32,7 +32,6 @@ import nu.xom.Node;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
@@ -40,6 +39,7 @@ import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Vector2;
+import org.xmlcml.xml.XMLConstants;
 
 /** draws a straight line.
  * 
@@ -146,7 +146,7 @@ public class SVGPath extends SVGShape {
 	}
 	
 	public static String createD(Real2Array xy) {
-		String s = CMLConstants.S_EMPTY;
+		String s = XMLConstants.S_EMPTY;
 		StringBuilder sb = new StringBuilder();
 		if (xy.size() > 0) {
 			sb.append("M");

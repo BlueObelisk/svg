@@ -13,12 +13,12 @@ import nu.xom.Node;
 import nu.xom.Nodes;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
-import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Vector2;
+import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
 
 public class SVGUtil {
 
@@ -58,7 +58,7 @@ public class SVGUtil {
 	}
 
 	public static List<SVGElement> getQuerySVGElements(SVGElement svgElement, String xpath) {
-		List<Element> elements = CMLUtil.getQueryElements(svgElement, xpath, SVGConstants.SVG_XPATH);
+		List<Element> elements = XMLUtil.getQueryElements(svgElement, xpath, SVGConstants.SVG_XPATH);
 		List<SVGElement> svgElements = new ArrayList<SVGElement>();
 		for (Element element : elements) {
 			if (!(element instanceof SVGElement)) {
@@ -342,7 +342,7 @@ public class SVGUtil {
 
 	public static void setSVGXAttribute(SVGElement svgElement, String attName, String value) {
 		if (attName != null && value != null) {
-			Attribute attribute = new Attribute(SVGConstants.SVGX_PREFIX+CMLConstants.S_COLON+attName, SVGConstants.SVGX_NS, value);
+			Attribute attribute = new Attribute(SVGConstants.SVGX_PREFIX+XMLConstants.S_COLON+attName, SVGConstants.SVGX_NS, value);
 			svgElement.addAttribute(attribute);
 		}
 	}
@@ -350,7 +350,7 @@ public class SVGUtil {
 	public static void debug(Element gChunk, FileOutputStream fileOutputStream,
 			int indent) {
 		try {
-			CMLUtil.debug(gChunk, fileOutputStream, indent);
+			XMLUtil.debug(gChunk, fileOutputStream, indent);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

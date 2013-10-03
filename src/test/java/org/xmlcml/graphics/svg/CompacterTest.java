@@ -11,7 +11,7 @@ import nu.xom.Element;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlcml.cml.base.CMLUtil;
+import org.xmlcml.xml.XMLUtil;
 
 public class CompacterTest {
 
