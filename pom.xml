@@ -67,11 +67,19 @@
             <artifactId>euclid-dev</artifactId>
             <version>1.1-SNAPSHOT</version>
         </dependency>
-        <!-- testing dependency
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- 
         <dependency>
             <groupId>org.xml-cml</groupId>
-            <artifactId>cmlxom</artifactId>
-            <version>3.2-SNAPSHOT</version>
+            <artifactId>euclid-testutil</artifactId>
+            <version>1.1-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
         -->
         <dependency>
@@ -80,36 +88,9 @@
             <artifactId>jumbo-testutil</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <!-- 
-        <dependency>
-            <groupId>xom</groupId>
-            <artifactId>xom</artifactId>
-            <version>1.2.5</version>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math</artifactId>
-            <version>2.2</version>
-        </dependency>
+        
     </dependencies>
+    
     <reporting>
         <plugins>
         <!-- 
