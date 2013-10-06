@@ -227,7 +227,11 @@ public class SVGImage extends SVGShape {
 	public static String convertBufferedImageToBase64(BufferedImage bufferedImage, String imageType) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
-			ImageIO.write(bufferedImage, imageType, baos);
+			boolean ok = ImageIO.write(bufferedImage, imageType, baos);
+			if (!ok) {
+				throw new RuntimeException("Cannot convert bufferedImage to ByteArrayOutputStream");
+			}
+			baos.close();
 		} catch (IOException e) {
 			throw new RuntimeException("Cannot read image", e);
 		}
@@ -261,7 +265,19 @@ public class SVGImage extends SVGShape {
 		}
 		return bufferedImage;
 	}
-	
+
+	/** converts href/data attribute to BufferedImage.
+	 * 
+	 * @return null if no image possible.
+	 */
+	public BufferedImage getBufferedImage() {
+		BufferedImage bufferedImage = null;
+		String hrefData = this.getImageValue();
+		if (hrefData != null) {
+			bufferedImage = readSrcDataToBufferedImage(hrefData);
+		}
+		return bufferedImage;
+	}
 	/*
 	 * <image transform="matrix(0.06781766590473381,-0.0,-0.0,0.0678967742330725,33.93199920654297,33.12698745727539)"
 	 *  x="0.0" y="0.0" width="702.0" height="310.0" xlink:href="data:image/png;base64,iVBORw0KGgoAAAA..."
@@ -397,6 +413,72 @@ public class SVGImage extends SVGShape {
 	@Override
 	public String getGeometricHash() {
 		return getAttributeValue(SRC)+" "+getAttributeValue(HREF);
+	}
+
+	/** sets image data into href attribute.
+	 * 
+	 * @param imageData; if null unset attribute
+	 */
+	public void setImageData(String imageData) {
+		if (imageData != null) {
+			this.addAttribute(new Attribute(XLINK_PREF+":"+HREF, XLINK_NS, imageData));
+		} else {
+			Attribute hrefAttribute = this.getAttribute(HREF, XLINK_NS);
+			if (hrefAttribute != null) {
+				hrefAttribute.detach();
+			}
+		}
+	}
+
+	/** creates an SVGImage from file.
+	 * 
+	 * <p>will not create a location (may need to set x, y or transform independently);
+	 * </p>
+	 * @param imageFile
+	 * @param imageType
+	 * @return image
+	 * @throws RuntimeException FNF, etc
+	 */
+	public static SVGImage createSVGFromImage(File imageFile, String imageType) throws RuntimeException {
+		SVGImage svgImage = null;
+		BufferedImage bufferedImage = null;
+		try {
+			bufferedImage = ImageIO.read(imageFile);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		String format = SVGImage.getFormatFromMimeType(imageType);
+		if (format == null) {
+			throw new RuntimeException("Unsupported mime type: "+imageType);
+		}
+		String imageData = SVGImage.convertBufferedImageToBase64(bufferedImage, format);
+		if (imageData != null) {
+		    svgImage = new SVGImage();
+		    svgImage.setImageData(imageData);
+		}
+		return svgImage;
+	}
+
+	/** get informal format for ImageIO.write.
+	 * 
+	 * ImageWriter types seem messy.
+	 * 
+	 * @param imageType
+	 * @return format
+	 */
+	public static String getFormatFromMimeType(String imageType) {
+		if (imageType == null) {
+			return null;
+		} else if (SVGImage.IMAGE_PNG.equals(imageType)) {
+			return SVGImage.PNG;
+		} else if (SVGImage.IMAGE_JPG.equals(imageType)) {
+			return SVGImage.JPG;
+		} else if (SVGImage.IMAGE_BMP.equals(imageType)) {
+			return SVGImage.BMP;
+		}
+
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

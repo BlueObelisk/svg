@@ -192,7 +192,6 @@ public class SVGElement extends GraphicsElement {
 				Node newNode = null;
 				if (node instanceof Text) {
 					String value = node.getValue();
-//					LOG.debug(value+"/"+(int)value.charAt(0));
 					newNode = new Text(value);
 				} else if (node instanceof Comment) {
 					newNode = new Comment(node.getValue());
@@ -1028,12 +1027,10 @@ public class SVGElement extends GraphicsElement {
 
 	public static void applyTransformsWithinElementsAndFormat(SVGElement svgElement) {
 		List<SVGElement> elementList = generateElementList(svgElement, ".//svg:*[@transform]");
-		LOG.debug("NODES "+elementList.size());
 		for (SVGElement element : elementList) {
 			element.applyTransformAttributeAndRemove();
 			element.format(2);
 		}
-		LOG.debug("... applied transformations");
 	}
 
 	/**

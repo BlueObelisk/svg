@@ -13,6 +13,8 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,7 +27,54 @@ public class SVGImageTest {
 	
 	private static final String CANNY = "Canny";
 	private static final String GRAYSCALE = "grayscale";
-//	private static final File SVG_TEST = Fixtures.TEST_SVG;
+//	public final static String IMAGE_SVG = ""
+//	 		+ "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" >"
+//	 		+ "  <image transform=\"matrix(0.05999946966767311,-0.0,-0.0,-0.05999946966767311,197.92599487304688,562.9089965820312)\" x=\"0.0\" y=\"0.0\" "
+//	 		+ "   width=\"16.0\" height=\"16.0\" "
+//	 		+ "   xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\" "
+//	 		+ "  />"
+//	 		+ "</svg>";
+	public final static String IMAGE_SVG = ""
+	 		+ "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" >"
+	 		+ "  <image  x=\"0.0\" y=\"0.0\" "
+	 		+ "   width=\"16.0\" height=\"16.0\" "
+	 		+ "   xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\" "
+	 		+ "  />"
+	 		+ "</svg>";
+
+	@Test 
+	public void testReadContent() {
+		 SVGElement svgElement = SVGUtil.parseToSVGElement(IMAGE_SVG);
+		 Assert.assertNotNull(svgElement);
+		 SVGImage image = (SVGImage) svgElement.getChildElements().get(0);
+		 Assert.assertNotNull(image);
+		 String dataValue = image.getImageValue();
+		 Assert.assertEquals("data", 
+				 "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=",
+				 dataValue);
+	}
+	
+	@Test 
+	public void testRoundtripImage() throws Exception {
+		 SVGImage svgImage = (SVGImage) SVGUtil.parseToSVGElement(IMAGE_SVG).getChildElements().get(0);
+		 BufferedImage image = svgImage.getBufferedImage();
+		 Assert.assertNotNull(image);
+		 String imageInfo = image.toString();
+		 imageInfo = imageInfo.replaceAll("@[a-f0-9]*", "@aaa");
+		 Assert.assertEquals("image", 
+			 "BufferedImage@aaa: type = 6 ColorModel: #pixelBits = 32 numComponents = 4 color space = java.awt.color.ICC_ColorSpace@aaa transparency = 3 has alpha = true isAlphaPre = false ByteInterleavedRaster: width = 16 height = 16 #numDataElements 4 dataOff[0] = 3",
+			 imageInfo);
+		 File imageFile = new File("target/image1.png");
+	     SVGImage.writeBufferedImage(image, SVGImage.IMAGE_PNG, imageFile);
+	     SVGImage svgImage1 = SVGImage.createSVGFromImage(imageFile, SVGImage.IMAGE_PNG);
+	     Assert.assertNotNull("image", svgImage1);
+	     svgImage.format(3);
+	     Assert.assertEquals("image", "<image xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0.0\" y=\"0.0\""
+	     		+ " width=\"16.0\" height=\"16.0\" "
+	     		+ "xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\" "
+	     		+ "/>", svgImage.toXML());
+	}
+
 	
 	@Test
 	public void testPNGWrite() throws Exception {
