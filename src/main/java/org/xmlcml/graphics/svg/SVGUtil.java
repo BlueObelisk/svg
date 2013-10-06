@@ -44,6 +44,18 @@ public class SVGUtil {
 
 	/** creates an SVGElement
 	 * 
+	 * throws RuntimeException on errors
+	 * 
+	 * @param xmlString
+	 * @return
+	 */
+	public static SVGElement parseToSVGElement(String xmlString) {
+		Element element = XMLUtil.parseXML(xmlString);
+		return SVGElement.readAndCreateSVG(element);
+	}
+
+	/** creates an SVGElement
+	 * 
 	 * @param is
 	 * @return
 	 */
