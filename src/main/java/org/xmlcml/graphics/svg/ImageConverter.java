@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.xmlcml.euclid.IntRange;
 
 /** utility methods to help processing images.
@@ -69,8 +70,8 @@ public class ImageConverter {
 	/** extracts all image data strings.
 	 * 
 	 * <p>Very crude. Designed to parse very long strings on assumption they come from 
-	 * XOM tools. detects <image ... />. If it works may be refined. Limits point to
-	 * "!<" and "/>!"
+	 * XOM tools. detects <image ... />. If it works may be refined. Range limits point to
+	 * "!<" and "/>!". Note- will fail on prefixed XML.
 	 * </p>
 	 * @return empty list if none
 	 */
@@ -169,6 +170,22 @@ public class ImageConverter {
 		return imageFilenames;
 	}
 
+	public void replaceHrefDataWithFileRef(String filePrefix) throws IOException {
+		createImageFiles();
+		StringBuilder sb = new StringBuilder(svgString);
+		for (int i = imageStringBoundaries.size() - 1; i  >= 0; i--) {
+			IntRange intRange = imageStringBoundaries.get(i);
+			String imageString = new String(imageStrings.get(i));
+			String fileRef = filePrefix + imageFilenames.get(i);
+			StringBuilder imageSb = new StringBuilder(imageString);
+			IntRange hrefRange = hrefIntRangeArray.get(i);
+			imageSb.replace(hrefRange.getMin(), hrefRange.getMax(), fileRef);
+			String newHref = imageSb.toString();
+			sb.replace(intRange.getMin(), intRange.getMax(), newHref);
+		}
+		svgString = sb.toString();
+	}
+
 	/** sets the directory for images to be output.
 	 * 
 	 * <p>creates directory if not existing</p>
@@ -203,20 +220,7 @@ public class ImageConverter {
 		return svgString;
 	}
 
-	public void replaceHrefDataWithFileRef(String filePrefix) {
-		if (imageFilenames != null) {
-			StringBuilder sb = new StringBuilder(svgString);
-			for (int i = 0; i < imageStringBoundaries.size(); i++) {
-				IntRange intRange = imageStringBoundaries.get(i);
-				String imageString = new String(imageStrings.get(i));
-				String fileRef = filePrefix + imageFilenames.get(i);
-				StringBuilder imageSb = new StringBuilder(imageString);
-				IntRange hrefRange = hrefIntRangeArray.get(i);
-				imageSb.replace(hrefRange.getMin(), hrefRange.getMax(), fileRef);
-				String newHref = imageSb.toString();
-				sb.replace(intRange.getMin(), intRange.getMax(), newHref);
-			}
-			svgString = sb.toString();
-		}
+	public void readSVGFile(File svgFile) throws IOException {
+		svgString = FileUtils.readFileToString(svgFile, "UTF-8");
 	}
 }
