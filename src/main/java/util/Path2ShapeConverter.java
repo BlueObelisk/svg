@@ -21,6 +21,7 @@ import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGPathPrimitive;
 import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGShape;
+import org.xmlcml.graphics.svg.SVGUtil;
 import org.xmlcml.graphics.svg.StyleBundle;
 import org.xmlcml.xml.XMLUtil;
 
@@ -179,7 +180,6 @@ public class Path2ShapeConverter {
 					// no need to replace as no conversion done
 				} else {
 					parent.replaceChild(path, shape);
-//					pathList.set(i, shape);
 				}
 			}
 		}
@@ -461,6 +461,10 @@ public class Path2ShapeConverter {
 			if (val != null) {
 				result.addAttribute(new Attribute(attName, val));
 			}
+		}
+		String zvalue = SVGUtil.getSVGXAttribute(path, "z");
+		if (zvalue != null) {
+			SVGUtil.setSVGXAttribute(result, "z", zvalue);
 		}
 	}
 	

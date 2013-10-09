@@ -18,6 +18,10 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.RealArray;
+import org.xmlcml.euclid.Transform2;
 import org.xmlcml.graphics.svg.util.CannyEdgeDetector;
 
 public class SVGImageTest {
@@ -27,24 +31,9 @@ public class SVGImageTest {
 	
 	private static final String CANNY = "Canny";
 	private static final String GRAYSCALE = "grayscale";
-//	public final static String IMAGE_SVG = ""
-//	 		+ "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" >"
-//	 		+ "  <image transform=\"matrix(0.05999946966767311,-0.0,-0.0,-0.05999946966767311,197.92599487304688,562.9089965820312)\" x=\"0.0\" y=\"0.0\" "
-//	 		+ "   width=\"16.0\" height=\"16.0\" "
-//	 		+ "   xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\" "
-//	 		+ "  />"
-//	 		+ "</svg>";
-	public final static String IMAGE_SVG = ""
-	 		+ "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" >"
-	 		+ "  <image  x=\"0.0\" y=\"0.0\" "
-	 		+ "   width=\"16.0\" height=\"16.0\" "
-	 		+ "   xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\" "
-	 		+ "  />"
-	 		+ "</svg>";
-
-	@Test 
+@Test 
 	public void testReadContent() {
-		 SVGElement svgElement = SVGUtil.parseToSVGElement(IMAGE_SVG);
+		 SVGElement svgElement = SVGUtil.parseToSVGElement(Fixtures.IMAGE_SVG);
 		 Assert.assertNotNull(svgElement);
 		 SVGImage image = (SVGImage) svgElement.getChildElements().get(0);
 		 Assert.assertNotNull(image);
@@ -56,7 +45,7 @@ public class SVGImageTest {
 	
 	@Test 
 	public void testRoundtripImage() throws Exception {
-		 SVGImage svgImage = (SVGImage) SVGUtil.parseToSVGElement(IMAGE_SVG).getChildElements().get(0);
+		 SVGImage svgImage = (SVGImage) SVGUtil.parseToSVGElement(Fixtures.IMAGE_SVG).getChildElements().get(0);
 		 BufferedImage image = svgImage.getBufferedImage();
 		 Assert.assertNotNull(image);
 		 String imageInfo = image.toString();
@@ -69,10 +58,10 @@ public class SVGImageTest {
 	     SVGImage svgImage1 = SVGImage.createSVGFromImage(imageFile, SVGImage.IMAGE_PNG);
 	     Assert.assertNotNull("image", svgImage1);
 	     svgImage.format(3);
-	     Assert.assertEquals("image", "<image xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0.0\" y=\"0.0\""
-	     		+ " width=\"16.0\" height=\"16.0\" "
-	     		+ "xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\" "
-	     		+ "/>", svgImage.toXML());
+	     // <image xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=" />
+	     
+	     Assert.assertEquals("image", "<image xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\" />",
+	    		 svgImage1.toXML());
 	}
 
 	
@@ -250,6 +239,89 @@ public class SVGImageTest {
 				(SVGImage) SVGImage.extractImages(SVGUtil.getQuerySVGElements(element, "//*[local-name()='image']")).get(0);
 		svgImage.writeImage("target/testReadSvg.png", SVGImage.IMAGE_PNG);
 	}
+	
+	@Test
+	public void testRotateImage() throws IOException {
+		SVGImage svgImage = SVGImage.createSVGFromImage(new File("target/image.g.2.2.png"), SVGImage.IMAGE_PNG);
+		svgImage.applyTransformToImage(new Transform2(new Angle(Math.PI)));
+		svgImage.writeImage(new File("target/rotx.png"), SVGImage.IMAGE_PNG);
+		
+	}
+	
+	@Test
+	public void testFlipImageHorizontally() throws IOException {
+		SVGImage svgImage = SVGImage.createSVGFromImage(new File("target/image.g.2.2.png"), SVGImage.IMAGE_PNG);
+		svgImage.applyTransformToImage(new Transform2(new double[]{-1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0}));
+		svgImage.writeImage(new File("target/fliphor.png"), SVGImage.IMAGE_PNG);
+		
+	}
+	
+	@Test
+	public void testFlipImageVertically() throws IOException {
+		SVGImage svgImage = SVGImage.createSVGFromImage(new File("target/image.g.2.2.png"), SVGImage.IMAGE_PNG);
+		svgImage.applyTransformToImage(new Transform2(new double[]{1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0}));
+		svgImage.writeImage(new File("target/flipvert.png"), SVGImage.IMAGE_PNG);
+		
+	}
+	
+	@Test
+	public void testTranslate() throws IOException {
+		SVGImage svgImage = (SVGImage) SVGElement.readAndCreateSVG(Fixtures.LETTERA_IMAGE_SVG);
+		LOG.debug(svgImage.toXML());
+		Transform2 transform = svgImage.getTransform();
+		LOG.debug(transform);
+		Real2 translationReal2 = transform.getTranslation();
+		LOG.debug(translationReal2);
+		RealArray scales = transform.getScales();
+		LOG.debug(scales);
+		Real2 dimension = svgImage.getReal2Dimension();
+		
+		Real2 centreOffset = dimension.multiplyBy(0.5);
+		LOG.debug("Offset: "+centreOffset);
+		translationReal2 = translationReal2.plus(centreOffset);
+		translationReal2.negative();
+		LOG.debug("translation: "+centreOffset);
+		Transform2 scaleTransform = Transform2.createScaleTransform(1./scales.get(0), 1./scales.get(1));
+//		Transform2 scaleTransform = Transform2.createScaleTransform(scales.get(0), scales.get(1));
+		translationReal2.transformBy(scaleTransform);
+		Transform2 translationTransform = Transform2.getTranslationTransform(translationReal2);
+		translationTransform = translationTransform.concatenate(scaleTransform);
+		LOG.debug("translationTransform "+translationTransform);
+		transform = transform.concatenate(translationTransform);
+		svgImage.setTransform(transform);
+		LOG.debug(svgImage.toXML());
+		SVGSVG svgx = SVGSVG.wrapAndWriteAsSVG(svgImage, new File("target/origin.svg"));
+	}
+	@Test
+	public void testTranslateToOrigin() throws IOException {
+		SVGImage svgImage = (SVGImage) SVGElement.readAndCreateSVG(Fixtures.LETTERA_IMAGE_SVG);
+		LOG.debug(svgImage.toXML());
+		Transform2 transform = svgImage.getTransform();
+		LOG.debug(transform);
+		Real2 translation = transform.getTranslation();
+		LOG.debug(translation);
+		Real2 dimension = svgImage.getReal2Dimension();
+		Real2 centreOffest = dimension.multiplyBy(0.5);
+		translation = translation.plus(centreOffest);
+		translation.negative();
+		Transform2 translationTransform = Transform2.getTranslationTransform(translation);
+		transform = transform.concatenate(translationTransform);
+		svgImage.setTransform(translationTransform);
+		SVGSVG svgx = SVGSVG.wrapAndWriteAsSVG(svgImage, new File("target/origin.svg"));
+	}
+
+	
+	@Test
+	public void testApplyExplicitTransformationAndUpdate() throws IOException {
+		SVGSVG svg = (SVGSVG) SVGElement.readAndCreateSVG(Fixtures.LETTERA_SVG);
+		SVGImage svgImage = (SVGImage) svg.getChildElements().get(0);
+		svgImage.applyExplicitTransformationAndUpdate();
+		SVGSVG svgx = SVGSVG.wrapAndWriteAsSVG(svgImage, new File("target/explicitxx.svg"));
+		SVGUtil.debug(svgImage, new FileOutputStream("target/explicit.svg"), 1);
+		svgImage.writeImage(new File("target/explicit.png"), SVGImage.IMAGE_PNG);
+		
+	}
+
 	// =================================================================
 	
 	private WritableRaster readRasterText(String text, String filename, int height) {

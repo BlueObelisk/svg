@@ -16,6 +16,8 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,8 +43,10 @@ import nu.xom.Node;
 
 import org.apache.log4j.Logger;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
 
 /** supports defs
@@ -174,6 +178,9 @@ public class SVGImage extends SVGShape {
 	}
 
 	/**
+	 * 
+	 * Does not transform the actual image. Maybe it should
+	 * 
    <image x="0" y="0" 
      transform="matrix(0.3605,0,0,0.3592,505.824,65.944)" 
      width="158" xlink:href="data:image/png;base64,iVBORw0KGgbGgjc... ...kJggg=="
@@ -219,22 +226,34 @@ public class SVGImage extends SVGShape {
 		this.setHeight(height);
 		
 		String base64 = convertBufferedImageToBase64(bufferedImage, imageType);
-		String attValue = DATA+":"+mimeType+";"+BASE64+","+base64;
+		String attValue = createHrefAttributeValue(mimeType, base64);
 		this.addAttribute(new Attribute(XLINK_PREF+":"+HREF, XLINK_NS, attValue));
+		return attValue;
+	}
+
+	private static String createHrefAttributeValue(String mimeType, String base64) {
+		String attValue = DATA+":"+mimeType+";"+BASE64+","+base64;
 		return attValue;
 	}
 
 	public static String convertBufferedImageToBase64(BufferedImage bufferedImage, String imageType) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		String format = SVGImage.getFormatFromMimeType(imageType); 
+		LOG.debug("format "+format);
+		format = SVGImage.PNG;
 		try {
-			boolean ok = ImageIO.write(bufferedImage, imageType, baos);
+//			boolean ok = ImageIO.write(bufferedImage, imageType, baos);
+			boolean ok = ImageIO.write(bufferedImage, format, baos);
 			if (!ok) {
-				throw new RuntimeException("Cannot convert bufferedImage to ByteArrayOutputStream");
+				throw new RuntimeException("ImageIO: Cannot convert bufferedImage to ByteArrayOutputStream for type: "+imageType+" / "+bufferedImage);
+//				throw new RuntimeException("ImageIO: Cannot convert bufferedImage to ByteArrayOutputStream for type: "+imageType+" / "+bufferedImage);
+//				return null;
 			}
 			baos.close();
 		} catch (IOException e) {
 			throw new RuntimeException("Cannot read image", e);
 		}
+		LOG.trace("BufferedImage "+bufferedImage);
 		byte[] byteArray = baos.toByteArray();
 		String base64 = Base64.encode(byteArray);
 		return base64;
@@ -335,31 +354,28 @@ public class SVGImage extends SVGShape {
 			LOG.trace("Writing: "+file.getAbsolutePath());
 			FileOutputStream fos = new FileOutputStream(file);
 			writeByWriter(bufferedImage, mimeType, fos);
-//			ok = writeByImageIO(bufferedImage, mimeType, file);
-//			if (!ok) {
-//				printKnownMimeTypes();
-//				throw new RuntimeException("Cannot write image: "+mimeType);
-//			}
 			fos.close();
-			
 		} else {
 			printKnownMimeTypes();
 			throw new RuntimeException("ImageIO unknown mimeType: "+mimeType);
 		}
 	}
 
-	private static boolean writeByImageIO(BufferedImage bufferedImage,
-			String mimeType, File file) throws IOException {
-		boolean ok;
-		String informalFormat = mimeType.startsWith("image/") ? mimeType.substring("image/".length()): mimeType;
-		ok = ImageIO.write(bufferedImage, informalFormat, file);
-		return ok;
-	}
+//	private static boolean writeByImageIO(BufferedImage bufferedImage,
+//			String mimeType, File file) throws IOException {
+//		boolean ok;
+//		String informalFormat = mimeType.startsWith("image/") ? mimeType.substring("image/".length()): mimeType;
+//		ok = ImageIO.write(bufferedImage, informalFormat, file);
+//		return ok;
+//	}
 
 	private static void writeByWriter(BufferedImage bufferedImage,
 			String mimeType, FileOutputStream fos) throws IOException {
 		if (bufferedImage != null) {
 			ImageWriter imageWriter = getFirstKnownImageWriter(mimeType);
+			if (imageWriter == null) {
+				throw new RuntimeException("Cannot create ImageWriter for: "+mimeType);
+			}
 		    ImageOutputStream ios = ImageIO.createImageOutputStream(fos);
 		    imageWriter.setOutput(ios);
 		    imageWriter.write(bufferedImage);
@@ -421,6 +437,9 @@ public class SVGImage extends SVGShape {
 	 */
 	public void setImageData(String imageData) {
 		if (imageData != null) {
+			if (!imageData.startsWith(DATA)) {
+				throw new RuntimeException("ImageData must start with "+DATA);
+			}
 			this.addAttribute(new Attribute(XLINK_PREF+":"+HREF, XLINK_NS, imageData));
 		} else {
 			Attribute hrefAttribute = this.getAttribute(HREF, XLINK_NS);
@@ -440,6 +459,9 @@ public class SVGImage extends SVGShape {
 	 * @throws RuntimeException FNF, etc
 	 */
 	public static SVGImage createSVGFromImage(File imageFile, String imageType) throws RuntimeException {
+		if (imageFile == null || !imageFile.exists() || imageFile.isDirectory()) {
+			throw new RuntimeException("Image file does not exist: "+imageFile);
+		}
 		SVGImage svgImage = null;
 		BufferedImage bufferedImage = null;
 		try {
@@ -451,7 +473,9 @@ public class SVGImage extends SVGShape {
 		if (format == null) {
 			throw new RuntimeException("Unsupported mime type: "+imageType);
 		}
-		String imageData = SVGImage.convertBufferedImageToBase64(bufferedImage, format);
+		String base64 = SVGImage.convertBufferedImageToBase64(bufferedImage, format);
+		String imageData = SVGImage.createHrefAttributeValue(imageType, base64);
+		LOG.debug(imageData);
 		if (imageData != null) {
 		    svgImage = new SVGImage();
 		    svgImage.setImageData(imageData);
@@ -479,6 +503,80 @@ public class SVGImage extends SVGShape {
 
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	/** if image is a bitmap apply transformation.
+	 * <p>
+	 * Some image are "wrong way up" with a transformation matrix. If so
+	 * apply this and reset to zero rotation.
+	 */
+	public BufferedImage applyTransformToImage(BufferedImage bufferedImage, Transform2 transform2) {
+		BufferedImage rotatedImage = null;
+		if (transform2 != null && bufferedImage != null) {
+			RealSquareMatrix rotmat = (RealSquareMatrix) transform2.getRotationMatrix().format(1);
+			Double m00 = rotmat.elementAt(0, 0);
+			Double m11 = rotmat.elementAt(1, 1);
+			if (rotmat.isImproperRotation()) {
+				if (Real.isEqual(m11, -1.0, 0.001)) {
+					rotatedImage = flipBitmapHorizontally(bufferedImage);
+				} else if (Real.isEqual(m00, -1.0, 0.001)) {
+					rotatedImage = flipBitmapVertically(bufferedImage);
+				}
+			} else if (Real.isEqual(m00, -1.0, 0.001) && Real.isEqual(m11, -1.0, 0.001)) {
+				rotatedImage = rotateBitmapByPI(bufferedImage);
+			} else {
+				rotatedImage = transform(bufferedImage, transform2.getAffineTransform());
+			}
+		}
+		return rotatedImage;
+	}
+	
+	public void applyTransformToImage(Transform2 transform) {
+		BufferedImage bufferedImage = this.getBufferedImage();
+		if (bufferedImage != null) {
+			BufferedImage transformedImage = applyTransformToImage(bufferedImage, transform);
+			String imageData = SVGImage.convertBufferedImageToBase64(transformedImage, SVGImage.IMAGE_PNG);
+			imageData = SVGImage.createHrefAttributeValue(SVGImage.IMAGE_PNG, imageData);
+			this.setImageData(imageData);
+		}
+	}
+
+	private BufferedImage rotateBitmapByPI(BufferedImage bufferedImage) {
+		return transform(bufferedImage, new AffineTransform(new double[]{
+				-1.0, 0.0, 0.0, -1.0, bufferedImage.getWidth(), bufferedImage.getHeight()}));
+	}
+
+	public BufferedImage flipBitmapVertically(BufferedImage bufferedImage) {
+		return transform(bufferedImage, new AffineTransform(new double[]{1.0, 0.0, 0.0, -1.0, 0.0, bufferedImage.getHeight()}));
+	}
+
+	public BufferedImage flipBitmapHorizontally(BufferedImage bufferedImage) {
+		return transform(bufferedImage, new AffineTransform(new double[]{-1.0, 0.0, 0.0, 1.0, bufferedImage.getWidth(), 0.0}));
+	}
+
+	private BufferedImage transform(BufferedImage img, AffineTransform affineTransform) {
+		int w = img.getWidth();
+	    int h = img.getHeight();
+	    BufferedImage rot = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		Graphics2D graphic = (Graphics2D) rot.createGraphics();
+		graphic.drawImage(img, affineTransform, null);
+		return rot;
+	}
+
+	/** applies any rotations in explicit transform attribute
+	 * 
+	 */
+	public void applyExplicitTransformationAndUpdate() {
+		/*
+		Transform2 transform = this.getTransform();
+		if (transform != null) {
+			this.applyTransformToImage(transform);
+			transform.setElementAt(0, 0, Math.abs(transform.elementAt(0, 0)));
+			transform.setElementAt(1, 1, Math.abs(transform.elementAt(1, 1)));
+		    this.setTransform(transform);
+		}
+		*/
+		this.debug("XXXXXXXXXXX");
 	}
 
 }

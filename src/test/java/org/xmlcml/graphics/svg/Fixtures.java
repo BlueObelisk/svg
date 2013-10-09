@@ -47,4 +47,26 @@ public class Fixtures {
 	public static final File SVG_G_8_2_SVG = new File(Fixtures.TEST_SVG, "image.g.8.2.svg");
 	public static final File SVG_PAGE6_SVG = new File(Fixtures.TEST_SVG, "page6.svg");
 
+	//	public final static String IMAGE_SVG = ""
+	//	 		+ "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" >"
+	//	 		+ "  <image transform=\"matrix(0.05999946966767311,-0.0,-0.0,-0.05999946966767311,197.92599487304688,562.9089965820312)\" x=\"0.0\" y=\"0.0\" "
+	//	 		+ "   width=\"16.0\" height=\"16.0\" "
+	//	 		+ "   xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\" "
+	//	 		+ "  />"
+	//	 		+ "</svg>";
+	public static final File SVG_IMAGES_DIR = new File(TEST_SVG, "svgimages");
+	public final static String IMAGE_SVG = ""
+		 + "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"><image  x=\"0.0\" y=\"0.0\" width=\"16.0\" height=\"16.0\" xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\"/></svg>";
+	public final static File LARGE_IMAGE_SVG = new File(SVG_IMAGES_DIR, "multiple-image-page6.svg"); 
+//	public final static String IMAGE_SCALE_SVG = ""
+//	 +"<svg xmlns=\"http://www.w3.org/2000/svg\" >"
+//	 +"<image transform=\"matrix(0.160000000808920095,-0.0,-0.0,-0.159999995788164284,261.77996826171875,801.2996826171875)\" "
+//	 + "x=\"0.0\" y=\"0.0\" width=\"56.0\" height=\"330.0\" "
+//	 + "xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAFKCAYAAABIG5xgAAABQ0lEQVR42u3aQQ7CMAwAwf7/0+HEjYJa4thOZySOkCyIplgcBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8GDjxyNqjfSwGZuKet3pYXc2E/3mhcRd2dBYHTkCHlHrlYj7tpmx8KsQHvhpQ2Nl5MpP586a314//Tg4e+7MN7HElSzyIlXmLIo6aqYtmnHW9los4xYt5V5QoECBlxcT2D1wdA48nhC4OlJg1GRt1aJpgatmoemB0Z9micDIyDKBUaHlAmeHlg2ctcHygf9utE3g3dFHu8AZI8I2gTND29g+sMKo8nQDFY+ZkjfYArNHFkOgQIECOyyYdtBvP1F7xMiw0h8Rtp2ktRwXlvyZlPWPwrbjhy3GhO1/uW8b1uri8fYCr8WfmTxzW6MAAAAASUVORK5CYII=\""
+//	 + " xmlns:xlink=\"http://www.w3.org/1999/xlink\"/>"
+//	 + "</svg>";
+	public final static File LETTERA_SVG_FILE = new File(Fixtures.IMAGES_DIR, "lettera.svg");
+	public final static SVGElement LETTERA_SVG = SVGElement.readAndCreateSVG(LETTERA_SVG_FILE);
+	public final static SVGElement LETTERA_IMAGE_SVG = (SVGImage) LETTERA_SVG.getChildElements().get(0);
+
 }

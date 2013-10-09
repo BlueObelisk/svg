@@ -892,14 +892,27 @@ public class SVGElement extends GraphicsElement {
 		return boundingBox;
 	}
 	
-	public Dimension getDimension() {
-		Dimension dimension = null;
+	/** return unrooted x-y range of element.
+	 * 
+	 * @return the (integer) ranges of the element.
+	 */
+	public java.awt.Dimension getDimension() {
+		Real2 real2 = getReal2Dimension();
+		return new Dimension((int)real2.getX(), (int)real2.getY());
+	}
+
+	/** return unrooted x-y range of element.
+	 * 
+	 * @return
+	 */
+	public Real2 getReal2Dimension() {
+		Real2 dimension = null;
 		getBoundingBox();
 		if (boundingBox != null) {
 			RealRange xrange = boundingBox.getXRange();
 			RealRange yrange = boundingBox.getYRange();
 			if (xrange != null && yrange != null) {
-				dimension = new Dimension((int)xrange.getRange(), (int) yrange.getRange());
+				dimension = new Real2(xrange.getRange(),  yrange.getRange());
 			}
 		}
 		return dimension;
