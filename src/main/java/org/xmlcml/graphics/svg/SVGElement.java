@@ -59,7 +59,7 @@ import org.xmlcml.xml.XMLUtil;
  *
  */
 public class SVGElement extends GraphicsElement {
-	private static Logger LOG = Logger.getLogger(GraphicsElement.class);
+	private static Logger LOG = Logger.getLogger(SVGElement.class);
 
 	public final static String ALL_ELEMENT_XPATH = "//svg:element";
 

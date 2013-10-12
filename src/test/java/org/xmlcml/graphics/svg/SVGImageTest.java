@@ -22,7 +22,7 @@ import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealArray;
 import org.xmlcml.euclid.Transform2;
-import org.xmlcml.graphics.svg.util.CannyEdgeDetector;
+import org.xmlcml.graphics.svg.image.CannyEdgeDetector;
 
 public class SVGImageTest {
 

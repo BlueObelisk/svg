@@ -69,4 +69,7 @@ public class Fixtures {
 	public final static SVGElement LETTERA_SVG = SVGElement.readAndCreateSVG(LETTERA_SVG_FILE);
 	public final static SVGElement LETTERA_IMAGE_SVG = (SVGImage) LETTERA_SVG.getChildElements().get(0);
 
+	public final static SVGPath ROUNDED_LINE_SVG = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.PATHS_DIR, "roundedline.svg"))
+	    .getChildElements().get(0).getChildElements().get(0);
+
 }
