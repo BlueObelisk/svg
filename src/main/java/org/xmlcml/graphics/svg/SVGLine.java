@@ -29,6 +29,7 @@ import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.Nodes;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real;
@@ -45,6 +46,8 @@ import org.xmlcml.xml.XMLConstants;
  */
 public class SVGLine extends SVGShape {
 
+	private static Logger LOG = Logger.getLogger(SVGLine.class);
+	
 	public final static String ALL_LINE_XPATH = ".//svg:line";
 	
 	private static final String STYLE = "style";
@@ -388,10 +391,29 @@ public class SVGLine extends SVGShape {
 	 * @param d max difference in radians from zero
 	 * @return
 	 */
-	public boolean isParallelTo(SVGLine svgLine, double d) {
-		Angle angle = this.getEuclidLine().getAngleMadeWith(svgLine.getEuclidLine());
-		double dd = Math.abs(angle.getAngle());
-		return dd < d;
+	public boolean isParallelTo(SVGLine svgLine, Angle angleEps) {
+		return this.getEuclidLine().isParallelTo(svgLine.getEuclidLine(), angleEps);
+	}
+
+	/**
+	 * 
+	 * @param svgLine
+	 * @param d max difference in radians from zero
+	 * @return
+	 */
+	public boolean isAntiParallelTo(SVGLine svgLine, Angle angleEps) {
+		return this.getEuclidLine().isAntiParallelTo(svgLine.getEuclidLine(), angleEps);
+	}
+
+
+	/**
+	 * 
+	 * @param svgLine
+	 * @param d max difference in radians from zero
+	 * @return
+	 */
+	public boolean isParallelOrAntiParallelTo(SVGLine svgLine, Angle angleEps) {
+		return this.getEuclidLine().isParallelOrAntiParallelTo(svgLine.getEuclidLine(), angleEps);
 	}
 
 	/**
@@ -406,6 +428,10 @@ public class SVGLine extends SVGShape {
 		return (dd < eps && dd > -eps);
 	}
 
+	public Double calculateUnsignedDistanceBetweenLines(SVGLine line1, Angle eps) {
+		return this.getEuclidLine().calculateUnsignedDistanceBetweenLines(line1.getEuclidLine(), eps);
+	}
+	
 	/** makes a new list composed of the lines in the list
 	 * 
 	 * @param elements

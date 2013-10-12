@@ -239,7 +239,7 @@ public class SVGImage extends SVGShape {
 	public static String convertBufferedImageToBase64(BufferedImage bufferedImage, String imageType) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		String format = SVGImage.getFormatFromMimeType(imageType); 
-		LOG.debug("format "+format);
+		LOG.trace("format "+format);
 		format = SVGImage.PNG;
 		try {
 //			boolean ok = ImageIO.write(bufferedImage, imageType, baos);
@@ -475,7 +475,7 @@ public class SVGImage extends SVGShape {
 		}
 		String base64 = SVGImage.convertBufferedImageToBase64(bufferedImage, format);
 		String imageData = SVGImage.createHrefAttributeValue(imageType, base64);
-		LOG.debug(imageData);
+		LOG.trace(imageData);
 		if (imageData != null) {
 		    svgImage = new SVGImage();
 		    svgImage.setImageData(imageData);
@@ -576,7 +576,7 @@ public class SVGImage extends SVGShape {
 		    this.setTransform(transform);
 		}
 		*/
-		this.debug("XXXXXXXXXXX");
+//		this.debug("XXXXXXXXXXX");
 	}
 
 }

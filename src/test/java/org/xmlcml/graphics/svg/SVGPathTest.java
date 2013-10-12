@@ -1,6 +1,7 @@
 package org.xmlcml.graphics.svg;
 
 import java.awt.geom.GeneralPath;
+import java.io.File;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -9,6 +10,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.EuclidTestUtils;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.graphics.svg.path.Arc;
+import org.xmlcml.graphics.svg.path.ClosePrimitive;
+import org.xmlcml.graphics.svg.path.CubicPrimitive;
+import org.xmlcml.graphics.svg.path.LinePrimitive;
+import org.xmlcml.graphics.svg.path.MovePrimitive;
+import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 
 public class SVGPathTest {
 
@@ -95,7 +102,7 @@ public class SVGPathTest {
 	@Test
 	public void testPrimitives1() {
 		SVGPath svgPath = new SVGPath("M100 200L250,300");
-		List<SVGPathPrimitive> primitives = svgPath.ensurePrimitives();
+		PathPrimitiveList primitives = svgPath.ensurePrimitives();
 		Assert.assertEquals("prim", 2, primitives.size());
 		Assert.assertTrue("prim", primitives.get(0) instanceof MovePrimitive);
 		Assert.assertEquals("prim", 1, primitives.get(0).getCoordArray().size());
@@ -106,7 +113,7 @@ public class SVGPathTest {
 	@Test
 	public void testPrimitives2() {
 		SVGPath svgPath = new SVGPath("M100 200 L250,300 C100 290 240 110 400 230 Z");
-		List<SVGPathPrimitive> primitives = svgPath.ensurePrimitives();
+		PathPrimitiveList primitives = svgPath.ensurePrimitives();
 		Assert.assertEquals("prim", 4, primitives.size());
 		Assert.assertTrue("prim", primitives.get(0) instanceof MovePrimitive);
 		Assert.assertTrue("prim", primitives.get(1) instanceof LinePrimitive);
@@ -114,8 +121,30 @@ public class SVGPathTest {
 		Assert.assertEquals("prim", 3, primitives.get(2).getCoordArray().size());
 		Assert.assertTrue("prim", primitives.get(3) instanceof ClosePrimitive);
 		Assert.assertNull("prim", primitives.get(3).getCoordArray());
-
 	}
 	
 
+	@Test 
+	public void testGetSkeleton() {
+		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.PATHS_DIR, "hollowcorner.svg"))
+				.getChildElements().get(0);
+		PathPrimitiveList primList = svgPath.ensurePrimitives();
+		
+		primList.createMeanLine(1, 7);
+		primList.createMeanCubic(2, 6);
+		primList.createMeanLine(3, 5);
+		primList.remove(4);
+
+		Assert.assertEquals("skeleton", ""
+			+ "M286.583 88.988 "
+			+ "L287.235 89.158 "
+			+ "C288.837 89.422 290.105 90.676 290.381 92.276 "
+			+ "L290.438 92.957 "
+			+ "L290.381 92.276 "
+			+ "C290.105 90.676 288.837 89.422 287.235 89.158 "
+			+ "L286.583 89.101",
+			primList.getDString().trim());
+		SVGPath newPath = new SVGPath(primList, svgPath);
+		SVGSVG.wrapAndWriteAsSVG(newPath, new File("target/skeletonPath.svg"));
+	}
 }

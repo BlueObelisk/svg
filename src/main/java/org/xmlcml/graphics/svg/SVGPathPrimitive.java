@@ -10,6 +10,12 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.RealArray;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.graphics.svg.path.ClosePrimitive;
+import org.xmlcml.graphics.svg.path.CubicPrimitive;
+import org.xmlcml.graphics.svg.path.LinePrimitive;
+import org.xmlcml.graphics.svg.path.MovePrimitive;
+import org.xmlcml.graphics.svg.path.PathPrimitiveList;
+import org.xmlcml.graphics.svg.path.QuadPrimitive;
 
 /**
  * parts of path (M, L, C, Z) currently not LHSQTA
@@ -39,8 +45,8 @@ public abstract class SVGPathPrimitive {
 	
 	public abstract String getTag();
 	
-	public static List<SVGPathPrimitive> parseDString(String d) {
-		List<SVGPathPrimitive> primitiveList = new ArrayList<SVGPathPrimitive>();
+	public static PathPrimitiveList parseDString(String d) {
+		PathPrimitiveList primitiveList = new PathPrimitiveList();
 		if (d == null) {
 			return primitiveList;
 		}
@@ -105,6 +111,7 @@ public abstract class SVGPathPrimitive {
 				primitiveList.add(pp);
 			}
 		}
+//		primitiveList.setFirstPoints();
 		return primitiveList;
 	}
 
@@ -166,7 +173,7 @@ public abstract class SVGPathPrimitive {
 	}
 		
 	public static String formatDString(String d, int places) {
-		List<SVGPathPrimitive> primitiveList = null;
+		PathPrimitiveList primitiveList = null;
 		try {
 			primitiveList = SVGPathPrimitive.parseDString(d);
 		} catch (RuntimeException e) {
@@ -181,7 +188,7 @@ public abstract class SVGPathPrimitive {
 	}
 	
 	public static String formatD(String d, int places) {
-		List<SVGPathPrimitive> primitiveList = SVGPathPrimitive.parseDString(d);
+		PathPrimitiveList primitiveList = SVGPathPrimitive.parseDString(d);
 		for (SVGPathPrimitive primitive : primitiveList) {
 			primitive.format(places);
 		}
@@ -189,7 +196,7 @@ public abstract class SVGPathPrimitive {
 		return d;
 	}
 	
-	public static String createD(List<SVGPathPrimitive> primitiveList) {
+	public static String createD(PathPrimitiveList primitiveList) {
 		StringBuilder sb = new StringBuilder();
 		for (SVGPathPrimitive primitive : primitiveList) {
 			sb.append(primitive.toString());
@@ -197,7 +204,7 @@ public abstract class SVGPathPrimitive {
 		return sb.toString();
 	}
 	
-	public static String createSignature(List<SVGPathPrimitive> primitiveList) {
+	public static String createSignature(PathPrimitiveList primitiveList) {
 		StringBuilder sig = new StringBuilder();
 		for (SVGPathPrimitive primitive : primitiveList) {
 			sig.append(primitive.getTag());
@@ -214,6 +221,16 @@ public abstract class SVGPathPrimitive {
 	
 	public Real2Array getCoordArray() {
 		return coordArray;
+	}
+
+	/** replace coordinate array.
+	 * 
+	 * Use with care. Currently no checks on size.
+	 * 
+	 * @param coordArray
+	 */
+	public void setCoordArray(Real2Array coordArray) {
+		this.coordArray = coordArray;
 	}
 
 	public String toString() {
@@ -233,6 +250,10 @@ public abstract class SVGPathPrimitive {
 
 	public Real2 getZerothCoord() {
 		return zerothCoord;
+	}
+	
+	protected void setZerothCoord(Real2 coord) {
+		this.zerothCoord = coord;
 	}
 
 	/** first coordinate in explicit coordinate array
@@ -272,26 +293,7 @@ public abstract class SVGPathPrimitive {
 		return trans;
 	}
 
-	/**
-	 * sets first points of primitives to last coord of precedingPrimitive
-	 * if last primitive (j) is Z, set firstCoord of primitive(0) to lastCoord of primitive(j-1) 
-	 * @param primitiveList
-	 */
-	public static void setFirstPoints(List<SVGPathPrimitive> primitiveList) {
-		if (primitiveList != null) {
-			int nprim = primitiveList.size();
-			for (int i = 1; i < nprim; i++) {
-				primitiveList.get(i).setFirstPoint(primitiveList.get(i-1).getLastCoord());
-			}
-			if (primitiveList.get(nprim-1) instanceof ClosePrimitive) {
-				if (nprim > 1) {
-					primitiveList.get(0).setFirstPoint(primitiveList.get(nprim-2).getLastCoord());
-				}
-			}
-		}
-	}
-
-	private void setFirstPoint(Real2 lastPoint) {
+	public void setFirstPoint(Real2 lastPoint) {
 		this.zerothCoord = lastPoint;
 	}
 }
