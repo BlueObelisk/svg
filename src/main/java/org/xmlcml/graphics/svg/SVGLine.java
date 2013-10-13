@@ -489,4 +489,8 @@ public class SVGLine extends SVGShape {
 	public String toString() {
 		return (euclidLine == null) ? null : euclidLine.toString();
 	}
+
+	public Real2 getMidPoint() {
+		return this.getEuclidLine().getMidPoint();
+	}
 }

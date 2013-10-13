@@ -6,11 +6,13 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.EuclidTestUtils;
 import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.graphics.svg.path.Arc;
 import org.xmlcml.graphics.svg.path.ClosePrimitive;
 import org.xmlcml.graphics.svg.path.CubicPrimitive;
 import org.xmlcml.graphics.svg.path.LinePrimitive;
@@ -19,6 +21,15 @@ import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 
 public class SVGPathTest {
 
+	
+	private final static Logger LOG = Logger.getLogger(SVGPathTest.class);
+
+	private final static Angle ANGLE_EPS = new Angle(0.01, Units.RADIANS);
+
+	private static final Double LINE_EPS = 1.0;
+
+	private static final Double MAX_WIDTH = 1.0;
+	
 	@Test
 	public void testCreatePolyline() {
 		String d = "M379.558 218.898 L380.967 212.146 L380.134 212.146 L378.725 218.898 L379.558 218.898";
@@ -147,4 +158,92 @@ public class SVGPathTest {
 		SVGPath newPath = new SVGPath(primList, svgPath);
 		SVGSVG.wrapAndWriteAsSVG(newPath, new File("target/skeletonPath.svg"));
 	}
+	
+	@Test
+	public void testRemoveRoundedCaps() {
+		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg"))
+				.getChildElements().get(0).getChildElements().get(0);
+		PathPrimitiveList primList = svgPath.ensurePrimitives();
+		String signature = svgPath.getSignature();
+		Assert.assertEquals("MLCCLCC", signature);
+		primList.replaceUTurnsByButt(5);
+		primList.replaceUTurnsByButt(2);
+		SVGPath newPath = new SVGPath(primList, svgPath);
+		Assert.assertEquals("new d", "M415.26 526.26 L415.26 517.98 L415.74 517.98 L415.74 526.26 L415.26 526.26", newPath.getDString().trim());
+		Assert.assertEquals("new sig", "MLLLL", newPath.getSignature());
+		
+	}
+
+	@Test
+	public void testRemoveRoundedCaps1() {
+		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg"))
+				.getChildElements().get(0).getChildElements().get(0);
+		PathPrimitiveList primList = svgPath.ensurePrimitives();
+		String signature = svgPath.getSignature();
+		Assert.assertEquals("MLCCLCC", signature);
+		svgPath.replaceAllUTurnsByButt(ANGLE_EPS);
+		SVGPath newPath = new SVGPath(primList, svgPath);
+		Assert.assertEquals("new d", "M415.26 526.26 L415.26 517.98 L415.74 517.98 L415.74 526.26 L415.26 526.26", newPath.getDString().trim());
+		Assert.assertEquals("new sig", "MLLLL", newPath.getSignature());
+		
+	}
+
+	@Test
+	public void testCreateLine() {
+		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg"))
+				.getChildElements().get(0).getChildElements().get(0);
+		SVGPath newPath = svgPath.replaceAllUTurnsByButt(ANGLE_EPS);
+		SVGLine line = newPath.createLineFromMLLLL(ANGLE_EPS, LINE_EPS);
+		Assert.assertNotNull("line", line);
+		Assert.assertEquals("line", "<line xmlns=\"http://www.w3.org/2000/svg\" stroke=\"black\" stroke-width=\"1.0\" x1=\"415.5\" y1=\"517.98\" x2=\"415.5\" y2=\"526.26\" />",
+				line.toXML().trim());
+		
+	}
+
+	@Test
+	public void testCreateLines() {
+		List<SVGPath> pathList = SVGPath.extractPaths(SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg")));
+		Angle angleEps = new Angle(2., Units.RADIANS);
+		Assert.assertEquals("paths", 13, pathList.size());
+		SVGG g = new SVGG();
+		int i = 0;
+		for (SVGPath path : pathList) {
+			LOG.trace(path.getSignature());
+			SVGPath newPath = path.replaceAllUTurnsByButt(angleEps);
+			if (newPath != null) {
+				SVGLine line = newPath.createLineFromMLLLL(angleEps, LINE_EPS);
+				if (line != null) {
+					g.appendChild(line);
+				} else {
+					LOG.debug("Failed line"+i);
+					newPath.setFill("red");
+					g.appendChild(newPath.copy());
+				}
+			} else {
+				LOG.debug("Failed Caps"+i);
+				path.setFill("blue");
+				g.appendChild(path.copy());
+			}
+			i++;
+		}
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/moleculeLines.svg"));
+	}
+
+
+	@Test
+	public void testCreateLine9() {
+		List<SVGPath> pathList = SVGPath.extractPaths(SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg")));
+		SVGPath path = pathList.get(9);
+		Angle angle2 = new Angle(0.02, Units.RADIANS);
+		Assert.assertEquals("old sig", "MLCCLCC", path.getSignature());
+		PathPrimitiveList primList = path.ensurePrimitives();
+		List<Integer> quadrantStartList = primList.getUTurnList(angle2);
+		Assert.assertEquals("uturns", 2, quadrantStartList.size());
+		SVGPath newPath = path.replaceAllUTurnsByButt(angle2);
+		Assert.assertEquals("new sig", "MLLLL", newPath.getSignature());
+		SVGLine line = newPath.createLineFromMLLLL(angle2, MAX_WIDTH);
+		Assert.assertNotNull(line);
+	}
+
+
 }

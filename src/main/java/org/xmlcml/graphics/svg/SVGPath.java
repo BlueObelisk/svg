@@ -16,9 +16,7 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -33,13 +31,16 @@ import nu.xom.Node;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealArray;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Vector2;
+import org.xmlcml.graphics.svg.path.Arc;
 import org.xmlcml.graphics.svg.path.ClosePrimitive;
 import org.xmlcml.graphics.svg.path.CubicPrimitive;
 import org.xmlcml.graphics.svg.path.PathPrimitiveList;
@@ -58,6 +59,8 @@ public class SVGPath extends SVGShape {
 		LOG.setLevel(Level.INFO);
 	}
 
+	private static final String MLLLL = "MLLLL";
+	private static final String MLLLLZ = "MLLLLZ";
 	public final static String CC = "CC";
 	public final static String D = "d";
 	public final static String TAG ="path";
@@ -66,6 +69,8 @@ public class SVGPath extends SVGShape {
 	public final static String ALL_PATH_XPATH = "//svg:path";
 	public final static String REMOVED = "removed";
 	public final static String ROUNDED_CAPS = "roundedCaps";
+	private static final Double ANGLE_EPS = 0.01;
+	private static final Double MAX_WIDTH = 2.0;
 	
 	private GeneralPath path2;
 	private boolean isClosed = false;
@@ -291,26 +296,50 @@ public class SVGPath extends SVGShape {
 	public SVGCircle createCircle(double epsilon) {
 		createCoordArray();
 		SVGCircle circle = null;
-		if (isClosed && allCoords.size() >= 8) {
-			Real2Range r2r = this.getBoundingBox();
-			// is it square?
-			if (Real.isEqual(r2r.getXRange().getRange(),  r2r.getYRange().getRange(), 2*epsilon)) {
-				Real2 centre = r2r.getCentroid();
-				Double sum = 0.0;
-				double[] spokeLengths = new double[firstCoords.size()];
-				for (int i = 0; i < firstCoords.size(); i++) {
-					Double spokeLength = centre.getDistance(firstCoords.get(i));
-					spokeLengths[i] = spokeLength;
-					sum += spokeLength;
+		String signature = this.getSignature();
+		if (signature.equals("MCCCCZ") || signature.equals("MCCCC") && isClosed) {
+			PathPrimitiveList primList = this.ensurePrimitives();
+			Angle angleEps = new Angle(0.05, Units.RADIANS);
+			Real2Array centreArray = new Real2Array();
+			RealArray radiusArray = new RealArray();
+			for (int i = 1; i < 5; i++) {
+				Arc arc = primList.getQuadrant(i, angleEps);
+				if (arc != null) {
+					Real2 centre = arc.getCentre();
+					centreArray.add(centre);
+					double radius = arc.getRadius();
+					radiusArray.addElement(radius);
+				} else {
+					LOG.debug("null quadrant");
 				}
-				Double rad = sum / firstCoords.size();
-				for (int i = 0; i < spokeLengths.length; i++) {
-					if (Math.abs(spokeLengths[i] - rad) > epsilon) {
-						return null;
-					}
-				}
-				circle = new SVGCircle(centre, rad);
 			}
+			Real2 meanCentre = centreArray.getMean();
+			Double meanRadius = radiusArray.getMean();
+			if (meanCentre != null) {
+				circle = new SVGCircle(meanCentre, meanRadius);
+			}
+		} else if (isClosed && allCoords.size() >= 8) {
+			// no longer useful I think
+//			LOG.debug("CIRCLE: "+signature);
+//			Real2Range r2r = this.getBoundingBox();
+//			// is it square?
+//			if (Real.isEqual(r2r.getXRange().getRange(),  r2r.getYRange().getRange(), 2*epsilon)) {
+//				Real2 centre = r2r.getCentroid();
+//				Double sum = 0.0;
+//				double[] spokeLengths = new double[firstCoords.size()];
+//				for (int i = 0; i < firstCoords.size(); i++) {
+//					Double spokeLength = centre.getDistance(firstCoords.get(i));
+//					spokeLengths[i] = spokeLength;
+//					sum += spokeLength;
+//				}
+//				Double rad = sum / firstCoords.size();
+//				for (int i = 0; i < spokeLengths.length; i++) {
+//					if (Math.abs(spokeLengths[i] - rad) > epsilon) {
+//						return null;
+//					}
+//				}
+//				circle = new SVGCircle(centre, rad);
+//			}
 		}
 		return circle;
 	}
@@ -670,20 +699,38 @@ public class SVGPath extends SVGShape {
 	 * @param angleEps
 	 * @return
 	 */
-	public SVGPath replaceTwoQuadrantCapsByButt(double maxCapRadius, Angle angleEps) {
+	public SVGPath replaceAllUTurnsByButt(Angle angleEps) {
 		SVGPath path = null;
 		if (getSignature().contains(CC)) {
 			PathPrimitiveList primList = this.ensurePrimitives();
-			List<Integer> quadrantStartList = primList.getTwoQuadrantList(angleEps);
+			List<Integer> quadrantStartList = primList.getUTurnList(angleEps);
 			if (quadrantStartList.size() > 0) {
 				for (int quad = quadrantStartList.size() - 1; quad >= 0; quad--) {
-					primList.replace2QuadrantsByButt(quadrantStartList.get(quad), maxCapRadius);
+					primList.replaceUTurnsByButt(quadrantStartList.get(quad)/*, maxCapRadius*/);
 				}
 				path = new SVGPath(primList, this);
 				SVGUtil.setSVGXAttribute(path, ROUNDED_CAPS, REMOVED);
 			}
 		}
 		return path;
+	}
+
+	/** creates a line from path with signature "MLLLL" or MLLLLZ".
+	 * 
+	 * <p>uses primitiveList.createLineFromMLLLL().</p>
+	 * @param angleEps
+	 * @param maxWidth
+	 * @return null if line has wrong signature or is too wide or not antiParallel.
+	 * 
+	 */
+	public SVGLine createLineFromMLLLL(Angle angleEps, Double maxWidth) {
+		SVGLine line = null;
+		String sig = this.getSignature();
+		if (MLLLL.equals(sig) || MLLLLZ.equals(sig)) {
+			ensurePrimitives();
+			line = primitiveList.createLineFromMLLLL(angleEps, maxWidth);
+		}
+		return line;
 	}
 	
 

@@ -83,9 +83,31 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		return primitiveList;
 	}
 
-	public Boolean isTwoQuadrants(int i, Angle angleEps) {
+	/** does the end turn through PI.
+	 * 
+	 * Can be very messy.
+	 * 
+	 * @param i
+	 * @param angleEps
+	 * @return
+	 */
+	public Boolean isUTurn(int i, Angle angleEps) {
+		Boolean uTurn = false;
 		Integer turn = quadrantValue(i, angleEps) + quadrantValue(i + 1, angleEps);
-		return Math.abs(turn) == 2;
+		// does it make 2 quarter turns?
+		if (Math.abs(turn) == 2) {
+			uTurn = true;
+		}
+		// are existing lines antiparallel?
+		if (!uTurn && isAntiParallel(i-1,  i+2, angleEps)) {
+			uTurn = true;
+		}
+		// is it the last one? (this is -2 from end)
+		if (!uTurn &&  i == this.size() - 2 &&
+				isAntiParallel(i-1,  1, angleEps)) {
+			uTurn = true;
+		}
+		return uTurn;
 	}
 
 	/** get value of a quadrant.
@@ -125,14 +147,14 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		return isClosed;
 	}
 
-	public List<Integer> getTwoQuadrantList(Angle angleEps) {
+	public List<Integer> getUTurnList(Angle angleEps) {
 		List<Integer> quadStartList = new ArrayList<Integer>();
 		for (int i = 0; i < primitiveList.size() - 1; i++) {
 			SVGPathPrimitive primitive0 = primitiveList.get(i);
 			SVGPathPrimitive primitive1 = primitiveList.get(i + 1);
 			if (primitive0 instanceof CubicPrimitive &&
 				primitive1 instanceof CubicPrimitive) {
-				if (isTwoQuadrants(i, angleEps)) {
+				if (isUTurn(i, angleEps)) {
 					quadStartList.add(i);
 				}
 			}
@@ -140,10 +162,9 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		return quadStartList;
 	}
 
-	public void replace2QuadrantsByButt(int quad, double maxCapRadius) {
-//		CubicPrimitive cubic0 = (CubicPrimitive) this.primitiveList.get(quad);
+	public void replaceUTurnsByButt(int quad) {
+		//maybe test radius later
 		CubicPrimitive cubic1 = (CubicPrimitive) this.primitiveList.get(quad + 1);
-//		Real2 point0 = cubic0.getFirstCoord();
 		Real2 point1 = cubic1.getLastCoord();
 		LinePrimitive linePrimitive = new LinePrimitive(point1);
 		primitiveList.remove(quad +1);
@@ -175,6 +196,9 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		SVGPathPrimitive prim = primitiveList.get(i);
 		if (prim instanceof CubicPrimitive) {
 			Angle angle = prim.getAngle();
+			if (angle.getRightAngle(angleEps) != 0) {
+				quadrant = new Arc((CubicPrimitive)prim);
+			}
 		}
 		return quadrant;
 	}
@@ -265,4 +289,33 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		}
 	}
 	
+	public SVGLine createLineFromMLLLL(Angle angleEps, double maxWidth) {
+		SVGLine line = null;
+		if (this.isAntiParallel(1, 3, angleEps) && this.isShort(2, maxWidth) && this.isShort(4, maxWidth)) {
+			line = this.createLineFromMidPoints(2, 4);
+		} else if (this.isAntiParallel(2, 4, angleEps) && this.isShort(1, maxWidth) && this.isShort(3, maxWidth)) {
+			line = this.createLineFromMidPoints(1, 3);
+		}
+		return line;
+	}
+
+	private SVGLine createLineFromMidPoints(int i, int j) {
+		SVGLine linei = this.getLine(i);
+		SVGLine linej = this.getLine(j);
+		return (linei == null || linej == null) ? null : 
+			new SVGLine(linei.getMidPoint(), linej.getMidPoint());
+	}
+
+	private boolean isShort(int i, double maxWidth) {
+		SVGLine line = this.getLine(i);
+		return (line == null) ? false : line.getLength() < maxWidth;
+	}
+
+	private boolean isAntiParallel(int i, int j, Angle angleEps) {
+		SVGLine linei = this.getLine(i);
+		SVGLine linej = this.getLine(j);
+		return (linei == null || linej == null) ? false : linei.isAntiParallelTo(linej, angleEps);
+	}
+
+
 }

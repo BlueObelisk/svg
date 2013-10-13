@@ -72,4 +72,6 @@ public class Fixtures {
 	public final static SVGPath ROUNDED_LINE_SVG = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.PATHS_DIR, "roundedline.svg"))
 	    .getChildElements().get(0).getChildElements().get(0);
 
+	public static final File MOLECULE_DIR = new File(TEST_SVG, "molecules");
+
 }

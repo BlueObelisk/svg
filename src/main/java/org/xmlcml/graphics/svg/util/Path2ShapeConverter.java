@@ -557,7 +557,7 @@ public class Path2ShapeConverter {
 					Real2 end0 = line0.getXY(0).getMidPoint(line1.getXY(0));
 					Real2 end1 = line0.getXY(1).getMidPoint(line1.getXY(1));
 					line = new SVGLine(end0, end1);
-					LOG.debug("line: "+line);
+					LOG.trace("line: "+line);
 				}
 			}
 		}
