@@ -1,5 +1,6 @@
 package org.xmlcml.graphics.svg;
 
+import java.io.File;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -46,15 +47,6 @@ public class SVGPathPrimitiveTest {
 		 Assert.assertTrue("c", primitiveList.get(10) instanceof CubicPrimitive);
 		 Assert.assertTrue("z", primitiveList.get(11) instanceof ClosePrimitive);
 	}
-
-//	@Test
-//	public void testZerothCoord() {
-//		PathPrimitiveList primitiveList = createPrimitiveList(D1);
-//		 Assert.assertNull("m", primitiveList.get(0).getZerothCoord());
-//		 Assert.assertNull("l", primitiveList.get(1).getZerothCoord());
-//		 Assert.assertNull("c", primitiveList.get(10).getZerothCoord());
-//		 Assert.assertNull("z", primitiveList.get(11).getZerothCoord());
-//	}
 
 	@Test
 	public void testZerothCoord1() {
@@ -189,7 +181,7 @@ public class SVGPathPrimitiveTest {
 	@Test
 	public void testTwoQuadrantList() {
 		PathPrimitiveList primitiveList = Fixtures.ROUNDED_LINE_SVG.ensurePrimitives();
-		List<Integer> quadStartList = primitiveList.getTwoQuadrantList(ANGLE_EPS);
+		List<Integer> quadStartList = primitiveList.getUTurnList(ANGLE_EPS);
 		Assert.assertEquals("quads", 2, quadStartList.size());
 		Assert.assertEquals("quads1", 2, (int) quadStartList.get(0));
 		Assert.assertEquals("quads2", 5, (int) quadStartList.get(1));
@@ -199,8 +191,23 @@ public class SVGPathPrimitiveTest {
 	public void testFindSemiCircles() {
 		PathPrimitiveList primitiveList = Fixtures.ROUNDED_LINE_SVG.ensurePrimitives();
 		Assert.assertEquals("MLCCLCC", Fixtures.ROUNDED_LINE_SVG.getSignature());
-		Assert.assertTrue(primitiveList.isTwoQuadrants(2, ANGLE_EPS));
+		Assert.assertTrue(primitiveList.isUTurn(2, ANGLE_EPS));
 	}
+	
+	@Test
+	public void testTwoQuadrantListMolecule() {
+		List<SVGPath> pathList = SVGPath.extractPaths(SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg")));
+		Assert.assertEquals("paths", 13, pathList.size());
+		SVGPath path = pathList.get(3);
+		SVGSVG.wrapAndWriteAsSVG(path, new File("target/badPath.svg"));
+		LOG.trace(path.toXML());
+		PathPrimitiveList primitiveList = path.ensurePrimitives();
+		List<Integer> quadStartList = primitiveList.getUTurnList(new Angle(0.1, Units.RADIANS));
+		Assert.assertEquals("quads", 2, quadStartList.size());
+		Assert.assertEquals("quads1", 2, (int) quadStartList.get(0));
+		Assert.assertEquals("quads2", 5, (int) quadStartList.get(1));
+	}
+
 
 // ==================================================================
 	

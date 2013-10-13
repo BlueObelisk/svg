@@ -70,7 +70,6 @@ public class SVGImageTest {
 		BufferedImage bufferedImage = ImageIO.read(Fixtures.IMAGE_TEST_PNG);
 		SVGImage svgImage = new SVGImage();
 		svgImage.readImageDataIntoSrcValue(bufferedImage, SVGImage.IMAGE_PNG);
-//		svgImage.debug("IMG");
 	}
 
 	@Test
@@ -267,39 +266,39 @@ public class SVGImageTest {
 	@Test
 	public void testTranslate() throws IOException {
 		SVGImage svgImage = (SVGImage) SVGElement.readAndCreateSVG(Fixtures.LETTERA_IMAGE_SVG);
-		LOG.debug(svgImage.toXML());
+		LOG.trace(svgImage.toXML());
 		Transform2 transform = svgImage.getTransform();
-		LOG.debug(transform);
+		LOG.trace(transform);
 		Real2 translationReal2 = transform.getTranslation();
-		LOG.debug(translationReal2);
+		LOG.trace(translationReal2);
 		RealArray scales = transform.getScales();
-		LOG.debug(scales);
+		LOG.trace(scales);
 		Real2 dimension = svgImage.getReal2Dimension();
 		
 		Real2 centreOffset = dimension.multiplyBy(0.5);
-		LOG.debug("Offset: "+centreOffset);
+		LOG.trace("Offset: "+centreOffset);
 		translationReal2 = translationReal2.plus(centreOffset);
 		translationReal2.negative();
-		LOG.debug("translation: "+centreOffset);
+		LOG.trace("translation: "+centreOffset);
 		Transform2 scaleTransform = Transform2.createScaleTransform(1./scales.get(0), 1./scales.get(1));
 //		Transform2 scaleTransform = Transform2.createScaleTransform(scales.get(0), scales.get(1));
 		translationReal2.transformBy(scaleTransform);
 		Transform2 translationTransform = Transform2.getTranslationTransform(translationReal2);
 		translationTransform = translationTransform.concatenate(scaleTransform);
-		LOG.debug("translationTransform "+translationTransform);
+		LOG.trace("translationTransform "+translationTransform);
 		transform = transform.concatenate(translationTransform);
 		svgImage.setTransform(transform);
-		LOG.debug(svgImage.toXML());
+		LOG.trace(svgImage.toXML());
 		SVGSVG svgx = SVGSVG.wrapAndWriteAsSVG(svgImage, new File("target/origin.svg"));
 	}
 	@Test
 	public void testTranslateToOrigin() throws IOException {
 		SVGImage svgImage = (SVGImage) SVGElement.readAndCreateSVG(Fixtures.LETTERA_IMAGE_SVG);
-		LOG.debug(svgImage.toXML());
+		LOG.trace(svgImage.toXML());
 		Transform2 transform = svgImage.getTransform();
-		LOG.debug(transform);
+		LOG.trace(transform);
 		Real2 translation = transform.getTranslation();
-		LOG.debug(translation);
+		LOG.trace(translation);
 		Real2 dimension = svgImage.getReal2Dimension();
 		Real2 centreOffest = dimension.multiplyBy(0.5);
 		translation = translation.plus(centreOffest);
