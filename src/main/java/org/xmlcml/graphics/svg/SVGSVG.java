@@ -82,8 +82,27 @@ public class SVGSVG extends SVGElement {
 		return this.getAttributeValue("id");
 	}
 
+	/** defaults to heigh=800 width=700.
+	 * 
+	 * */
 	public static SVGSVG wrapAndWriteAsSVG(SVGElement svgg, File file) {
+		return wrapAndWriteAsSVG(svgg, file, 800.0, 700.0);
+	}
+	
+	/**	creates an SVGSVG wrapper for any element and outputs to file.
+	 * 
+	 *   <p>mainly for debugging.</p>
+	 *   
+	 * @param svgg
+	 * @param file
+	 * @param height
+	 * @param width
+	 * @return
+	 */
+	public static SVGSVG wrapAndWriteAsSVG(SVGElement svgg, File file, double height, double width) {
 		SVGSVG svgsvg = wrapAsSVG(svgg);
+		svgsvg.setHeight(height);
+		svgsvg.setWidth(width);
 		try {
 			LOG.trace("Writing SVG "+file.getAbsolutePath());
 			SVGUtil.debug(svgsvg, new FileOutputStream(file), 1);
