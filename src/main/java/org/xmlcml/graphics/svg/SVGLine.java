@@ -493,4 +493,25 @@ public class SVGLine extends SVGShape {
 	public Real2 getMidPoint() {
 		return this.getEuclidLine().getMidPoint();
 	}
+
+	public Real2 getNearestPointOnLine(Real2 point) {
+		return getEuclidLine().getNearestPointOnLine(point);
+	}
+	
+	/** does either end of this fall within line2 without extension.
+	 * 
+	 * NOT TESTED
+	 * 
+	 * @param line2
+	 * @param eps to avoid rounding errors
+	 * @return
+	 */
+	public boolean overlapsWithLine(SVGLine line2, double eps) {
+		Real2 point = line2.getNearestPointOnLine(getXY(0));
+		if (line2.getEuclidLine().contains(point, eps, false)) return true;
+		point = line2.getNearestPointOnLine(getXY(1));
+		if (line2.getEuclidLine().contains(point, eps, false)) return true;
+		return false;
+	}
+
 }
