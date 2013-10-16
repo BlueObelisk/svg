@@ -165,7 +165,7 @@ public class SVGElement extends GraphicsElement {
         return newElement;
 	}
 	
-	/** converts a SVG file to SVGElement
+	/** converts an SVG file to SVGElement
 	 * 
 	 * @param file
 	 * @return
@@ -175,7 +175,7 @@ public class SVGElement extends GraphicsElement {
 		return (element == null) ? null : (SVGElement) readAndCreateSVG(element);
 	}
 	
-	/** converts a SVG file to SVGElement
+	/** converts an SVG file to SVGElement
 	 * 
 	 * @param file
 	 * @return

@@ -692,7 +692,7 @@ public class SVGPath extends SVGShape {
 		return SVGPath.extractPaths(SVGUtil.getQuerySVGElements(g, ALL_PATH_XPATH));
 	}
 
-	/** not finshed
+	/** not finished
 	 * 
 	 * @param svgPath
 	 * @param distEps
