@@ -514,4 +514,36 @@ public class SVGLine extends SVGShape {
 		return false;
 	}
 
+	/**
+	 * creates a mean line.
+	 * 
+	 * <p>
+	 * averages the point at end of the two lines. If lines are parallel use
+	 * XY(0) and line.XY(0), as first/from point. If antiparallel use XY(0) and line.XY(1).
+	 * Similarly second/to uses XY(1) and line.XY(1) for parallel and XY(1) and line.XY(0)
+	 * for antiparallel. Mean line is always aligned with line 0.
+	 * </p>
+	 * <p>Does not check for overlap of lines - that's up to the user to decide the cases. 
+	 * Does not add any style</p>
+	 * 
+	 * @param line
+	 * @param angleEps to test whether anti/parallel
+	 * @return null if lines not parallel
+	 */
+	public SVGLine getMeanLine(SVGLine line, Angle angleEps) {
+		SVGLine meanLine = null;
+		if (this.isParallelTo(line, angleEps)) {
+			meanLine = new SVGLine(getXY(0).getMidPoint(line.getXY(0)), 
+			                       getXY(1).getMidPoint(line.getXY(1)));
+		} else if (this.isAntiParallelTo(line, angleEps)) {
+			meanLine = new SVGLine(getXY(0).getMidPoint(line.getXY(1)), 
+                    getXY(1).getMidPoint(line.getXY(0)));
+		}
+		return meanLine;
+	}
+
+	public Real2 getIntersection(SVGLine line) {
+		return (line == null) ? null : this.getEuclidLine().getIntersection(line.getEuclidLine());
+	}
+
 }
