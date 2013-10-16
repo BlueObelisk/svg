@@ -167,7 +167,7 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		CubicPrimitive cubic1 = (CubicPrimitive) this.primitiveList.get(quad + 1);
 		Real2 point1 = cubic1.getLastCoord();
 		LinePrimitive linePrimitive = new LinePrimitive(point1);
-		primitiveList.remove(quad +1);
+		primitiveList.remove(quad + 1);
 		primitiveList.remove(quad);
 		primitiveList.add(quad, linePrimitive);
 		setFirstPoints();
