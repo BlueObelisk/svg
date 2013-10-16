@@ -78,6 +78,8 @@ public class SVGText extends SVGElement {
 	private List<SVGTSpan> tspans;
 
 	private FontWeight fontWeight;
+	private Double widthOfFirstCharacter;
+	private Double heightOfFirstCharacter;
 	
 	/** constructor
 	 */
@@ -905,4 +907,38 @@ public class SVGText extends SVGElement {
 		}
 		return s;
 	}
+
+	/** get Centre point of text.
+	 * 
+	 * onlt works for single character.
+	 * 
+	 * @param i position of character (currently only 0)
+	 * @return
+	 */
+	public Real2 getCentrePointOfFirstCharacter() {
+		getWidthOfFirstCharacter();
+		heightOfFirstCharacter = this.getFontSize();
+		Real2 delta = new Real2(widthOfFirstCharacter / 2.0, - heightOfFirstCharacter / 2.0); 
+		Real2 xy = this.getXY();
+		return xy.plus(delta);
+	}
+
+	public Double getWidthOfFirstCharacter() {
+		widthOfFirstCharacter = this.getSVGXFontWidth() / 1000.0 * this.getFontSize();
+		return widthOfFirstCharacter;
+	}
+	
+	public Double getheightOfFirstCharacter() {
+		heightOfFirstCharacter = this.getFontSize();
+		return heightOfFirstCharacter;
+	}
+	
+	public Double getRadiusOfFirstCharacter() {
+		getWidthOfFirstCharacter();
+		getheightOfFirstCharacter();
+		return (heightOfFirstCharacter == null || widthOfFirstCharacter == null) ? null :
+			Math.sqrt(heightOfFirstCharacter * heightOfFirstCharacter + widthOfFirstCharacter * widthOfFirstCharacter) /2.;
+	}
+	
+	
 }
