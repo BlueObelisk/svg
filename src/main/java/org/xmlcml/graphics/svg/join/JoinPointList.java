@@ -27,7 +27,7 @@ public class JoinPointList {
 		List<JoinPoint> commonJoinPointList = new ArrayList<JoinPoint>();
 		ensureJoinPoints();
 		if (this.equals(otherJoiner)) {
-			throw new RuntimeException("Cannot jointo self");
+			throw new RuntimeException("Cannot join to self");
 		}
 		List<JoinPoint> otherJoinPoints = otherJoiner.getJoinPoints();
 		for (int i = 0; i < joinPoints.size(); i++) {

@@ -18,10 +18,10 @@ public class JunctionManager {
 
 	public List<Junction> makeJunctionList(List<Joinable> joinableList) {
 		ensureJunctionList();
-		for (int i  = 0; i < joinableList.size() - 1; i++) {
+		for (int i = 0; i < joinableList.size() - 1; i++) {
 			Joinable joinablei = joinableList.get(i);
 			JoinPointList jpli = joinablei.getJoinPointList();
-			for (int j  = i + 1; j < joinableList.size(); j++) {
+			for (int j = i + 1; j < joinableList.size(); j++) {
 				Joinable joinablej = joinableList.get(j);
 				JoinPoint commonPoint = joinablei.getIntersectionPoint(joinablej);
 				if (commonPoint != null) {
@@ -51,9 +51,10 @@ public class JunctionManager {
 			for (int j = 0; j < i; j++) {
 				Junction fixed = junctionList.get(j);
 				if (fixed.containsCommonPoints(labile)) {
+					LOG.debug("moving "+labile + " to " + fixed);
 					labile.transferDetailsTo(fixed);
-					LOG.debug("removing "+junctionList.get(i));
 					junctionList.remove(i);
+					break;
 				}
 			}
 		}

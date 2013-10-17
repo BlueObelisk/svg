@@ -67,7 +67,7 @@ public interface Joinable {
 	 */
 	Real2 getPoint();
 	
-	/** polymorphic intesections 
+	/** polymorphic intersections 
 	 * 
 	 * Must be implemented for each type of shape , shape
 	 * @param shape
