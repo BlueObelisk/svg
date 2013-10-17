@@ -16,11 +16,13 @@ public class TramLineManager {
 	
 	private final static Double EPS = 0.000001; // rounding errors
 	private List<TramLine> tramLineList;
-	private Angle angleEps = new Angle(0.2, Units.RADIANS);
-	private Double tramLineSeparationFactor = 0.2; // this is tricky for very short tramlines
-
-	private Set<SVGLine> usedLineSet;
+	private Angle angleEps = new Angle(0.3, Units.RADIANS);
+	private Double maxTramLineSeparationFactor = 0.35; // this is tricky for very short tramlines
+	private Double minTramLineSeparationFactor = 0.1;
+	private Double minRelativeLineLength = 0.5;
 	
+	private Set<SVGLine> usedLineSet;
+
 	public TramLineManager() {
 		
 	}
@@ -33,22 +35,27 @@ public class TramLineManager {
 	private void ensureTramLineList() {
 		if (tramLineList == null) {
 			tramLineList = new ArrayList<TramLine>();
-		}
-		if (usedLineSet == null) {
-			usedLineSet = new HashSet<SVGLine>();
+	 		if (usedLineSet == null) {
+		 		usedLineSet = new HashSet<SVGLine>();
+		 	}
+
 		}
 	}
 	
 	public TramLine createTramLine(SVGLine linei, SVGLine linej) {
 		TramLine tramLine = null;
-		if (linei == null || linej == null) return tramLine; 
-		if (linei.isParallelOrAntiParallelTo(linej, angleEps)) {
-			Double dist = linei.calculateUnsignedDistanceBetweenLines(linej, angleEps);
-			Double maxDist = linei.getLength() * tramLineSeparationFactor;
-			LOG.trace(linei.getId()+" "+linej.getId()+" "+maxDist+" "+dist);
-			if (dist < maxDist) {
-				if (linei.overlapsWithLine(linej, EPS) || linej.overlapsWithLine(linei, EPS)) {
-					tramLine = new TramLine(linei, linej);
+		Double length1 = linei.getLength();
+		Double length2 = linej.getLength();
+		Double longer = (length1 > length2 ? length1 : length2);
+		Double shorter = (length1 > length2 ? length2 : length1);
+		if (linei == null || linej == null) return tramLine;
+		if (shorter / longer > minRelativeLineLength) {
+			if (linei.isParallelOrAntiParallelTo(linej, angleEps)) {
+				Double dist = linei.calculateUnsignedDistanceBetweenLines(linej, angleEps);
+				if (dist < longer * maxTramLineSeparationFactor && dist > longer * minTramLineSeparationFactor) {
+					if (linei.overlapsWithLine(linej, EPS) || linej.overlapsWithLine(linei, EPS)) {
+						tramLine = new TramLine(linei, linej);
+					}
 				}
 			}
 		}
@@ -60,18 +67,15 @@ public class TramLineManager {
 		ensureTramLineList();
 		for (int i = 0; i < lineList.size() - 1; i++) {
 			SVGLine linei = lineList.get(i);
-			linei.format(3);
-			LOG.trace("line "+linei.toXML());
 			for (int j = i + 1; j < lineList.size(); j++) {
 				SVGLine linej = lineList.get(j);
-				LOG.trace("line: "+linei.getId()+" "+linej.getId());
 				TramLine tramLine = createTramLine(linei, linej);
 				if (tramLine != null) {
-					LOG.trace("tram "+linei.getId()+" "+linej.getId());
-					tramLine.setId("tram."+linei.getId()+"."+linej.getId());
-					tramLineList.add(tramLine);
-					usedLineSet.add(linei);
-					usedLineSet.add(linej);
+										LOG.trace("tram "+linei.getId()+" "+linej.getId());
+					 					tramLine.setId("tram."+linei.getId()+"."+linej.getId());
+					 					tramLineList.add(tramLine);
+					 					usedLineSet.add(linei);
+					 					usedLineSet.add(linej);
 				}
 			}
 		}
@@ -86,12 +90,28 @@ public class TramLineManager {
 		this.angleEps = angleEps;
 	}
 
-	public Double getTramLineSeparationFactor() {
-		return tramLineSeparationFactor;
+	public Double getMaxTramLineSeparationFactor() {
+		return maxTramLineSeparationFactor;
 	}
 
-	public void setTramLineSeparationFactor(Double tramLineSeparationFactor) {
-		this.tramLineSeparationFactor = tramLineSeparationFactor;
+	public void setMaxTramLineSeparationFactor(Double maxTramLineSeparationFactor) {
+		this.maxTramLineSeparationFactor = maxTramLineSeparationFactor;
+	}
+	
+	public Double getMinTramLineSeparationFactor() {
+		return minTramLineSeparationFactor;
+	}
+
+	public void setMinTramLineSeparationFactor(Double minTramLineSeparationFactor) {
+		this.minTramLineSeparationFactor = minTramLineSeparationFactor;
+	}
+
+	public Double getMinRelativeLineLength() {
+		return minRelativeLineLength;
+	}
+
+	public void setMinRelativeLineLength(Double minRelativeLineLength) {
+		this.minRelativeLineLength = minRelativeLineLength;
 	}
 
 	public List<TramLine> getTramLineList() {
@@ -99,14 +119,12 @@ public class TramLineManager {
 	}
 
 	public List<SVGLine> removeUsedTramLinePrimitives(List<SVGLine> lineList) {
-		for (int i = lineList.size() - 1; i >= 0; i--) {
-			if (usedLineSet.contains(lineList.get(i))) {
-				lineList.remove(i);
-			}
-		}
-		return lineList;
-	}
-
-
+ 		for (int i = lineList.size() - 1; i >= 0; i--) {
+ 			if (usedLineSet.contains(lineList.get(i))) {
+ 				lineList.remove(i);
+ 			}
+ 		}
+ 		return lineList;
+ 	}
 	
 }
