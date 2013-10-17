@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.join.TramLine;
 
 public class TramLineManager {
 
