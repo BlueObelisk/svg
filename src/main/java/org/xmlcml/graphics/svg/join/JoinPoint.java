@@ -14,7 +14,7 @@ public class JoinPoint {
 	
 	private Joinable joinable;
 	private Real2 point;
-	private Double radius = 1.5;
+	private Double radius = 1.05;
 	
 	public JoinPoint(Joinable joinable, Real2 point) {
 		this.point = point;
