@@ -1,7 +1,5 @@
 package org.xmlcml.graphics.svg.path;
 
-import java.util.List;
-
 import junit.framework.Assert;
 
 import org.junit.Test;

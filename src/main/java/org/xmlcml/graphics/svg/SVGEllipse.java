@@ -16,7 +16,6 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 
@@ -37,6 +36,7 @@ import org.xmlcml.euclid.Transform2;
 public class SVGEllipse extends SVGShape {
 
 
+	@SuppressWarnings("unused")
 	private final static Logger LOG = Logger.getLogger(SVGEllipse.class);
 
 	private static final String RX = "rx";

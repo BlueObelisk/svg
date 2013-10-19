@@ -44,4 +44,15 @@ public class JoinPoint {
 	public String getId() {
 		return joinable.getId();
 	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder("(");
+		sb.append(joinable.getId());
+		sb.append(";");
+		sb.append(radius);
+		sb.append(";");
+		sb.append(point.toString());
+		sb.append(")");
+		return sb.toString();
+	}
 }

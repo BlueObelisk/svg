@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGCircle;
+import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGText;
 
 /** a junction between two or more objects.
@@ -39,11 +40,36 @@ public class Junction extends SVGCircle {
 		this.joinPoint = joinPoint;
 	}
 
+	/** gets the first and only SVG Joinable.
+	 * 
+	 * @return
+	 */
+	public SVGText getSvgText() {
+		if (svgText == null) {
+			ensureJoinableList();
+			for (Joinable joinable : joinableList) {
+				SVGElement element = joinable.getSVGElement();
+				if (element instanceof SVGText) {
+					svgText = (SVGText) element;
+					break;
+				}
+			}
+		}
+		return svgText;
+	}
+
+	/** gets Id of the SVGText.
+	 * 
+	 */
+	public String getId() {
+		SVGText svgText = getSvgText();
+		return svgText == null ? null: svgText.getId();
+	}
+	
 	private void add(Joinable joinable) {
 		ensureJoinableList();
 		if (!joinableList.contains(joinable)) {
 			joinableList.add(joinable);
-//			point = joinable.getPoint();
 		}
 	}
 
@@ -54,11 +80,9 @@ public class Junction extends SVGCircle {
 	}
 	
 	public boolean containsCommonPoints(Junction labile) {
-//		List<Joinable> labileList = labile.joinableList;
-//		LOG.debug(this.joinPoint.getId()+" / "+labile.joinPoint.getId());
 		double dist = this.joinPoint.getDistanceTo(labile.joinPoint);
 		if (dist < EPS) {
-			LOG.debug(dist);
+			LOG.trace(dist);
 			return true;
 		}
 		return false;
@@ -70,18 +94,29 @@ public class Junction extends SVGCircle {
 			} else { 
 				fixed.joinableList.add(joinable);
 			}
-			fixed.coordinates = fixed.coordinates.getMidPoint(this.coordinates);
+			if (fixed.coordinates != null) {
+				fixed.coordinates = fixed.coordinates.getMidPoint(this.coordinates);
+			}
 		}
-		LOG.error("NYI");
 	}
 	
+	public List<Joinable> getJoinableList() {
+		return joinableList;
+	}
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("J>>");
+		sb.append("J: ");
 		for (Joinable joinable : joinableList) {
 			sb.append(" ["+joinable.getSVGElement().getClass().getSimpleName()+": "+joinable.getId()+"] ");
 		}
 		return sb.toString();
+	}
+
+	public String getSvgTextAtomValue() {
+		SVGText svgText = getSvgText();
+		String name = (svgText == null) ? "C" : svgText.getValue();
+		return name;
 	}
 
 }

@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.euclid.Vector2;
 import org.xmlcml.graphics.svg.SVGPathPrimitive;
 import org.xmlcml.graphics.svg.path.Arc.Direction;
 

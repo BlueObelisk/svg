@@ -1,8 +1,6 @@
 package org.xmlcml.graphics.svg.symbol;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.graphics.svg.SVGElement;
-import org.xmlcml.graphics.svg.symbol.AbstractSymbol.SymbolFill;
 
 public class Triangle extends AbstractSymbol {
 

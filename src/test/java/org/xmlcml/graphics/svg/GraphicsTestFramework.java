@@ -23,6 +23,10 @@ public class GraphicsTestFramework {
 
 class MyPanel extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private SVGPath path;
 	public MyPanel() {
 		path = new SVGPath("M100 200L250,300C100 290 240 110 400 230L110 20 Z M 30 40 L 70 20");

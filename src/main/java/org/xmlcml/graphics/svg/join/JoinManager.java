@@ -13,17 +13,19 @@ import org.xmlcml.graphics.svg.SVGText;
  * @author pm286
  *
  */
-public class JoinPointList {
+public class JoinManager {
 
-	private final static Logger LOG = Logger.getLogger(JoinPointList.class);
+	private final static Logger LOG = Logger.getLogger(JoinManager.class);
 	
 	private List<JoinPoint> joinPoints;
 	private double distanceToOther;
 
-	public JoinPointList() {
+	private List<Junction> junctionList;
+
+	public JoinManager() {
 	}
 	
-	public List<JoinPoint> getCommonJoinPointList(JoinPointList otherJoiner) {
+	public List<JoinPoint> getCommonJoinPointList(JoinManager otherJoiner) {
 		List<JoinPoint> commonJoinPointList = new ArrayList<JoinPoint>();
 		ensureJoinPoints();
 		if (this.equals(otherJoiner)) {
@@ -83,7 +85,7 @@ public class JoinPointList {
 	public static List<Joinable> makeJoinableList(List<? extends SVGElement> elementList) {
 		List<Joinable> joinableList = new ArrayList<Joinable>();
 		for (SVGElement element : elementList) {
-			Joinable joinable = JoinPointList.createJoinable(element);
+			Joinable joinable = JoinManager.createJoinable(element);
 			joinableList.add(joinable);
 		}
 		return joinableList;
@@ -99,6 +101,33 @@ public class JoinPointList {
 			joinable = new JoinableText((SVGText) element);
  		}
 		return joinable;
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder("joinPoints: (");
+		for (JoinPoint joinPoint : joinPoints) {
+			sb.append(joinPoint);
+		}
+		sb.append(")");
+		return sb.toString();
+	}
+
+	public void add(Junction junction) {
+		enableJunctionList();
+		if (!junctionList.contains(junction)) {
+			junctionList.add(junction);
+		}
+	}
+
+	private void enableJunctionList() {
+		if (junctionList == null) {
+			junctionList = new ArrayList<Junction>();
+		}
+	}
+
+	public List<Junction> getJunctionList() {
+		enableJunctionList();
+		return junctionList;
 	}
 
 }

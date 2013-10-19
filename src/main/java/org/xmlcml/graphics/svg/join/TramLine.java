@@ -1,5 +1,6 @@
 package org.xmlcml.graphics.svg.join;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -21,6 +22,7 @@ import org.xmlcml.graphics.svg.SVGLine;
  */
 public class TramLine extends SVGG implements Joinable {
 
+	@SuppressWarnings("unused")
 	private final static Logger LOG = Logger.getLogger(TramLine.class);
 
 	// large enough to cover any known tramlines
@@ -29,7 +31,7 @@ public class TramLine extends SVGG implements Joinable {
 	private static final double TRAM_LINE_PRORITY = 5.0;
 
 	private List<SVGLine> lineList;
-	private JoinPointList joinPointList;
+	private JoinManager joinManager;
 	private SVGLine backbone;
 	
 
@@ -42,7 +44,7 @@ public class TramLine extends SVGG implements Joinable {
 
 	private void createJoinerAndAddJoinPoints() {
 		Angle EPS = new Angle(0.1, Units.RADIANS); // we already know they are aligned
-		joinPointList = new JoinPointList();
+		joinManager = new JoinManager();
 		SVGLine line0 = lineList.get(0);
 		SVGLine line1 = lineList.get(1);
 		Real2 point00 = line0.getXY(0);
@@ -58,8 +60,8 @@ public class TramLine extends SVGG implements Joinable {
 			join0 = point00.getMidPoint(point10);
 			join1 = point01.getMidPoint(point11);
 		}
-		joinPointList.add(new JoinPoint(this, join0));
-		joinPointList.add(new JoinPoint(this, join1));
+		joinManager.add(new JoinPoint(this, join0));
+		joinManager.add(new JoinPoint(this, join1));
 	}
 	
 	public double getPriority() {
@@ -105,19 +107,19 @@ public class TramLine extends SVGG implements Joinable {
 	}
 
 	public JoinPoint getIntersectionPoint(JoinableLine line) {
-		return joinPointList.getCommonPoint(line);
+		return joinManager.getCommonPoint(line);
 	}
 
 	public JoinPoint getIntersectionPoint(JoinableText text) {
-		return joinPointList.getCommonPoint(text);
+		return joinManager.getCommonPoint(text);
 	}
 
 	public JoinPoint getIntersectionPoint(TramLine tramLine) {
-		return joinPointList.getCommonPoint(tramLine);
+		return joinManager.getCommonPoint(tramLine);
 	}
 
-	public JoinPointList getJoinPointList() {
-		return joinPointList;
+	public JoinManager getJoinPointList() {
+		return joinManager;
 	}
 
 	public void setFillAll(String fill) {
@@ -154,6 +156,14 @@ public class TramLine extends SVGG implements Joinable {
 		return null;
 	}
 
+	public void addJunction(Junction junction) {
+		joinManager.add(junction);
+	}
+
+	public List<Junction> getJunctionList() {
+		return joinManager == null ? new ArrayList<Junction>() : joinManager.getJunctionList();
+	}
+	
 	/** returns intersection of backbones.
 	 * 
 	 * @return null if joinable has no backbone (e.g. text);

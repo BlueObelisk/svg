@@ -32,7 +32,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
-import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
@@ -56,7 +55,7 @@ public class SVGPath extends SVGShape {
 
 	private static Logger LOG = Logger.getLogger(SVGPath.class);
 	static {
-		LOG.setLevel(Level.INFO);
+		LOG.setLevel(Level.DEBUG);
 	}
 
 	private static final String MLLLL = "MLLLL";
