@@ -16,7 +16,6 @@ import org.xmlcml.graphics.svg.path.CubicPrimitive;
 import org.xmlcml.graphics.svg.path.LinePrimitive;
 import org.xmlcml.graphics.svg.path.MovePrimitive;
 import org.xmlcml.graphics.svg.path.PathPrimitiveList;
-import org.xmlcml.graphics.svg.util.Path2ShapeConverter;
 
 public class SVGPathPrimitiveTest {
 
@@ -153,8 +152,10 @@ public class SVGPathPrimitiveTest {
 </svg>	 */
 	@Test
 	public void checkAngleForClosedCurve() {
-		PathPrimitiveList primitiveList = Fixtures.ROUNDED_LINE_SVG.ensurePrimitives();
-		Assert.assertEquals("MLCCLCC", Fixtures.ROUNDED_LINE_SVG.getSignature());
+		SVGPath ROUNDED_LINE_SVG = (SVGPath) SVGElement.readAndCreateSVG(Fixtures.ROUNDED_LINE_SVG_FILE)
+				.getChildElements().get(0).getChildElements().get(0);
+	    PathPrimitiveList primitiveList = ROUNDED_LINE_SVG.ensurePrimitives();
+		Assert.assertEquals("MLCCLCC", ROUNDED_LINE_SVG.getSignature());
 		Assert.assertTrue("closed", primitiveList.isClosed());
 		Assert.assertNull("angle0", primitiveList.getAngle(0)); //MOVE
 		Assert.assertEquals("angle1", 0.0, primitiveList.getAngle(1).getRadian(), ANGLE_EPS.getRadian());
@@ -167,8 +168,10 @@ public class SVGPathPrimitiveTest {
 
 	@Test
 	public void testQuadrantValue() {
-		PathPrimitiveList primitiveList = Fixtures.ROUNDED_LINE_SVG.ensurePrimitives();
-		Assert.assertEquals("MLCCLCC", Fixtures.ROUNDED_LINE_SVG.getSignature());
+		SVGPath ROUNDED_LINE_SVG = (SVGPath) SVGElement.readAndCreateSVG(Fixtures.ROUNDED_LINE_SVG_FILE)
+				.getChildElements().get(0).getChildElements().get(0);
+		PathPrimitiveList primitiveList = ROUNDED_LINE_SVG.ensurePrimitives();
+		Assert.assertEquals("MLCCLCC", ROUNDED_LINE_SVG.getSignature());
 		Assert.assertEquals("q0", 0, primitiveList.quadrantValue(0, ANGLE_EPS));
 		Assert.assertEquals("q1", 0, primitiveList.quadrantValue(1, ANGLE_EPS));
 		Assert.assertEquals("q2", 1, primitiveList.quadrantValue(2, ANGLE_EPS));
@@ -180,7 +183,9 @@ public class SVGPathPrimitiveTest {
 
 	@Test
 	public void testTwoQuadrantList() {
-		PathPrimitiveList primitiveList = Fixtures.ROUNDED_LINE_SVG.ensurePrimitives();
+		SVGPath ROUNDED_LINE_SVG = (SVGPath) SVGElement.readAndCreateSVG(Fixtures.ROUNDED_LINE_SVG_FILE)
+				.getChildElements().get(0).getChildElements().get(0);
+	PathPrimitiveList primitiveList = ROUNDED_LINE_SVG.ensurePrimitives();
 		List<Integer> quadStartList = primitiveList.getUTurnList(ANGLE_EPS);
 		Assert.assertEquals("quads", 2, quadStartList.size());
 		Assert.assertEquals("quads1", 2, (int) quadStartList.get(0));
@@ -189,14 +194,16 @@ public class SVGPathPrimitiveTest {
 	
 	@Test
 	public void testFindSemiCircles() {
-		PathPrimitiveList primitiveList = Fixtures.ROUNDED_LINE_SVG.ensurePrimitives();
-		Assert.assertEquals("MLCCLCC", Fixtures.ROUNDED_LINE_SVG.getSignature());
+		SVGPath ROUNDED_LINE_SVG = (SVGPath) SVGElement.readAndCreateSVG(Fixtures.ROUNDED_LINE_SVG_FILE)
+				.getChildElements().get(0).getChildElements().get(0);
+		PathPrimitiveList primitiveList = ROUNDED_LINE_SVG.ensurePrimitives();
+		Assert.assertEquals("MLCCLCC", ROUNDED_LINE_SVG.getSignature());
 		Assert.assertTrue(primitiveList.isUTurn(2, ANGLE_EPS));
 	}
 	
 	@Test
 	public void testTwoQuadrantListMolecule() {
-		List<SVGPath> pathList = SVGPath.extractPaths(SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg")));
+		List<SVGPath> pathList = SVGPath.extractPaths(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_13_SVG));
 		Assert.assertEquals("paths", 13, pathList.size());
 		SVGPath path = pathList.get(3);
 		SVGSVG.wrapAndWriteAsSVG(path, new File("target/badPath.svg"));

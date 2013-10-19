@@ -10,7 +10,6 @@ import nu.xom.ParentNode;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
@@ -25,8 +24,6 @@ import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGUtil;
 import org.xmlcml.graphics.svg.StyleBundle;
 import org.xmlcml.graphics.svg.path.Arc;
-import org.xmlcml.graphics.svg.path.CubicPrimitive;
-import org.xmlcml.graphics.svg.path.LinePrimitive;
 import org.xmlcml.graphics.svg.path.MovePrimitive;
 import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 import org.xmlcml.xml.XMLUtil;

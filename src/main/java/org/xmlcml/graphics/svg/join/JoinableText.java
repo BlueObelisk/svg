@@ -15,8 +15,10 @@ public class JoinableText implements Joinable {
 
 	private static final double TEXT_PRIORITY = 10.0;
 
-	private JoinPointList joinPointList;
+	private JoinManager joinManager;
 	private SVGText svgText;
+
+	private Double radiusExpansion = 1.3;
 
 	public JoinableText(SVGText svgText) {
 		this.svgText = svgText;
@@ -24,12 +26,12 @@ public class JoinableText implements Joinable {
 	}
 
 	private void createJoinerAndAddJoinPoints() {
-		joinPointList = new JoinPointList();
+		joinManager = new JoinManager();
 		Real2 coord = svgText.getCentrePointOfFirstCharacter();
 		if (coord != null) {
 			JoinPoint joinPoint = new JoinPoint(this, coord);
-			joinPoint.setRadius(svgText.getRadiusOfFirstCharacter());
-			joinPointList.add(joinPoint);
+			joinPoint.setRadius(svgText.getRadiusOfFirstCharacter() * radiusExpansion );
+			joinManager.add(joinPoint);
 		}
 	}
 
@@ -51,7 +53,7 @@ public class JoinableText implements Joinable {
 	}
 
 	public JoinPoint getIntersectionPoint(JoinableLine line) {
-		return joinPointList.getCommonPoint(line);
+		return joinManager.getCommonPoint(line);
 	}
 
 	public JoinPoint getIntersectionPoint(JoinableText text) {
@@ -61,11 +63,11 @@ public class JoinableText implements Joinable {
 	}
 
 	public JoinPoint getIntersectionPoint(TramLine tramLine) {
-		return joinPointList.getCommonPoint(tramLine);
+		return joinManager.getCommonPoint(tramLine);
 	}
 
-	public JoinPointList getJoinPointList() {
-		return joinPointList;
+	public JoinManager getJoinPointList() {
+		return joinManager;
 	}
 
 	public String getId() {
@@ -100,5 +102,16 @@ public class JoinableText implements Joinable {
 	public double getPriority() {
 		return TEXT_PRIORITY;
 	}
-
+	
+	public void addJunction(Junction junction) {
+		joinManager.add(junction);
+	}
+	
+	public List<Junction> getJunctionList() {
+		return joinManager == null ? new ArrayList<Junction>() : joinManager.getJunctionList();
+	}
+	
+	public String toString() {
+		return svgText.toXML()+"\n ... "+joinManager;
+	}
 }

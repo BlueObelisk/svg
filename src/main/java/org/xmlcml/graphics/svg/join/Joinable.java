@@ -1,5 +1,7 @@
 package org.xmlcml.graphics.svg.join;
 
+import java.util.List;
+
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
@@ -41,7 +43,7 @@ public interface Joinable {
 	 * 
 	 * @return the joiner
 	 */
-	JoinPointList getJoinPointList();
+	JoinManager getJoinPointList();
 
 	/** get the backbone.
 	 * 
@@ -79,4 +81,8 @@ public interface Joinable {
     JoinPoint getIntersectionPoint(TramLine tramLine);
 
 	double getPriority();
+
+	void addJunction(Junction junction);
+
+	List<Junction> getJunctionList();
 }

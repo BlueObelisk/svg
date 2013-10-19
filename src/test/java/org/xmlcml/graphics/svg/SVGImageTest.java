@@ -265,7 +265,8 @@ public class SVGImageTest {
 	
 	@Test
 	public void testTranslate() throws IOException {
-		SVGImage svgImage = (SVGImage) SVGElement.readAndCreateSVG(Fixtures.LETTERA_IMAGE_SVG);
+		SVGImage svgImage = (SVGImage) SVGElement.readAndCreateSVG(
+				SVGElement.readAndCreateSVG(Fixtures.LETTERA_SVG_FILE)).getChildElements().get(0);
 		LOG.trace(svgImage.toXML());
 		Transform2 transform = svgImage.getTransform();
 		LOG.trace(transform);
@@ -293,7 +294,8 @@ public class SVGImageTest {
 	}
 	@Test
 	public void testTranslateToOrigin() throws IOException {
-		SVGImage svgImage = (SVGImage) SVGElement.readAndCreateSVG(Fixtures.LETTERA_IMAGE_SVG);
+		SVGImage svgImage = (SVGImage) SVGElement.readAndCreateSVG(
+				SVGElement.readAndCreateSVG(Fixtures.LETTERA_SVG_FILE)).getChildElements().get(0);
 		LOG.trace(svgImage.toXML());
 		Transform2 transform = svgImage.getTransform();
 		LOG.trace(transform);
@@ -312,7 +314,7 @@ public class SVGImageTest {
 	
 	@Test
 	public void testApplyExplicitTransformationAndUpdate() throws IOException {
-		SVGSVG svg = (SVGSVG) SVGElement.readAndCreateSVG(Fixtures.LETTERA_SVG);
+		SVGSVG svg = (SVGSVG) SVGElement.readAndCreateSVG(SVGElement.readAndCreateSVG(Fixtures.LETTERA_SVG_FILE));
 		SVGImage svgImage = (SVGImage) svg.getChildElements().get(0);
 		svgImage.applyExplicitTransformationAndUpdate();
 		SVGSVG svgx = SVGSVG.wrapAndWriteAsSVG(svgImage, new File("target/explicitxx.svg"));

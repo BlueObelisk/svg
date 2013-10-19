@@ -1,5 +1,8 @@
 package org.xmlcml.graphics.svg.join;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGElement;
@@ -12,7 +15,7 @@ public class JoinableLine implements Joinable {
 	private static final double LINE_PRORITY = 1.0;
 
 	private SVGLine svgLine;
-	private JoinPointList joinPointList;
+	private JoinManager joinManager;
 
 	public JoinableLine(SVGLine svgLine) {
 		this.svgLine = svgLine;
@@ -23,9 +26,9 @@ public class JoinableLine implements Joinable {
 		return LINE_PRORITY;
 	}
 	public void createJoinerAndAddPoints() {
-		joinPointList = new JoinPointList();
-		joinPointList.add(new JoinPoint(this, svgLine.getXY(0)));
-		joinPointList.add(new JoinPoint(this, svgLine.getXY(1)));
+		joinManager = new JoinManager();
+		joinManager.add(new JoinPoint(this, svgLine.getXY(0)));
+		joinManager.add(new JoinPoint(this, svgLine.getXY(1)));
 	}
 
 	public JoinPoint getIntersectionPoint(Joinable joinable) {
@@ -33,19 +36,19 @@ public class JoinableLine implements Joinable {
 	}
 
 	public JoinPoint getIntersectionPoint(JoinableLine line) {
-		return joinPointList.getCommonPoint(line);
+		return joinManager.getCommonPoint(line);
 	}
 
 	public JoinPoint getIntersectionPoint(JoinableText text) {
-		return joinPointList.getCommonPoint(text);
+		return joinManager.getCommonPoint(text);
 	}
 
 	public JoinPoint getIntersectionPoint(TramLine tramLine) {
-		return joinPointList.getCommonPoint(tramLine);
+		return joinManager.getCommonPoint(tramLine);
 	}
 
-	public JoinPointList getJoinPointList() {
-		return joinPointList;
+	public JoinManager getJoinPointList() {
+		return joinManager;
 	}
 
 	public String getId() {
@@ -84,5 +87,15 @@ public class JoinableLine implements Joinable {
 		return intersectionPoint;
 	}
 
-
+	public void addJunction(Junction junction) {
+		joinManager.add(junction);
+	}
+	
+	public List<Junction> getJunctionList() {
+		return joinManager == null ? new ArrayList<Junction>() : joinManager.getJunctionList();
+	}
+	
+	public String toString() {
+		return svgLine.toXML()+"\n ... "+joinManager;
+	}
 }

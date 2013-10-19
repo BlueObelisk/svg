@@ -66,12 +66,20 @@ public class Fixtures {
 //	 + " xmlns:xlink=\"http://www.w3.org/1999/xlink\"/>"
 //	 + "</svg>";
 	public final static File LETTERA_SVG_FILE = new File(Fixtures.IMAGES_DIR, "lettera.svg");
-	public final static SVGElement LETTERA_SVG = SVGElement.readAndCreateSVG(LETTERA_SVG_FILE);
-	public final static SVGElement LETTERA_IMAGE_SVG = (SVGImage) LETTERA_SVG.getChildElements().get(0);
 
-	public final static SVGPath ROUNDED_LINE_SVG = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.PATHS_DIR, "roundedline.svg"))
-	    .getChildElements().get(0).getChildElements().get(0);
+	public final static File ROUNDED_LINE_SVG_FILE = new File(Fixtures.PATHS_DIR, "roundedline.svg");
 
 	public static final File MOLECULE_DIR = new File(TEST_SVG, "molecules");
+	public static final File IMAGE_2_11_SVG = new File(MOLECULE_DIR, "image.g.2.11.svg");
+	public static final File IMAGE_2_13_SVG = new File(MOLECULE_DIR, "image.g.2.13.svg");
+	public static final File IMAGE_2_16_SVG = new File(MOLECULE_DIR, "image.g.2.16.svg");
+	public static final File IMAGE_2_18_SVG = new File(MOLECULE_DIR, "image.g.2.18.svg");
+	public static final File IMAGE_2_23_SVG = new File(MOLECULE_DIR, "image.g.2.23.svg");
+	public static final File IMAGE_2_25_SVG = new File(MOLECULE_DIR, "image.g.2.25.svg");
+	public static final File IMAGE_5_11_SVG = new File(MOLECULE_DIR, "image.g.5.11.svg");
+	public static final File IMAGE_5_12_SVG = new File(MOLECULE_DIR, "image.g.5.12.svg");
+	public static final File IMAGE_5_13_SVG = new File(MOLECULE_DIR, "image.g.5.13.svg");
+	public static final File IMAGE_5_14_SVG = new File(MOLECULE_DIR, "image.g.5.14.svg");
+	public static final File IMAGE_02_00100_65_SVG = new File(MOLECULE_DIR, "02.00100.g.6.5.svg");
 
 }
