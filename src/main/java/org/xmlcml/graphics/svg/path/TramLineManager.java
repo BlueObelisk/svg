@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.graphics.svg.SVGLine;
-import org.xmlcml.graphics.svg.join.TramLine;
+import org.xmlcml.graphics.svg.builder.TramLine;
 
 public class TramLineManager {
 
