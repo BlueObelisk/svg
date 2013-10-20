@@ -1,4 +1,4 @@
-package org.xmlcml.graphics.svg.join;
+package org.xmlcml.graphics.svg.builder;
 
 import java.util.List;
 

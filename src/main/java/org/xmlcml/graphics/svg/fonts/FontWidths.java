@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package org.xmlcml.graphics.svg;
+package org.xmlcml.graphics.svg.fonts;
 
 import java.util.HashMap;
 import java.util.Map;

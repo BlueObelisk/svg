@@ -1,4 +1,4 @@
-package org.xmlcml.graphics.svg.join;
+package org.xmlcml.graphics.svg.builder;
 /**
  * creates lines from SVG Paths and joins them, including overlap with Text
  * 
