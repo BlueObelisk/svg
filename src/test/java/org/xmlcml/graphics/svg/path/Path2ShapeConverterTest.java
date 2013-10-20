@@ -1,4 +1,4 @@
-package org.xmlcml.graphics.svg.util;
+package org.xmlcml.graphics.svg.path;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,8 +9,6 @@ import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.graphics.svg.Fixtures;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGElement;
@@ -18,10 +16,8 @@ import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGPolygon;
 import org.xmlcml.graphics.svg.SVGRect;
-import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGUtil;
-import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 
 public class Path2ShapeConverterTest {
 
@@ -126,15 +122,11 @@ public class Path2ShapeConverterTest {
 */
 	@Test
 	public void testReplaceTwoQuadrantCapsByButt() {
-		SVGPath svgPath = (SVGPath)createAndProcessElement(new File(Fixtures.PATHS_DIR, "roundedline.svg"))
+		SVGLine svgLine = (SVGLine)createAndProcessElement(new File(Fixtures.PATHS_DIR, "roundedline.svg"))
 				.getChildElements().get(0).getChildElements().get(0);
-		Assert.assertEquals("sig",  "MLCCLCC", svgPath.getSignature());
-		SVGPath newPath = svgPath.replaceAllUTurnsByButt(new Angle(0.1, Units.RADIANS)); 
-		Assert.assertNotNull("newPath", newPath);
-		Assert.assertEquals("d ", "M172.14 512.58 L172.14 504.3 L172.62 504.3 L172.62 512.58 L172.14 512.58 ", newPath.getDString());
-		SVGSVG.wrapAndWriteAsSVG(newPath, new File("target/newpath.svg"));
-		PathPrimitiveList primitiveList = newPath.ensurePrimitives();
-		Assert.assertEquals("sig ", "MLLLL", newPath.getSignature());
+		Assert.assertEquals("path converted to line", 
+				"<line fill=\"#000000\" stroke=\"black\" stroke-width=\"0.0\" x1=\"172.38\" y1=\"504.3\" x2=\"172.38\" y2=\"512.58\" id=\"line.0\" />",
+				svgLine.toXML());
 	}
 	
 	@Test

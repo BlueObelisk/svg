@@ -1,13 +1,14 @@
-package org.xmlcml.graphics.svg.path;
+package org.xmlcml.graphics.svg.builder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.graphics.svg.SVGLine;
-import org.xmlcml.graphics.svg.builder.TramLine;
 
 public class TramLineManager {
 
@@ -20,18 +21,24 @@ public class TramLineManager {
 	private Double minTramLineSeparationFactor = 0.1;
 	private Double minRelativeLineLength = 0.5;
 	
+	private Set<SVGLine> usedLineSet;
+
 	public TramLineManager() {
 		
 	}
 	
 	public void add(TramLine line) {
-		ensureTramLineList();
+		ensureTramLineListAndUsedLineSet();
 		tramLineList.add(line);
 	}
 
-	private void ensureTramLineList() {
+	private void ensureTramLineListAndUsedLineSet() {
 		if (tramLineList == null) {
 			tramLineList = new ArrayList<TramLine>();
+	 		if (usedLineSet == null) {
+		 		usedLineSet = new HashSet<SVGLine>();
+		 	}
+
 		}
 	}
 	
@@ -56,16 +63,21 @@ public class TramLineManager {
 	}
 
 
-	public List<TramLine> makeTramLineList(List<SVGLine> lineList) {
-		ensureTramLineList();
-		for (int i = 0; i < lineList.size() - 1; i++) {
-			SVGLine linei = lineList.get(i);
-			for (int j = i + 1; j < lineList.size(); j++) {
-				SVGLine linej = lineList.get(j);
-				TramLine tramLine = createTramLine(linei, linej);
-				if (tramLine != null) {
-					LOG.debug("tram "+i+" "+j );
-					tramLineList.add(tramLine);
+	List<TramLine> createTramLineList(List<SVGLine> lineList) {
+		if (tramLineList == null) {
+			ensureTramLineListAndUsedLineSet();
+			for (int i = 0; i < lineList.size() - 1; i++) {
+				SVGLine linei = lineList.get(i);
+				for (int j = i + 1; j < lineList.size(); j++) {
+					SVGLine linej = lineList.get(j);
+					TramLine tramLine = createTramLine(linei, linej);
+					if (tramLine != null) {
+						LOG.trace("tram "+linei.getId()+" "+linej.getId());
+	 					tramLine.setId("tram."+linei.getId()+"."+linej.getId());
+	 					tramLineList.add(tramLine);
+	 					usedLineSet.add(linei);
+	 					usedLineSet.add(linej);
+					}
 				}
 			}
 		}
@@ -108,4 +120,13 @@ public class TramLineManager {
 		return tramLineList;
 	}
 
+	public List<SVGLine> removeUsedTramLinePrimitives(List<SVGLine> lineList) {
+ 		for (int i = lineList.size() - 1; i >= 0; i--) {
+ 			if (usedLineSet.contains(lineList.get(i))) {
+ 				lineList.remove(i);
+ 			}
+ 		}
+ 		return lineList;
+ 	}
+	
 }

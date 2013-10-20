@@ -1,4 +1,4 @@
-package org.xmlcml.graphics.svg.join;
+package org.xmlcml.graphics.svg.builder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +62,9 @@ public class Junction extends SVGCircle {
 	 * 
 	 */
 	public String getId() {
-		SVGText svgText = getSvgText();
-		return svgText == null ? null: svgText.getId();
+//		SVGText svgText = getSvgText();
+//		return svgText == null ? null: svgText.getId();
+		return super.getId();
 	}
 	
 	private void add(Joinable joinable) {
@@ -113,9 +114,17 @@ public class Junction extends SVGCircle {
 		return sb.toString();
 	}
 
-	public String getSvgTextAtomValue() {
+	public Real2 getCoordinates() {
+		return coordinates;
+	}
+
+	public void setCoordinates(Real2 coords) {
+		this.coordinates = coords;
+	}
+
+	public String getSvgTextValue() {
 		SVGText svgText = getSvgText();
-		String name = (svgText == null) ? "C" : svgText.getValue();
+		String name = (svgText == null) ? "" : svgText.getValue();
 		return name;
 	}
 

@@ -1,4 +1,4 @@
-package org.xmlcml.graphics.svg.join;
+package org.xmlcml.graphics.svg.builder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,14 +18,12 @@ public class JoinManager {
 	private final static Logger LOG = Logger.getLogger(JoinManager.class);
 	
 	private List<JoinPoint> joinPoints;
-	private double distanceToOther;
-
 	private List<Junction> junctionList;
 
 	public JoinManager() {
 	}
 	
-	public List<JoinPoint> getCommonJoinPointList(JoinManager otherJoiner) {
+	List<JoinPoint> getCommonJoinPointList(JoinManager otherJoiner) {
 		List<JoinPoint> commonJoinPointList = new ArrayList<JoinPoint>();
 		ensureJoinPoints();
 		if (this.equals(otherJoiner)) {
@@ -36,7 +34,7 @@ public class JoinManager {
 			JoinPoint joinPoint = joinPoints.get(i);
 			for (int j = 0; j < otherJoinPoints.size(); j++) {
 				JoinPoint otherJoinPoint = otherJoinPoints.get(j);
-				distanceToOther = joinPoint.getDistanceTo(otherJoinPoint);
+				double distanceToOther = joinPoint.getDistanceTo(otherJoinPoint);
 				if (joinPoint.getRadius() + otherJoinPoint.getRadius() > distanceToOther) {
 					JoinPoint commonJoinPoint = null;
 					if (joinPoint.getPriority() > otherJoinPoint.getPriority()) {
@@ -59,11 +57,11 @@ public class JoinManager {
 		}
 	}
 	
-	public List<JoinPoint> getJoinPoints() {
+	List<JoinPoint> getJoinPoints() {
 		return joinPoints;
 	}
 	
-	public void add(JoinPoint point) {
+	void add(JoinPoint point) {
 		ensureJoinPoints();
 		joinPoints.add(point);
 	}
@@ -99,6 +97,8 @@ public class JoinManager {
 			joinable = new JoinableLine((SVGLine) element);
 		} else if (element instanceof SVGText) {
 			joinable = new JoinableText((SVGText) element);
+ 		} else {
+ 			LOG.debug("Unknown joinable: "+element);
  		}
 		return joinable;
 	}
@@ -113,20 +113,19 @@ public class JoinManager {
 	}
 
 	public void add(Junction junction) {
-		enableJunctionList();
+		ensureJunctionList();
 		if (!junctionList.contains(junction)) {
 			junctionList.add(junction);
 		}
 	}
 
-	private void enableJunctionList() {
+	private void ensureJunctionList() {
 		if (junctionList == null) {
 			junctionList = new ArrayList<Junction>();
 		}
 	}
 
 	public List<Junction> getJunctionList() {
-		enableJunctionList();
 		return junctionList;
 	}
 

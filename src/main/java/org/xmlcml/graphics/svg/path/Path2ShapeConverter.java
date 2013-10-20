@@ -1,4 +1,4 @@
-package org.xmlcml.graphics.svg.util;
+package org.xmlcml.graphics.svg.path;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,6 +10,7 @@ import nu.xom.ParentNode;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
@@ -23,9 +24,6 @@ import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGUtil;
 import org.xmlcml.graphics.svg.StyleBundle;
-import org.xmlcml.graphics.svg.path.Arc;
-import org.xmlcml.graphics.svg.path.MovePrimitive;
-import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 import org.xmlcml.xml.XMLUtil;
 
 /** converts a SVGPath or list of SVGPaths to SVGShape(s).
@@ -40,8 +38,11 @@ import org.xmlcml.xml.XMLUtil;
  */
 public class Path2ShapeConverter {
 
+
 	private final static Logger LOG = Logger.getLogger(Path2ShapeConverter.class);
 	
+	private static final String MLCCLCC = "MLCCLCC";
+	private static final String MLCCLCCZ = "MLCCLCCZ";
 	private static final String MLLLL = "MLLLL";
 	private static final String MLLL = "MLLL";
 	private static final String MCLC = "MCLC";
@@ -50,6 +51,9 @@ public class Path2ShapeConverter {
 	private static final double MOVE_EPS = 0.001;
 	private static final double RECT_EPS = 0.01;
 	private static final double _ROUNDED_BOX_EPS = 0.4;
+	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.015, Units.RADIANS);
+	private static final double DEFAULT_MAX_WIDTH_FOR_PARALLEL = 2.0;
+	
 	private static final String SVG = "svg";
 	private static final Integer DEFAULT_DECIMAL_PLACES = 3;
 	private static final Angle ANGLE_EPS = new Angle(0.001);
@@ -68,6 +72,8 @@ public class Path2ShapeConverter {
 	private List<SVGPath> splitPathList;
 	private SVGPath svgPath;
 
+	private Angle maxAngleForParallel = DEFAULT_MAX_ANGLE_FOR_PARALLEL;
+	private double maxWidthForParallel = DEFAULT_MAX_WIDTH_FOR_PARALLEL;
 
 	public Path2ShapeConverter() {
 	}
@@ -109,13 +115,18 @@ public class Path2ShapeConverter {
 		shapeListOut = new ArrayList<SVGShape>();
 		int id = 0;
 		for (SVGElement path : pathList) {
-			this.setSVGPath((SVGPath)path);
-			SVGShape  shape = this.convertPathToShape();
+			SVGShape shape = convertPathToShape(path);
 			shape.setId(shape.getClass().getSimpleName().toLowerCase().substring(SVG.length())+"."+id);
 			shapeListOut.add(shape);
 			id++;
 		}
 		return shapeListOut;
+	}
+
+	public SVGShape convertPathToShape(SVGElement path) {
+		this.setSVGPath((SVGPath)path);
+		SVGShape  shape = this.convertPathToShape();
+		return shape;
 	}
 
 	public void setSVGPath(SVGPath path) {
@@ -124,6 +135,27 @@ public class Path2ShapeConverter {
 	
 	public void setDecimalPlaces(int places) {
 		this.decimalPlaces = places;
+	}
+	
+	private SVGLine createLineFromMLLLorMLCCLCC(SVGPath path) {
+		SVGLine line = null;
+		if (path != null) {
+			path = removeRoundedCapsFromPossibleLine(path);
+			// if signature is now MLLLL continue
+			line = path.createLineFromMLLLL(maxAngleForParallel, maxWidthForParallel);
+		}
+		return line;
+	}
+
+	private SVGPath removeRoundedCapsFromPossibleLine(SVGPath path) {
+		String signature = path.getSignature();
+		if (MLCCLCC.equals(signature) || MLCCLCCZ.equals(signature)) {
+			SVGPath newPath = path.replaceAllUTurnsByButt(maxAngleForParallel);
+			if (newPath != null) {
+				path = newPath;			
+			}
+		}
+		return path;
 	}
 
 	/** create best guess at higher SVGElement
@@ -136,7 +168,7 @@ public class Path2ShapeConverter {
 		SVGShape newSvg = null;
 		newSvg = svgPath.createRectangle(RECT_EPS);
 		if (newSvg == null) {
-//			newSvg = path.createRoundCapLine(_ROUNDED_BOX_EPS);
+			newSvg = createLineFromMLLLorMLCCLCC(svgPath);
 		}
 		if (newSvg == null) {
 			newSvg = svgPath.createRoundedBox(_ROUNDED_BOX_EPS);

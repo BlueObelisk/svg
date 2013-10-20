@@ -1,4 +1,4 @@
-package org.xmlcml.graphics.svg.join;
+package org.xmlcml.graphics.svg.builder;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
@@ -25,7 +25,7 @@ public class JoinPoint {
 		return point.getDistance(otherPoint.getPoint());
 	}
 
-	private Real2 getPoint() {
+	public Real2 getPoint() {
 		return point;
 	}
 
