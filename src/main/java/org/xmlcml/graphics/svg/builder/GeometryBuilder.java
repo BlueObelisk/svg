@@ -362,12 +362,13 @@ public class GeometryBuilder {
 	}
 
 	public List<Junction> getMergedJunctionList() {
+		ensureMergedJunctionList();
 		return mergedJunctionList;
 	}
 
 	private void ensureMergedJunctionList() {
 		if (mergedJunctionList == null) {
-			mergeJunctions();
+			createMergedJunctions();
 		}
 	}
 

@@ -296,4 +296,11 @@ public abstract class SVGPathPrimitive {
 	public void setFirstPoint(Real2 lastPoint) {
 		this.zerothCoord = lastPoint;
 	}
+
+	public static void setFirstPoints(PathPrimitiveList primitiveList) {
+		throw new RuntimeException("NYI");
+//		for (SVGPathPrimitive primitive : primitiveList) {
+//			primitive.s
+//		}
+	}
 }
