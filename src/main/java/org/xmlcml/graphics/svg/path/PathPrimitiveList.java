@@ -30,9 +30,9 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		setFirstPoints();
 	}
 
-	public void add(List<SVGPathPrimitive> primitiveList) {
+	public void add(PathPrimitiveList primitiveList) {
 		ensurePathPrimitiveList();
-		primitiveList.addAll(primitiveList);
+		this.primitiveList.addAll(primitiveList.getPrimitiveList());
 		setFirstPoints();
 	}
 

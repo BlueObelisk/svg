@@ -309,7 +309,7 @@ public class SVGPath extends SVGShape {
 					double radius = arc.getRadius();
 					radiusArray.addElement(radius);
 				} else {
-					LOG.debug("null quadrant");
+					LOG.trace("null quadrant");
 				}
 			}
 			Real2 meanCentre = centreArray.getMean();

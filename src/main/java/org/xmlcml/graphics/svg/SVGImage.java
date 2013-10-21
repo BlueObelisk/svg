@@ -211,7 +211,14 @@ public class SVGImage extends SVGShape {
 			 preserveAspectRatio="none" stroke-width="0" xmlns:xlink="http://www.w3.org/1999/xlink"/>
     */
 	
-	public String readImageDataIntoSrcValue(BufferedImage bufferedImage, String mimeType) {
+	/** Convert image data to base64.
+	 * 
+	 * @param bufferedImage
+	 * @param mimeType
+	 * @return base64 value
+	 * @throws RuntimeException (probably when the mime type is bad or ImageIO fails (no useful message)
+	 */
+	public String readImageDataIntoSrcValue(BufferedImage bufferedImage, String mimeType) throws RuntimeException {
 		String imageType = mimeType2ImageTypeMap.get(mimeType);
 		if (imageType == null) {
 			throw new RuntimeException("Cannot convert mimeType: "+mimeType);
