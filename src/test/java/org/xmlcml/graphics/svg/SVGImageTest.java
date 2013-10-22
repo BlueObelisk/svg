@@ -241,7 +241,7 @@ public class SVGImageTest {
 	
 	@Test
 	public void testRotateImage() throws IOException {
-		SVGImage svgImage = SVGImage.createSVGFromImage(new File("target/image.g.2.2.png"), SVGImage.IMAGE_PNG);
+		SVGImage svgImage = SVGImage.createSVGFromImage(Fixtures.IMAGE_G_2_2_PNG, SVGImage.IMAGE_PNG);
 		svgImage.applyTransformToImage(new Transform2(new Angle(Math.PI)));
 		svgImage.writeImage(new File("target/rotx.png"), SVGImage.IMAGE_PNG);
 		
@@ -249,7 +249,7 @@ public class SVGImageTest {
 	
 	@Test
 	public void testFlipImageHorizontally() throws IOException {
-		SVGImage svgImage = SVGImage.createSVGFromImage(new File("target/image.g.2.2.png"), SVGImage.IMAGE_PNG);
+		SVGImage svgImage = SVGImage.createSVGFromImage(Fixtures.IMAGE_G_2_2_PNG, SVGImage.IMAGE_PNG);
 		svgImage.applyTransformToImage(new Transform2(new double[]{-1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0}));
 		svgImage.writeImage(new File("target/fliphor.png"), SVGImage.IMAGE_PNG);
 		
@@ -257,7 +257,7 @@ public class SVGImageTest {
 	
 	@Test
 	public void testFlipImageVertically() throws IOException {
-		SVGImage svgImage = SVGImage.createSVGFromImage(new File("target/image.g.2.2.png"), SVGImage.IMAGE_PNG);
+		SVGImage svgImage = SVGImage.createSVGFromImage(Fixtures.IMAGE_G_2_2_PNG, SVGImage.IMAGE_PNG);
 		svgImage.applyTransformToImage(new Transform2(new double[]{1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0}));
 		svgImage.writeImage(new File("target/flipvert.png"), SVGImage.IMAGE_PNG);
 		
