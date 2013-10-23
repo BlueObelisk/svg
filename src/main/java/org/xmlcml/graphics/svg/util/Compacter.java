@@ -1,6 +1,7 @@
 package org.xmlcml.graphics.svg.util;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.xmlcml.graphics.svg.SVGConstants;
