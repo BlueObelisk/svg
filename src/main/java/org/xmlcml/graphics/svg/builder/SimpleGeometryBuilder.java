@@ -36,7 +36,7 @@ import org.xmlcml.graphics.svg.path.Path2ShapeConverter;
  * </p>
  * 
  * <p>Input may either be explicit SVG primitives (e.g. <svg:rect>, <svg:line>) or 
- * implicit (<svg:apth> which can be interpreted to the above. The input may be eitehr or
+ * implicit (<svg:path> which can be interpreted to the above. The input may be either or
  * both - we can't control it. The implicit get converted to explicit and then merged with the 
  * explicit:
  * <pre>
@@ -49,14 +49,18 @@ import org.xmlcml.graphics.svg.path.Path2ShapeConverter;
  * primitives. Each step tests to see whether the result of the previous is null.
  * If so its creates a non-null list and fills it if possible. </p>
  * 
+ * UPDATE: 2013-10-23 Renamed to "SimpleGeometryManager" as it doesn't deal with Words (which
+ * require TextStructurer.) it's possible the whole higherlevel primitive stuff should be removed to another
+ * project.
+ * 
  * @author pm286
  *
  */
-public class GeometryBuilder {
+public class SimpleGeometryBuilder {
 
 	private static final String TEXT = "text";
 
-	private final static Logger LOG = Logger.getLogger(GeometryBuilder.class);
+	private final static Logger LOG = Logger.getLogger(SimpleGeometryBuilder.class);
 	
 	public static final Angle DEFAULT_MAX_ANGLE = new Angle(0.12, Units.RADIANS);
 	public static final Double DEFAULT_MAX_WIDTH = 2.0;
@@ -88,10 +92,10 @@ public class GeometryBuilder {
 	private Angle maxAngle = DEFAULT_MAX_ANGLE;
 	private Double minRectThickness = DEFAULT_MIN_RECT_THICKNESS;
 
-	public GeometryBuilder() {
+	public SimpleGeometryBuilder() {
 	}
 
-	public GeometryBuilder(SVGElement svgRoot) {
+	public SimpleGeometryBuilder(SVGElement svgRoot) {
 		this.setSvgRoot(svgRoot);
 	}
 
@@ -444,6 +448,11 @@ public class GeometryBuilder {
 			element.setId(id);
 		}
 	}
+
+	public SVGElement getSVGRoot() {
+		return svgRoot;
+	}
+
 
 	
 }
