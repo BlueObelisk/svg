@@ -305,9 +305,11 @@ public class SVGPath extends SVGShape {
 				Arc arc = primList.getQuadrant(i, angleEps);
 				if (arc != null) {
 					Real2 centre = arc.getCentre();
-					centreArray.add(centre);
-					double radius = arc.getRadius();
-					radiusArray.addElement(radius);
+					if (centre != null) {
+						centreArray.add(centre);
+						double radius = arc.getRadius();
+						radiusArray.addElement(radius);
+					}
 				} else {
 					LOG.trace("null quadrant");
 				}
