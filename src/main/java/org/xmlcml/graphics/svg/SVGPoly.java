@@ -68,7 +68,7 @@ public abstract class SVGPoly extends SVGShape {
 	
 	protected Real2Array real2Array;
 	protected List<SVGLine> lineList;
-	protected List<SVGMarker> pointList;
+	protected List<SVGMarker> markerList;
 	
 	/** constructor
 	 */
@@ -147,9 +147,9 @@ public abstract class SVGPoly extends SVGShape {
 		}
 	}
 
-	public List<SVGMarker> createPointList() {
+	public List<SVGMarker> createMarkerList() {
 		createLineList();
-		return pointList;
+		return markerList;
 	}
 	
 	public Line2D.Double createAndSetLine2D() {
@@ -284,10 +284,10 @@ public abstract class SVGPoly extends SVGShape {
 	}
 
 	public List<SVGMarker> getPointList() {
-		if (pointList == null) {
-			createPointList();
+		if (markerList == null) {
+			createMarkerList();
 		}
-		return pointList;
+		return markerList;
 	}
 
 	public List<SVGLine> createLineList() {
@@ -308,15 +308,15 @@ public abstract class SVGPoly extends SVGShape {
 			}
 			String id = this.getId();
 			lineList = new ArrayList<SVGLine>();
-			pointList = new ArrayList<SVGMarker>();
+			markerList = new ArrayList<SVGMarker>();
 			SVGMarker lastPoint = new SVGMarker(real2Array.get(0));
-			pointList.add(lastPoint);
+			markerList.add(lastPoint);
 			SVGLine line;
 			for (int i = 1; i < real2Array.size(); i++) {
 				line = new SVGLine(real2Array.elementAt(i-1), real2Array.elementAt(i));
 				copyNonSVGAttributes(this, line);
 				SVGMarker point = new SVGMarker(real2Array.get(i));
-				pointList.add(point);
+				markerList.add(point);
 				lastPoint.addLine(line);
 				point.addLine(line);
 				if (line.getEuclidLine().getLength() < 0.0000001) {
@@ -366,10 +366,10 @@ public abstract class SVGPoly extends SVGShape {
 	}
 
 	protected List<SVGMarker> ensurePointList() {
-		if (pointList == null) {
-			pointList = new ArrayList<SVGMarker>();
+		if (markerList == null) {
+			markerList = new ArrayList<SVGMarker>();
 		}
-		return pointList;
+		return markerList;
 	}
 
 	@Override
