@@ -56,11 +56,11 @@ import org.xmlcml.graphics.svg.path.Path2ShapeConverter;
  * @author pm286
  *
  */
-public class SimpleGeometryBuilder {
+public class SimpleBuilder {
 
 	private static final String TEXT = "text";
 
-	private final static Logger LOG = Logger.getLogger(SimpleGeometryBuilder.class);
+	private final static Logger LOG = Logger.getLogger(SimpleBuilder.class);
 	
 	public static final Angle DEFAULT_MAX_ANGLE = new Angle(0.12, Units.RADIANS);
 	public static final Double DEFAULT_MAX_WIDTH = 2.0;
@@ -68,7 +68,7 @@ public class SimpleGeometryBuilder {
 
 	private static final double DEFAULT_BOND_LENGTH_SCALE = 0.1;
 
-	private SVGElement svgRoot;
+	protected SVGElement svgRoot;
 	private List<SVGElement> highLevelPrimitives;
 	
 	private List<SVGPath> explicitPathList;
@@ -92,10 +92,10 @@ public class SimpleGeometryBuilder {
 	private Angle maxAngle = DEFAULT_MAX_ANGLE;
 	private Double minRectThickness = DEFAULT_MIN_RECT_THICKNESS;
 
-	public SimpleGeometryBuilder() {
+	public SimpleBuilder() {
 	}
 
-	public SimpleGeometryBuilder(SVGElement svgRoot) {
+	public SimpleBuilder(SVGElement svgRoot) {
 		this.setSvgRoot(svgRoot);
 	}
 

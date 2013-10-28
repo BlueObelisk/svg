@@ -291,9 +291,9 @@ public class SVGPolyline extends SVGPoly {
 		createLineList();
 		if (lineList.size() > 0) {
 			lineList.remove(lineList.size()-1);
-			pointList.remove(pointList.size()-1);
-			if (pointList.size() == 1) {
-				pointList.remove(0);
+			markerList.remove(markerList.size()-1);
+			if (markerList.size() == 1) {
+				markerList.remove(0);
 			}
 		}
 	}
@@ -302,9 +302,9 @@ public class SVGPolyline extends SVGPoly {
 		createLineList();
 		if (lineList.size() > 0) {
 			lineList.remove(0);
-			pointList.remove(0);
-			if (pointList.size() == 1) {
-				pointList.remove(0);
+			markerList.remove(0);
+			if (markerList.size() == 1) {
+				markerList.remove(0);
 			}
 		}
 	}
@@ -312,7 +312,7 @@ public class SVGPolyline extends SVGPoly {
 	public void add(SVGLine line) {
 		ensureLineList();
 		ensurePointList();
-		if (pointList.size() == 0) {
+		if (markerList.size() == 0) {
 			addNewMarker(line);
 		}
 		lineList.add(line);
@@ -322,7 +322,7 @@ public class SVGPolyline extends SVGPoly {
 	private void addNewMarker(SVGLine line) {
 		SVGMarker marker = new SVGMarker();
 		marker.addLine(line);
-		pointList.add(marker);
+		markerList.add(marker);
 	}
 
 	/** split polyline at given position.
@@ -473,7 +473,7 @@ public class SVGPolyline extends SVGPoly {
 		this.real2Array.add(r2a);
 		this.setReal2Array(real2Array);
 		createLineList(true);
-		createPointList();
+		createMarkerList();
 	}
 
 	/** replaces polyline by its split SVGLines.

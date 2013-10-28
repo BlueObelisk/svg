@@ -20,6 +20,7 @@ import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGPathPrimitive;
+import org.xmlcml.graphics.svg.SVGPolygon;
 import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGUtil;
@@ -602,5 +603,18 @@ public class Path2ShapeConverter {
 			Arc quadrant2 = primList.getQuadrant(3, ANGLE_EPS);
 		}
 		return newPath;
+	}
+
+	public SVGCircle convertToCircle(SVGPolygon polygon) {
+		Real2Range bbox = polygon.getBoundingBox();
+		if (Math.abs(bbox.getXRange().getRange() - bbox.getYRange().getRange()) < 10.*RECT_EPS) {
+			Real2 centre = bbox.getCentroid();
+			for (Real2 point : polygon.getReal2Array()) {
+				
+			}
+		} else {
+//			System.out.println(bbox);
+		}
+		return null;
 	}
 }
