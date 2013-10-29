@@ -20,6 +20,7 @@ import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGPathPrimitive;
+import org.xmlcml.graphics.svg.SVGPoly;
 import org.xmlcml.graphics.svg.SVGPolygon;
 import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
@@ -183,41 +184,66 @@ public class  Path2ShapeConverter {
 	 */
 	public SVGShape convertPathToShape() {
 		if (svgPath == null) return null;
-		SVGShape newSvg = null;
-		newSvg = svgPath.createRectangle(RECT_EPS);
-		if (newSvg == null) {
-			newSvg = createLineFromMLLLorMLCCLCC(svgPath);
-		} else {
-			newSvg = createLineFromRect((SVGRect)newSvg); 
+		SVGShape shape = null;
+		shape = createRectOrAxialLine(RECT_EPS);
+		if (shape == null) {
+			shape = svgPath.createRoundedBox(_ROUNDED_BOX_EPS);
 		}
-		if (newSvg == null) {
-			newSvg = svgPath.createRoundedBox(_ROUNDED_BOX_EPS);
+		if (shape == null) {
+			shape = svgPath.createCircle(_CIRCLE_EPS);
 		}
-		if (newSvg == null) {
-			newSvg = svgPath.createCircle(_CIRCLE_EPS);
-		}
-		if (newSvg == null) {
-			SVGPolyline polyline = svgPath.createPolyline();
+		if (shape == null) {
+			SVGPolyline polyline = (SVGPolyline)svgPath.createPolyline();
 			// not a polyline, return unchanged path
 			if (polyline == null) {
-				newSvg = new SVGPath(svgPath);
+				shape = new SVGPath(svgPath);
 			} else {
 				// SVG is a polyline, try the variants
 					// is it a line?
-				newSvg = polyline.createSingleLine();
-				if (newSvg == null) {
+				shape = polyline.createSingleLine();
+				if (shape == null) {
 					// or a polygon?
-					newSvg = polyline.createPolygon(RECT_EPS);
+					shape = createPolygonRectOrLine(shape, polyline);
+					LOG.trace("polygon "+shape);
 				}
 				// no, reset to polyline
-				if (newSvg == null) {
-					newSvg = polyline;
+				if (shape == null) {
+					shape = polyline;
 				}
 			}
 		}
-		copyAttributes(svgPath, newSvg);
-		newSvg.format(decimalPlaces);
-		return newSvg;
+		copyAttributes(svgPath, shape);
+		shape.format(decimalPlaces);
+		return shape;
+	}
+
+	private SVGShape createPolygonRectOrLine(SVGShape shape, SVGPolyline polyline) {
+		SVGPolygon polygon = (SVGPolygon)polyline.createPolygon(RECT_EPS);
+		if (polygon != null) {
+			SVGRect rect = polygon.createRect(RECT_EPS);
+			SVGLine line = createLineFromRect(rect); 
+			if (line != null) {
+				shape = line;
+			} else if (rect != null){
+				shape = rect;
+			} else {
+				shape = polygon;
+			}
+		}
+		return shape;
+	}
+
+	private SVGShape createRectOrAxialLine(double eps) {
+		SVGShape shape;
+		SVGRect rect = svgPath.createRectangle(eps);
+		SVGLine line = null;
+		if (rect == null) {
+			line = createLineFromMLLLorMLCCLCC(svgPath);
+		} else {
+			line = createLineFromRect(rect); 
+		}
+		shape = (line != null) ? null : rect;
+		return shape;
 	}
 
 	/**
@@ -402,7 +428,7 @@ public class  Path2ShapeConverter {
 		List<SVGLine> totalSplitLineList = new ArrayList<SVGLine>();
 		for (SVGShape shape : shapeList) {
 			if (shape instanceof SVGPolyline) {
-				SVGPolyline polyline = (SVGPolyline) shape;
+				SVGPoly polyline = (SVGPoly) shape;
 				List<SVGLine> lines = polyline.createLineList();
 				if (lines.size() < minLinesInPolyline) {
 					annotateLinesAndAddToParentAndList(totalSplitLineList, polyline, lines);
@@ -415,7 +441,7 @@ public class  Path2ShapeConverter {
 	}
 
 	private void annotateLinesAndAddToParentAndList (
-			List<SVGLine> totalSplitLineList, SVGPolyline polyline, List<SVGLine> linesToAdd) {
+			List<SVGLine> totalSplitLineList, SVGPoly polyline, List<SVGLine> linesToAdd) {
 		ParentNode parent = polyline.getParent();
 		for (int i = 0; i < linesToAdd.size(); i++) {
 			SVGLine line = linesToAdd.get(i);
@@ -574,23 +600,6 @@ public class  Path2ShapeConverter {
 		return shapeListOut;
 	}
 
-//	private SVGShape createRoundCapLine(SVGPath svgPath, double roundedBoxEps) {
-//		String signature = svgPath.getSignature();
-//		LOG.debug("SIG "+signature);
-//		return null;
-//	}
-	
-//	private LinePrimitive condenseRoundedCaps(LinePrimitive preceeding, CubicPrimitive cubic1, CubicPrimitive cubic2) {
-//		LinePrimitive linePrimitive = null;
-//		if (preceeding != null && cubic1 != null && cubic2 != null) {
-//			Angle angle1 = cubic1.getAngle();
-//			Angle angle2 = cubic2.getAngle();
-//			Angle angleTot = angle1.plus(angle2);
-//			LOG.debug(angle1+" "+angle2+" "+angleTot);
-//		}
-//		return linePrimitive;
-//	}
-
 	public SVGLine createNarrowLine() {
 		maxPathWidth = 1.0;
 		if (svgPath == null) return null;
@@ -643,14 +652,16 @@ public class  Path2ShapeConverter {
 	}
 	
 	public SVGLine createLineFromRect(SVGRect rect) {
-		Real2 origin = rect.getXY();
-		double width = rect.getWidth();
-		double height = rect.getHeight();
 		SVGLine line = null;
-		if (width < minRectThickness ) {
-			line = new SVGLine(origin, origin.plus(new Real2(0.0, height)));
-		} else if (height < minRectThickness ) {
-			line = new SVGLine(origin, origin.plus(new Real2(width, 0.0)));
+		if (rect != null) {
+			Real2 origin = rect.getXY();
+			double width = rect.getWidth();
+			double height = rect.getHeight();
+			if (width < minRectThickness ) {
+				line = new SVGLine(origin, origin.plus(new Real2(0.0, height)));
+			} else if (height < minRectThickness ) {
+				line = new SVGLine(origin, origin.plus(new Real2(width, 0.0)));
+			}
 		}
 		return line;
 	}

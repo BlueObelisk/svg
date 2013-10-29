@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGPath;
 
 /** holds primitives that are being built.
  * 
@@ -49,5 +50,6 @@ public class HigherPrimitives {
 	public List<Junction> getRawJunctionList() {
 		return rawJunctionList;
 	}
+
 
 }
