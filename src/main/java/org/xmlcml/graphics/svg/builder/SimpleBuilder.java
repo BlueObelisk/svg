@@ -9,10 +9,14 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPath;
+import org.xmlcml.graphics.svg.SVGPolygon;
+import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
+import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.graphics.svg.path.Path2ShapeConverter;
@@ -62,35 +66,17 @@ public class SimpleBuilder {
 
 	private final static Logger LOG = Logger.getLogger(SimpleBuilder.class);
 	
-	public static final Angle DEFAULT_MAX_ANGLE = new Angle(0.12, Units.RADIANS);
-	public static final Double DEFAULT_MAX_WIDTH = 2.0;
-	private static final Double DEFAULT_MIN_RECT_THICKNESS = 0.99;
 
 	private static final double DEFAULT_BOND_LENGTH_SCALE = 0.1;
 
 	protected SVGElement svgRoot;
 	private List<SVGElement> highLevelPrimitives;
 	
-	private List<SVGPath> explicitPathList;
-	private List<SVGShape> explicitShapeList; // does not include Path or Line
-	private List<SVGLine> explicitLineList;
-	private List<SVGText> explicitTextList;
+	protected SVGPrimitives explicitContainer;
+	protected SVGPrimitives implicitContainer;
+	protected HigherPrimitives higherPrimitives;
 	
-	private List<SVGLine> rawLineList;
-	private List<SVGShape> implicitShapeList; // does not include Path or Line 
-	private List<SVGLine> implicitLineList;
-	private List<Junction> rawJunctionList;
-	
-	private List<Junction> mergedJunctionList;
-	private List<SVGPath> currentPathList;
-	private List<SVGShape> currentShapeList;
-	private List<SVGLine> singleLineList;
-	private List<TramLine> tramLineList;
-	private List<Joinable> joinableList;
-	
-	private double maxWidth = DEFAULT_MAX_WIDTH;
-	private Angle maxAngle = DEFAULT_MAX_ANGLE;
-	private Double minRectThickness = DEFAULT_MIN_RECT_THICKNESS;
+	protected List<SVGPath> currentPathList;
 
 	public SimpleBuilder() {
 	}
@@ -107,7 +93,6 @@ public class SimpleBuilder {
 	 * 
 	 */
 	public void createHigherLevelPrimitives() {
-		
 	}
 
 	/**
@@ -128,28 +113,14 @@ public class SimpleBuilder {
 	}
 	
 	private void createExplicitShapeAndPathLists() {
-		if (explicitShapeList == null) {
-			explicitShapeList = new ArrayList<SVGShape>();
-			explicitLineList = new ArrayList<SVGLine>();
-			explicitPathList = new ArrayList<SVGPath>();
-			if (svgRoot != null) {
-				List<SVGShape> shapeList = SVGShape.extractSelfAndDescendantShapes(svgRoot);
-				for (SVGShape shape : shapeList) {
-					if (shape instanceof SVGPath) {
-						explicitPathList.add((SVGPath)shape);
-					} else if (shape instanceof SVGRect) {
-						addAsLineOrRect(shape, explicitShapeList, explicitLineList);
-					} else if (shape instanceof SVGLine) {
-						explicitLineList.add((SVGLine)shape);
-					} else {
-						explicitShapeList.add(shape);
-					}
-				}
-				currentPathList = new ArrayList<SVGPath>(explicitPathList);
-				currentShapeList = new ArrayList<SVGShape>(explicitShapeList);
-			}
+		if (explicitContainer == null) {
+			explicitContainer = new SVGPrimitives();
+			List<SVGShape> shapeList = SVGShape.extractSelfAndDescendantShapes(svgRoot);
+			explicitContainer.addShapes(shapeList);
+			currentPathList = explicitContainer.getPathList();
 		}
 	}
+
 	
 	/**
 	 * Try to create highLevel primitives from paths.
@@ -162,79 +133,53 @@ public class SimpleBuilder {
 	 * @return List of newly created SVGShapes
 	 */
 	
-	public List<SVGShape> createImplicitShapesFromPaths() {
-		if (implicitShapeList == null) {
+	public void createImplicitShapesFromPaths() {
+		if (implicitContainer == null) {
 			createExplicitShapeAndPathLists();
-			implicitShapeList = new ArrayList<SVGShape>();
-			implicitLineList = new ArrayList<SVGLine>();
+			implicitContainer = new SVGPrimitives();
+			List<SVGShape> shapeList = SVGShape.extractSelfAndDescendantShapes(svgRoot);
+			implicitContainer.addShapes(shapeList);
 			Path2ShapeConverter path2ShapeConverter = new Path2ShapeConverter();
 			for (int i = currentPathList.size() - 1; i >= 0; i--) {
 				SVGPath path = currentPathList.get(i);
 				SVGShape shape = path2ShapeConverter.convertPathToShape(path);
 				if (shape != null) {
 					addId(i, shape, path);
-					if (shape instanceof SVGLine) {
-						implicitLineList.add((SVGLine)shape);
-					} else if (shape instanceof SVGRect) {
-						addAsLineOrRect(shape, implicitShapeList, implicitLineList);
-					} else {
-						implicitShapeList.add(path);
-					}
+					implicitContainer.add(shape);
 					currentPathList.remove(i);
 				}
 			}
 		}
-		return implicitShapeList;
 	}
 
-	private void addAsLineOrRect(SVGShape shape, List<SVGShape> shapeList, List<SVGLine> lineList) {
-		SVGLine line = makeLineFromRect(shape);
-		if (line == null) {
-			shapeList.add(shape);
-		} else {
-			lineList.add(line);
-		}
-	}
-
-	private SVGLine makeLineFromRect(SVGShape shape) {
-		SVGRect rect = (SVGRect) shape;
-		Real2 origin = rect.getXY();
-		double width = rect.getWidth();
-		double height = rect.getHeight();
-		SVGLine line = null;
-		if (width < minRectThickness ) {
-			line = new SVGLine(origin, origin.plus(new Real2(0.0, height)));
-		} else if (height < minRectThickness ) {
-			line = new SVGLine(origin, origin.plus(new Real2(width, 0.0)));
-		}
-		return line;
-	}
-	
-	public List<SVGPath> createExplicitPathList() {
-		if (explicitPathList == null) {
-			if (svgRoot != null) {
-				explicitPathList = SVGPath.extractPaths(svgRoot);
-				currentPathList = new ArrayList<SVGPath>(explicitPathList);
-			}
-		}
-		return explicitPathList;
-	}
+//	public List<SVGPath> createExplicitPathList() {
+//		if (explicitPathList == null) {
+//			if (svgRoot != null) {
+//				explicitPathList = SVGPath.extractPaths(svgRoot);
+//				currentPathList = new ArrayList<SVGPath>(explicitPathList);
+//			}
+//		}
+//		return explicitPathList;
+//	}
 	
 
 	public List<SVGLine> createExplicitAndImplicitLines() {
 		createImplicitShapesFromPaths();
-		singleLineList = new ArrayList<SVGLine>();
-		singleLineList.addAll(implicitLineList);
-		singleLineList.addAll(explicitLineList);
-		return singleLineList;
+		ensureHigherPrimitives();
+		higherPrimitives.addSingleLines(implicitContainer.getLineList());
+		higherPrimitives.addSingleLines(explicitContainer.getLineList());
+		return higherPrimitives.getSingleLineList();
+	}
+
+	private void ensureHigherPrimitives() {
+		if (higherPrimitives == null) {
+			higherPrimitives = new HigherPrimitives();
+		}
 	}
 
 	public List<SVGText> createExplicitTextList() {
-		if (explicitTextList == null) {
-			explicitTextList = SVGText.extractSelfAndDescendantTexts(svgRoot);
-			ensureIds(explicitTextList);
-		}
-		return explicitTextList;
+		explicitContainer.addTexts(SVGText.extractSelfAndDescendantTexts(svgRoot));
+		return explicitContainer.getTextList();
 	}
 
 	private void ensureIds(List<? extends SVGElement> elementList) {
@@ -245,7 +190,7 @@ public class SimpleBuilder {
 	}
 	
 	private List<Junction> mergeJunctions() {
-		createRawJunctionList();
+		List<Junction> rawJunctionList = createRawJunctionList();
 		for (int i = rawJunctionList.size() - 1; i > 0; i--) {
 			Junction labile = rawJunctionList.get(i);
 			for (int j = 0; j < i; j++) {
@@ -260,41 +205,46 @@ public class SimpleBuilder {
 		return rawJunctionList;
 	}
 
-	public void createJoinableList() {
+	public List<Joinable> createJoinableList() {
+		List<Joinable> joinableList = higherPrimitives.getJoinableList();
 		if (joinableList == null) {
 			createExplicitAndImplicitLines();
-			joinableList = JoinManager.makeJoinableList(singleLineList);
+			joinableList = JoinManager.makeJoinableList(higherPrimitives.getSingleLineList());
 		}
+		return joinableList;
 	}
 
 	public List<TramLine> createTramLineListAndRemoveUsedLines() {
+		List<TramLine> tramLineList = higherPrimitives.getTramLineList();
 		if (tramLineList == null) {
 			createExplicitAndImplicitLines();
 			TramLineManager tramLineManager = new TramLineManager();
-			tramLineList = tramLineManager.createTramLineList(singleLineList);
-			tramLineManager.removeUsedTramLinePrimitives(singleLineList);
+			tramLineList = tramLineManager.createTramLineList(higherPrimitives.getSingleLineList());
+			tramLineManager.removeUsedTramLinePrimitives(higherPrimitives.getSingleLineList());
 		}
 		return tramLineList;
 	}
 
 	public List<Junction> createMergedJunctions() {
-		if (mergedJunctionList == null) {
+		List<Junction> junctionList = higherPrimitives.getMergedJunctionList();
+		if (junctionList == null) {
 			createTramLineListAndRemoveUsedLines();
-			joinableList = JoinManager.makeJoinableList(singleLineList);
-			joinableList.addAll(tramLineList);
+			List<Joinable> joinableList = JoinManager.makeJoinableList(higherPrimitives.getSingleLineList());
+			joinableList.addAll(higherPrimitives.getTramLineList());
 			createExplicitTextList();
-			for (SVGText svgText : explicitTextList) {
+			for (SVGText svgText : explicitContainer.getTextList()) {
 				joinableList.add(new JoinableText(svgText));
 			}
-			mergedJunctionList = this.mergeJunctions();
+			junctionList = this.mergeJunctions();
 		}
-		return mergedJunctionList;
+		return junctionList;
 		
 	}
 
 	public List<Junction> createRawJunctionList() {
+		List<Junction> rawJunctionList = higherPrimitives.getRawJunctionList();
 		if (rawJunctionList == null) {
-			createJoinableList();
+			List<Joinable> joinableList = createJoinableList();
 			rawJunctionList = new ArrayList<Junction>();
 			for (int i = 0; i < joinableList.size() - 1; i++) {
 				Joinable joinablei = joinableList.get(i);
@@ -317,130 +267,6 @@ public class SimpleBuilder {
 		return rawJunctionList;
 	}
 
-	// =========== Getters, Setters and Ensurers ============================
-
-	private void ________________________________________________() {}
-	
-	public List<SVGLine> getImplicitLineList() {
-		return implicitLineList;
-	}
-
-	private void ensureImplicitLineList() {
-		if (implicitLineList == null) {
-			implicitLineList = new ArrayList<SVGLine>();
-		}
-	}
-
-	public List<SVGLine> getExplicitLineList() {
-		return explicitLineList;
-	}
-
-	private void ensureExplicitLineList() {
-		if (explicitLineList == null) {
-			explicitLineList = new ArrayList<SVGLine>();
-		}
-	}
-
-	public List<SVGPath> getExplicitPathList() {
-		return explicitPathList;
-	}
-
-	public List<SVGPath> getCurrentPathList() {
-		return currentPathList;
-	}
-
-	private void ensureExplicitPathList() {
-		if (explicitPathList == null) {
-			explicitPathList = new ArrayList<SVGPath>();
-		}
-	}
-
-	public List<Joinable> getJoinableList() {
-		return joinableList;
-	}
-
-	private void ensureJoinableList() {
-		if (joinableList == null) {
-			joinableList = new ArrayList<Joinable>();
-		}
-	}
-
-	public List<Junction> getMergedJunctionList() {
-		ensureMergedJunctionList();
-		return mergedJunctionList;
-	}
-
-	private void ensureMergedJunctionList() {
-		if (mergedJunctionList == null) {
-			createMergedJunctions();
-		}
-	}
-
-	public List<Junction> getRawJunctionList() {
-		return rawJunctionList;
-	}
-
-	void ensureRawJunctionList() {
-		if (rawJunctionList == null) {
-			createRawJunctionList();
-		}
-	}
-
-	public List<SVGLine> getRawLineList() {
-		return rawLineList;
-	}
-
-	private void ensureRawLineList() {
-		if (rawLineList == null) {
-			rawLineList = new ArrayList<SVGLine>();
-		}
-	}
-
-	public List<SVGShape> getCurrentShapeList() {
-		return currentShapeList;
-	}
-	
-	public List<SVGLine> getSingleLineList() {
-		return singleLineList;
-	}
-
-	private void ensureSingleLineList() {
-		if (singleLineList == null) {
-			singleLineList = new ArrayList<SVGLine>();
-		}
-	}
-	public List<SVGText> getRawTextList() {
-		return explicitTextList;
-	}
-
-	private void ensureRawTextList() {
-		if (explicitTextList == null) {
-			explicitTextList = new ArrayList<SVGText>();
-		}
-	}
-	
-	public List<TramLine> getTramLineList() {
-		return tramLineList;
-	}
-
-	private void ensureTramLineList() {
-		if (this.tramLineList == null) {
-			tramLineList = new ArrayList<TramLine>();
-		}
-	}
-
-	// =========================================================================
-	
-	private void _______________________________________________() {}
-	
-	public void setMaxWidth(double maxWidth) {
-		this.maxWidth = maxWidth;
-	}
-
-	public void setMaxAngle(Angle maxAngle) {
-		this.maxAngle = maxAngle;
-	}
-	
 	private void addId(int i, SVGElement element, SVGElement reference) {
 		String id = (reference == null) ? null : reference.getId();
 		if (id == null) {
@@ -453,6 +279,61 @@ public class SimpleBuilder {
 		return svgRoot;
 	}
 
+	public List<SVGLine> getImplicitLineList() {
+		return (implicitContainer == null) ? null : implicitContainer.getLineList();
+	}
+
+	public List<SVGLine> getExplicitLineList() {
+		return (explicitContainer == null) ? null : explicitContainer.getLineList();
+	}
+
+	public List<Joinable> getJoinableList() {
+		return (higherPrimitives == null) ? null : higherPrimitives.getJoinableList();
+	}
+
+	public List<TramLine> getTramLineList() {
+		return (higherPrimitives == null) ? null : higherPrimitives.getTramLineList();
+	}
+
+	public List<SVGLine> getSingleLineList() {
+		return higherPrimitives == null ? null : higherPrimitives.getSingleLineList();
+	}
+
+	public List<SVGPath> getExplicitPathList() {
+		return explicitContainer == null ? null : explicitContainer.getPathList();
+	}
+
+	public List<SVGShape> getCurrentPathList() {
+		return implicitContainer == null ? null : implicitContainer.getShapeList();
+	}
+
+	protected void ensureImplicitContainer() {
+		if (implicitContainer == null) {
+			implicitContainer = new SVGPrimitives();
+		}
+	}
+
+	protected void ensureExplicitContainer() {
+		if (explicitContainer == null) {
+			explicitContainer = new SVGPrimitives();
+		}
+	}
+
+	public List<SVGText> getRawTextList() {
+		return explicitContainer  == null ? null : explicitContainer.getTextList();
+	}
+
+	public void extractPlotComponents() {
+		ensureImplicitContainer();
+		ensureExplicitContainer();
+		List<SVGPath> pathList = SVGPath.extractPaths(getSVGRoot());
+		Path2ShapeConverter path2ShapeConverter = new Path2ShapeConverter();
+		explicitContainer.addShapes(path2ShapeConverter.convertPathsToShapes(pathList));
+	}
+
+	public List<SVGShape> getCurrentShapeList() {
+		return implicitContainer == null ? null : implicitContainer.getShapeList();
+	}
 
 	
 }

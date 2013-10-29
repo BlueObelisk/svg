@@ -22,6 +22,7 @@ import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGPathPrimitive;
 import org.xmlcml.graphics.svg.SVGPolygon;
 import org.xmlcml.graphics.svg.SVGPolyline;
+import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGUtil;
 import org.xmlcml.graphics.svg.StyleBundle;
@@ -37,8 +38,7 @@ import org.xmlcml.xml.XMLUtil;
  * @author pm286
  *
  */
-public class Path2ShapeConverter {
-
+public class  Path2ShapeConverter {
 
 	private final static Logger LOG = Logger.getLogger(Path2ShapeConverter.class);
 	
@@ -52,20 +52,29 @@ public class Path2ShapeConverter {
 	private static final double MOVE_EPS = 0.001;
 	private static final double RECT_EPS = 0.01;
 	private static final double _ROUNDED_BOX_EPS = 0.4;
+	
 	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.015, Units.RADIANS);
 	private static final double DEFAULT_MAX_WIDTH_FOR_PARALLEL = 2.0;
+	public static final Angle DEFAULT_MAX_ANGLE = new Angle(0.12, Units.RADIANS);
+	public static final Double DEFAULT_MAX_WIDTH = 2.0;
+	private static final Double DEFAULT_MIN_RECT_THICKNESS = 0.99;
+	private static final double DEFAULT_MAX_PATH_WIDTH = 1.0;
+	private static final int DEFAULT_LINES_IN_POLYLINE = 8;
+	private static final int DEFAULT_DECIMAL_PLACES = 3;
 	
 	private static final String SVG = "svg";
-	private static final Integer DEFAULT_DECIMAL_PLACES = 3;
 	private static final Angle ANGLE_EPS = new Angle(0.001);
 
 
 	private Integer decimalPlaces = DEFAULT_DECIMAL_PLACES;
-	private Integer minLinesInPolyline = 8;
+	private Integer minLinesInPolyline = DEFAULT_LINES_IN_POLYLINE;
 	private boolean removeDuplicatePaths = true;
 	private boolean removeRedundantMoveCommands = true;
 	private boolean splitAtMoveCommands = true;
-	private double maxPathWidth = 1.0;
+	private double maxPathWidth = DEFAULT_MAX_PATH_WIDTH;
+	private double maxWidth = DEFAULT_MAX_WIDTH;
+	private Angle maxAngle = DEFAULT_MAX_ANGLE;
+	private Double minRectThickness = DEFAULT_MIN_RECT_THICKNESS;
 	
 	/** input and output */
 	private List<SVGPath> pathListIn;
@@ -95,6 +104,14 @@ public class Path2ShapeConverter {
 		this.maxPathWidth = maxPathWidth;
 	}
 
+	public void setMaxWidth(double maxWidth) {
+		this.maxWidth = maxWidth;
+	}
+
+	public void setMaxAngle(Angle maxAngle) {
+		this.maxAngle = maxAngle;
+	}
+	
 	
 	/** main routine if pathList has been read in.
 	 * 
@@ -170,6 +187,8 @@ public class Path2ShapeConverter {
 		newSvg = svgPath.createRectangle(RECT_EPS);
 		if (newSvg == null) {
 			newSvg = createLineFromMLLLorMLCCLCC(svgPath);
+		} else {
+			newSvg = createLineFromRect((SVGRect)newSvg); 
 		}
 		if (newSvg == null) {
 			newSvg = svgPath.createRoundedBox(_ROUNDED_BOX_EPS);
@@ -607,14 +626,34 @@ public class Path2ShapeConverter {
 
 	public SVGCircle convertToCircle(SVGPolygon polygon) {
 		Real2Range bbox = polygon.getBoundingBox();
-		if (Math.abs(bbox.getXRange().getRange() - bbox.getYRange().getRange()) < 10.*RECT_EPS) {
+		SVGCircle circle = null;
+		double eps = 10.*RECT_EPS; // why not?
+		if (Math.abs(bbox.getXRange().getRange() - bbox.getYRange().getRange()) < eps) {
 			Real2 centre = bbox.getCentroid();
+			RealArray radArray = new RealArray();
 			for (Real2 point : polygon.getReal2Array()) {
-				
+				radArray.addElement(centre.getDistance(point));
 			}
-		} else {
-//			System.out.println(bbox);
+			circle = new SVGCircle();
+			circle.copyAttributesFrom(polygon);
+			circle.setRad(radArray.getMean());
+			circle.setCXY(centre);
 		}
-		return null;
+		return circle;
 	}
+	
+	public SVGLine createLineFromRect(SVGRect rect) {
+		Real2 origin = rect.getXY();
+		double width = rect.getWidth();
+		double height = rect.getHeight();
+		SVGLine line = null;
+		if (width < minRectThickness ) {
+			line = new SVGLine(origin, origin.plus(new Real2(0.0, height)));
+		} else if (height < minRectThickness ) {
+			line = new SVGLine(origin, origin.plus(new Real2(width, 0.0)));
+		}
+		return line;
+	}
+	
+
 }
