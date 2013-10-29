@@ -63,7 +63,7 @@ public class TramLineManager {
 	}
 
 
-	List<TramLine> createTramLineList(List<SVGLine> lineList) {
+	public List<TramLine> createTramLineList(List<SVGLine> lineList) {
 		if (tramLineList == null) {
 			ensureTramLineListAndUsedLineSet();
 			for (int i = 0; i < lineList.size() - 1; i++) {
