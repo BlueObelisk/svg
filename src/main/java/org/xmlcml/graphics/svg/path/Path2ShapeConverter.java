@@ -222,7 +222,7 @@ public class  Path2ShapeConverter {
 
 	private SVGShape createNarrowLine(SVGPolygon polygon) {
 		SVGLine line = null;
-		if (polygon.size() == 4 || polygon.size() == 3) {
+		if (polygon != null && (polygon.size() == 4 || polygon.size() == 3)) {
 			SVGLine line0 = polygon.getLineList().get(0);
 			SVGLine line2 = polygon.getLineList().get(2);
 			line = createNarrowLine(line0, line2);
