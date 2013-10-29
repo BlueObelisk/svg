@@ -73,7 +73,7 @@ public class SimpleBuilder {
 	protected SVGPrimitives rawPrimitives;
 	protected HigherPrimitives higherPrimitives;
 	
-	protected List<SVGPath> currentPathList;
+//	protected List<SVGPath> currentPathList;
 
 	public SimpleBuilder() {
 	}
@@ -103,18 +103,17 @@ public class SimpleBuilder {
 		if (highLevelPrimitives == null) {
 			highLevelPrimitives = new ArrayList<SVGElement>();
 			createRawShapeAndPathLists();
-			createShapesFromPaths();
-			createExplicitTextList();
+			createDerivedShapesFromPaths();
+			createRawTextList();
 		}
 		return highLevelPrimitives;
 	}
 	
 	private void createRawShapeAndPathLists() {
-		if (derivedPrimitives == null) {
-			derivedPrimitives = new SVGPrimitives();
+		if (rawPrimitives == null) {
+			rawPrimitives = new SVGPrimitives();
 			List<SVGShape> shapeList = SVGShape.extractSelfAndDescendantShapes(svgRoot);
-			derivedPrimitives.addShapes(shapeList);
-			currentPathList = derivedPrimitives.getPathList();
+			rawPrimitives.addShapesToSubclassedLists(shapeList);
 		}
 	}
 
@@ -130,19 +129,22 @@ public class SimpleBuilder {
 	 * @return List of newly created SVGShapes
 	 */
 	
-	public void createShapesFromPaths() {
-		if (rawPrimitives == null) {
-			createRawShapeAndPathLists();
-			rawPrimitives = new SVGPrimitives();
+	public void createDerivedShapesFromPaths() {
+		createRawShapeAndPathLists();
+		if (derivedPrimitives == null) {
+			derivedPrimitives = new SVGPrimitives();
 			List<SVGShape> shapeList = SVGShape.extractSelfAndDescendantShapes(svgRoot);
-			rawPrimitives.addShapes(shapeList);
+			derivedPrimitives.addShapesToSubclassedLists(shapeList);
 			Path2ShapeConverter path2ShapeConverter = new Path2ShapeConverter();
+			List<SVGPath> currentPathList = derivedPrimitives.getPathList();
 			for (int i = currentPathList.size() - 1; i >= 0; i--) {
 				SVGPath path = currentPathList.get(i);
 				SVGShape shape = path2ShapeConverter.convertPathToShape(path);
 				if (shape != null) {
+					LOG.trace("shape "+shape.getClass().getSimpleName());
 					addId(i, shape, path);
-					rawPrimitives.add(shape);
+					derivedPrimitives.addShapeToSubclassedLists(shape);
+					LOG.trace("Lines "+derivedPrimitives.getLineList().size());
 					currentPathList.remove(i);
 				}
 			}
@@ -150,10 +152,17 @@ public class SimpleBuilder {
 	}
 
 	public List<SVGLine> createRawAndDerivedLines() {
-		createShapesFromPaths();
-		ensureHigherPrimitives();
-		higherPrimitives.addSingleLines(rawPrimitives.getLineList());
-		higherPrimitives.addSingleLines(derivedPrimitives.getLineList());
+		if (rawPrimitives  == null) {
+			createDerivedShapesFromPaths();
+			ensureHigherPrimitives();
+			ensureRawContainer();
+			ensureDerivedContainer();
+			// 
+			List<SVGLine> rawLines = rawPrimitives.getLineList();
+			higherPrimitives.addSingleLines(rawLines);
+			List<SVGLine> derivedLines = derivedPrimitives.getLineList();
+			higherPrimitives.addSingleLines(derivedLines);
+		}
 		return higherPrimitives.getSingleLineList();
 	}
 
@@ -163,7 +172,7 @@ public class SimpleBuilder {
 		}
 	}
 
-	public List<SVGText> createExplicitTextList() {
+	public List<SVGText> createRawTextList() {
 		derivedPrimitives.addTexts(SVGText.extractSelfAndDescendantTexts(svgRoot));
 		return derivedPrimitives.getTextList();
 	}
@@ -196,6 +205,7 @@ public class SimpleBuilder {
 		if (joinableList == null) {
 			createRawAndDerivedLines();
 			joinableList = JoinManager.makeJoinableList(higherPrimitives.getSingleLineList());
+			higherPrimitives.addJoinableList(joinableList);
 		}
 		return joinableList;
 	}
@@ -217,7 +227,7 @@ public class SimpleBuilder {
 			createTramLineListAndRemoveUsedLines();
 			List<Joinable> joinableList = JoinManager.makeJoinableList(higherPrimitives.getSingleLineList());
 			joinableList.addAll(higherPrimitives.getTramLineList());
-			createExplicitTextList();
+			createRawTextList();
 			for (SVGText svgText : derivedPrimitives.getTextList()) {
 				joinableList.add(new JoinableText(svgText));
 			}
@@ -245,7 +255,7 @@ public class SimpleBuilder {
 						if (junction.getCoordinates() == null && commonPoint.getPoint() != null) {
 							junction.setCoordinates(commonPoint.getPoint());
 						}
-						LOG.trace("junct: "+junction.getId()+" coords "+junction.getCoordinates()+" "+commonPoint.getPoint());
+						LOG.debug("junct: "+junction.getId()+" coords "+junction.getCoordinates()+" "+commonPoint.getPoint());
 					}
 				}
 			}
@@ -265,32 +275,20 @@ public class SimpleBuilder {
 		return svgRoot;
 	}
 
-	public List<SVGLine> getDerivedLineList() {
-		return (rawPrimitives == null) ? null : rawPrimitives.getLineList();
-	}
-
-	public List<SVGLine> getRawLineList() {
-		return (derivedPrimitives == null) ? null : derivedPrimitives.getLineList();
-	}
-
-	public List<Joinable> getJoinableList() {
-		return (higherPrimitives == null) ? null : higherPrimitives.getJoinableList();
-	}
-
-	public List<TramLine> getTramLineList() {
-		return (higherPrimitives == null) ? null : higherPrimitives.getTramLineList();
-	}
-
 	public List<SVGLine> getSingleLineList() {
 		return higherPrimitives == null ? null : higherPrimitives.getSingleLineList();
 	}
 
-	public List<SVGPath> getExplicitPathList() {
+	public List<SVGPath> getDerivedPathList() {
 		return derivedPrimitives == null ? null : derivedPrimitives.getPathList();
 	}
 
-	public List<SVGShape> getCurrentPathList() {
-		return rawPrimitives == null ? null : rawPrimitives.getShapeList();
+	public List<SVGPath> getCurrentPathList() {
+		return derivedPrimitives == null ? null : derivedPrimitives.getPathList();
+	}
+
+	public List<SVGShape> getCurrentShapeList() {
+		return derivedPrimitives == null ? null : derivedPrimitives.getShapeList();
 	}
 
 	protected void ensureRawContainer() {
@@ -309,16 +307,28 @@ public class SimpleBuilder {
 		return derivedPrimitives  == null ? null : derivedPrimitives.getTextList();
 	}
 
+	public List<SVGLine> getRawLineList() {
+		return (rawPrimitives == null) ? null : rawPrimitives.getLineList();
+	}
+
+	public List<SVGLine> getDerivedLineList() {
+		return (derivedPrimitives == null) ? null : derivedPrimitives.getLineList();
+	}
+
+	public List<Joinable> getJoinableList() {
+		return (higherPrimitives == null) ? null : higherPrimitives.getJoinableList();
+	}
+
+	public List<TramLine> getTramLineList() {
+		return (higherPrimitives == null) ? null : higherPrimitives.getTramLineList();
+	}
+
 	public void extractPlotComponents() {
 		ensureRawContainer();
 		ensureDerivedContainer();
 		List<SVGPath> pathList = SVGPath.extractPaths(getSVGRoot());
 		Path2ShapeConverter path2ShapeConverter = new Path2ShapeConverter();
-		derivedPrimitives.addShapes(path2ShapeConverter.convertPathsToShapes(pathList));
-	}
-
-	public List<SVGShape> getCurrentShapeList() {
-		return rawPrimitives == null ? null : rawPrimitives.getShapeList();
+		derivedPrimitives.addShapesToSubclassedLists(path2ShapeConverter.convertPathsToShapes(pathList));
 	}
 
 	

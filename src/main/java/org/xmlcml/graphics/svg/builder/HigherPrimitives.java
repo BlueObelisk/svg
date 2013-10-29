@@ -21,8 +21,10 @@ public class HigherPrimitives {
 
 	
 	public void addSingleLines(List<SVGLine> lineList) {
-		ensureSingleLineList();
-		singleLineList.addAll(lineList);
+		if (lineList != null) {
+			ensureSingleLineList();
+			singleLineList.addAll(lineList);
+		}
 	}
 
 	private void ensureSingleLineList() {
@@ -49,6 +51,17 @@ public class HigherPrimitives {
 
 	public List<Junction> getRawJunctionList() {
 		return rawJunctionList;
+	}
+
+	public void addJoinableList(List<Joinable> joinableList) {
+		ensureJoinableList();
+		this.joinableList.addAll(joinableList);
+	}
+
+	private void ensureJoinableList() {
+		if (joinableList == null) {
+			joinableList = new ArrayList<Joinable>();
+		}
 	}
 
 
