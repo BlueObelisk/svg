@@ -7,15 +7,16 @@ public class Fixtures {
 
 	public static final File RESOURCES_DIR = new File("src/test/resources/");
 	
-	public static final File TEST_SVG = new File(RESOURCES_DIR, "org/xmlcml/graphics/svg");
-	public static final File IMAGES_DIR = new File(TEST_SVG, "images");
+	public static final File SVG_DIR = new File(RESOURCES_DIR, "org/xmlcml/graphics/svg");
+	
+	public static final File IMAGES_DIR = new File(SVG_DIR, "images");
 	public static final File IMAGE_G_2_2_SVG = new File(IMAGES_DIR, "image.g.2.2.svg");
 	public static final File IMAGE_G_2_2_PNG = new File(IMAGES_DIR, "image.g.2.2.png");
 	public static final File IMAGE_G_3_2_SVG = new File(IMAGES_DIR, "image.g.3.2.svg");
 	public static final File IMAGE_G_8_0_SVG = new File(IMAGES_DIR, "image.g.8.0.svg");
 	public static final File IMAGE_G_8_2_SVG = new File(IMAGES_DIR, "image.g.8.2.svg");
 	
-	public static final File PATHS_DIR = new File(RESOURCES_DIR, "org/xmlcml/graphics/svg/paths");
+	public static final File PATHS_DIR = new File(SVG_DIR, "paths");
 	public static final File PATHS_BMCLOGO_SVG = new File(PATHS_DIR, "bmclogo.svg");
 	public static final File PATHS_NOPATH_SVG = new File(PATHS_DIR, "nopath.svg");
 	public static final File PATHS_RECT_LINE_SVG = new File(PATHS_DIR, "rectLine.svg");
@@ -44,9 +45,9 @@ public class Fixtures {
 	public static final File TEST_PNG = new File(Fixtures.IMAGES_DIR, "test.png");
 	public static final File TEST1MINI_BMP = new File(Fixtures.IMAGES_DIR, "test1mini.bmp");
 
-	public static final File SVG_G_8_0_SVG = new File(Fixtures.TEST_SVG, "image.g.8.0.svg");
-	public static final File SVG_G_8_2_SVG = new File(Fixtures.TEST_SVG, "image.g.8.2.svg");
-	public static final File SVG_PAGE6_SVG = new File(Fixtures.TEST_SVG, "page6.svg");
+	public static final File SVG_G_8_0_SVG = new File(Fixtures.SVG_DIR, "image.g.8.0.svg");
+	public static final File SVG_G_8_2_SVG = new File(Fixtures.SVG_DIR, "image.g.8.2.svg");
+	public static final File SVG_PAGE6_SVG = new File(Fixtures.SVG_DIR, "page6.svg");
 
 	//	public final static String IMAGE_SVG = ""
 	//	 		+ "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" >"
@@ -55,7 +56,8 @@ public class Fixtures {
 	//	 		+ "   xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\" "
 	//	 		+ "  />"
 	//	 		+ "</svg>";
-	public static final File SVG_IMAGES_DIR = new File(TEST_SVG, "svgimages");
+	public static final File SVG_IMAGES_DIR = new File(SVG_DIR, "svgimages");
+	
 	public final static String IMAGE_SVG = ""
 		 + "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"><image  x=\"0.0\" y=\"0.0\" width=\"16.0\" height=\"16.0\" xlink:href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mP4J8LwHx0zAAE2cWzyeBUSgxnw2UwMnzouINVmnF4YwmEwmg7Is3kYhQEA6pzZRchLX5wAAAAASUVORK5CYII=\"/></svg>";
 	public final static File LARGE_IMAGE_SVG = new File(SVG_IMAGES_DIR, "multiple-image-page6.svg"); 
@@ -70,17 +72,7 @@ public class Fixtures {
 
 	public final static File ROUNDED_LINE_SVG_FILE = new File(Fixtures.PATHS_DIR, "roundedline.svg");
 
-	public static final File MOLECULE_DIR = new File(TEST_SVG, "molecules");
-	public static final File IMAGE_2_11_SVG = new File(MOLECULE_DIR, "image.g.2.11.svg");
-	public static final File IMAGE_2_13_SVG = new File(MOLECULE_DIR, "image.g.2.13.svg");
-	public static final File IMAGE_2_16_SVG = new File(MOLECULE_DIR, "image.g.2.16.svg");
-	public static final File IMAGE_2_18_SVG = new File(MOLECULE_DIR, "image.g.2.18.svg");
-	public static final File IMAGE_2_23_SVG = new File(MOLECULE_DIR, "image.g.2.23.svg");
-	public static final File IMAGE_2_25_SVG = new File(MOLECULE_DIR, "image.g.2.25.svg");
-	public static final File IMAGE_5_11_SVG = new File(MOLECULE_DIR, "image.g.5.11.svg");
-	public static final File IMAGE_5_12_SVG = new File(MOLECULE_DIR, "image.g.5.12.svg");
-	public static final File IMAGE_5_13_SVG = new File(MOLECULE_DIR, "image.g.5.13.svg");
-	public static final File IMAGE_5_14_SVG = new File(MOLECULE_DIR, "image.g.5.14.svg");
-	public static final File IMAGE_02_00100_65_SVG = new File(MOLECULE_DIR, "02.00100.g.6.5.svg");
+	public static final File MOLECULES_DIR = new File(SVG_DIR, "molecules");
+	public static final File IMAGE_2_13_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg");
 
 }
