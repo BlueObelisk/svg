@@ -65,26 +65,30 @@ public class SVGPrimitives {
 		}
  */
 
-	private void addShapeList(List<SVGShape> shapeList) {
+	public void addShapesToSubclassedLists(List<SVGShape> shapeList) {
 		for (SVGShape shape : shapeList) {
-			if (false) {
-			} else if (shape instanceof SVGCircle) {
-				add((SVGCircle)shape);
-			} else if (shape instanceof SVGLine) {
-				add((SVGLine)shape);
-			} else if (shape instanceof SVGPath) {
-				add((SVGPath)shape);
-			} else if (shape instanceof SVGPolygon) {
-				add((SVGPolygon)shape);
-			} else if (shape instanceof SVGPolyline) {
-				add((SVGPolyline)shape);
-			} else if (shape instanceof SVGRect) {
-				add((SVGRect)shape);
-			} else {
-				add(shape);
-			}
+			addShapeToSubclassedLists(shape);
 		}
 	}
+
+void addShapeToSubclassedLists(SVGShape shape) {
+	if (false) {
+	} else if (shape instanceof SVGCircle) {
+		add((SVGCircle)shape);
+	} else if (shape instanceof SVGLine) {
+		add((SVGLine)shape);
+	} else if (shape instanceof SVGPath) {
+		add((SVGPath)shape);
+	} else if (shape instanceof SVGPolygon) {
+		add((SVGPolygon)shape);
+	} else if (shape instanceof SVGPolyline) {
+		add((SVGPolyline)shape);
+	} else if (shape instanceof SVGRect) {
+		add((SVGRect)shape);
+	} else {
+		add((SVGShape)shape);
+	}
+}
 	
 /**
  * 
@@ -132,6 +136,7 @@ public class SVGPrimitives {
 	}
 
 	public List<SVGLine> getLineList() {
+//		ensureLineList();
 		return lineList;
 	}
 
@@ -243,15 +248,19 @@ public class SVGPrimitives {
 		return shapeList;
 	}
 
-	public void add(SVGShape shape) {
+	/** only add to shapeList if we know it's not subclassed
+	 * 
+	 * @param shape
+	 */
+	void add(SVGShape shape) {
 		ensureShapeList();
 		shapeList.add(shape);
 	}
 
-	public void addShapes(List<SVGShape> shapeList) {
-		ensureShapeList();
-		shapeList.addAll(shapeList);
-	}
+//	public void addShapes(List<SVGShape> shapeList) {
+//		ensureShapeList();
+//		shapeList.addAll(shapeList);
+//	}
 
 	/** text */
 	

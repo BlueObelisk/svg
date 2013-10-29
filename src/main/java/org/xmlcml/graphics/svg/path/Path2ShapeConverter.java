@@ -64,7 +64,7 @@ public class  Path2ShapeConverter {
 	private static final int DEFAULT_DECIMAL_PLACES = 3;
 	
 	private static final String SVG = "svg";
-	private static final Angle ANGLE_EPS = new Angle(0.001);
+	private static final Angle ANGLE_EPS = new Angle(0.01);
 
 
 	private Integer decimalPlaces = DEFAULT_DECIMAL_PLACES;
@@ -207,14 +207,27 @@ public class  Path2ShapeConverter {
 					LOG.trace("polygon "+shape);
 				}
 				// no, reset to polyline
-				if (shape == null) {
-					shape = polyline;
+				if (shape == null || shape instanceof SVGPolygon) {
+					shape = createNarrowLine((SVGPolygon) shape);
+					if (shape == null) {
+						shape = polyline;
+					} 
 				}
 			}
 		}
 		copyAttributes(svgPath, shape);
 		shape.format(decimalPlaces);
 		return shape;
+	}
+
+	private SVGShape createNarrowLine(SVGPolygon polygon) {
+		SVGLine line = null;
+		if (polygon.size() == 4 || polygon.size() == 3) {
+			SVGLine line0 = polygon.getLineList().get(0);
+			SVGLine line2 = polygon.getLineList().get(2);
+			line = createNarrowLine(line0, line2);
+		}
+		return line;
 	}
 
 	private SVGShape createPolygonRectOrLine(SVGShape shape, SVGPolyline polyline) {
@@ -609,14 +622,20 @@ public class  Path2ShapeConverter {
 			PathPrimitiveList primList = svgPath.ensurePrimitives();
 			SVGLine line0 = primList.getLine(1);
 			SVGLine line1 = primList.getLine(3);
-			if (line0.isParallelOrAntiParallelTo(line1, ANGLE_EPS)) {
-				double dist = line0.calculateUnsignedDistanceBetweenLines(line1, ANGLE_EPS);
-				if (dist < maxPathWidth) {
-					Real2 end0 = line0.getXY(0).getMidPoint(line1.getXY(0));
-					Real2 end1 = line0.getXY(1).getMidPoint(line1.getXY(1));
-					line = new SVGLine(end0, end1);
-					LOG.trace("line: "+line);
-				}
+			line = createNarrowLine(line0, line1);
+		}
+		return line;
+	}
+
+	private SVGLine createNarrowLine(SVGLine line0, SVGLine line1) {
+		SVGLine line = null;
+		if (line0.isParallelOrAntiParallelTo(line1, ANGLE_EPS)) {
+			double dist = line0.calculateUnsignedDistanceBetweenLines(line1, ANGLE_EPS);
+			if (dist < maxPathWidth) {
+				Real2 end0 = line0.getXY(0).getMidPoint(line1.getXY(0));
+				Real2 end1 = line0.getXY(1).getMidPoint(line1.getXY(1));
+				line = new SVGLine(end0, end1);
+				LOG.trace("line: "+line);
 			}
 		}
 		return line;
