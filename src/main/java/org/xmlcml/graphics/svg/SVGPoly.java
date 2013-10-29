@@ -32,6 +32,7 @@ import nu.xom.Node;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Axis.Axis2;
+import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
@@ -69,7 +70,11 @@ public abstract class SVGPoly extends SVGShape {
 	protected Real2Array real2Array;
 	protected List<SVGLine> lineList;
 	protected List<SVGMarker> markerList;
-	
+
+	protected Boolean isClosed = false;
+	protected Boolean isBox;
+	protected Boolean isAligned = null;
+
 	/** constructor
 	 */
 	public SVGPoly(String name) {
@@ -398,9 +403,79 @@ public abstract class SVGPoly extends SVGShape {
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
+	public SVGRect createRect(double epsilon) {
+		SVGRect rect = null;
+		if (this != null && isBox(epsilon)) {
+			Real2Range r2r = this.getBoundingBox();
+			rect = new SVGRect(r2r.getCorners()[0], r2r.getCorners()[1]);
+			rect.setFill("none");
+		}
+		return rect;
+	}
+
+	public Boolean getIsClosed() {
+		return isClosed;
+	}
+
+	public Boolean getIsBox() {
+		return isBox;
+	}
+
+	public Boolean isClosed() {
+		return isClosed;
+	}
+
+	/** calculates whether 4 lines form a rectangle aligned with the axes
+	 * 
+	 * @param epsilon tolerance in coords
+	 * @return is rectangle
+	 */
+	public boolean isBox(double epsilon) {
+		if (isBox == null) {
+			isBox = false;
+			createLineList();
+			if (lineList == null) {
+			} else if (lineList.size() == 4 || (lineList.size() == 3 && isClosed)) {
+				SVGLine line0 = lineList.get(0);
+				SVGLine line2 = lineList.get(2);
+				Real2 point0 = line0.getXY(0);
+				Real2 point1 = line0.getXY(1);
+				Real2 point2 = line2.getXY(0);
+				Real2 point3 = line2.getXY(1);
+				// vertical
+				// so we can debug!
+				double point0x = point0.getX();
+				double point1x = point1.getX();
+				double point2x = point2.getX();
+				double point3x = point3.getX();
+				double point0y = point0.getY();
+				double point1y = point1.getY();
+				double point2y = point2.getY();
+				double point3y = point3.getY();
+				
+				isBox = 
+					Real.isEqual(point0x, point1x, epsilon) &&
+					Real.isEqual(point2x, point3x, epsilon) &&
+					Real.isEqual(point1y, point2y, epsilon) &&
+					Real.isEqual(point3y, point0y, epsilon);
+				if (!isBox) {
+					isBox = Real.isEqual(point0y, point1y, epsilon) &&
+							Real.isEqual(point2y, point3y, epsilon) &&
+							Real.isEqual(point1x, point2x, epsilon) &&
+							Real.isEqual(point3x, point0x, epsilon);
+				}
+			}
+		}
+		return isBox;
+	}
+
+	public Boolean getIsAligned() {
+		return isAligned;
+	}
+
 	public static void replacePolyLinesBySplitLines(SVGElement svgElement) {
 		List<SVGPolyline> polylineList = SVGPolyline.extractSelfAndDescendantPolylines(svgElement);
-		for (SVGPolyline polyline : polylineList) {
+		for (SVGPoly polyline : polylineList) {
 			SVGPolyline.replacePolyLineBySplitLines(polyline);
 		}		
 	}

@@ -242,7 +242,7 @@ public class SVGPath extends SVGShape {
 		}
 	}
 	
-	public SVGPolyline createPolyline() {
+	public SVGPoly createPolyline() {
 		createCoordArray();
 		if (isPolyline && allCoords.size() > 1) {
 			polyline = new SVGPolyline(allCoords);
@@ -621,8 +621,8 @@ public class SVGPath extends SVGShape {
 	}
 
 	// there are some polylines which contain a small number of curves and may be transformable
-	public SVGPolyline createHeuristicPolyline(int minL, int maxC, int minPrimitives) {
-		SVGPolyline polyline = null;
+	public SVGPoly createHeuristicPolyline(int minL, int maxC, int minPrimitives) {
+		SVGPoly polyline = null;
 		String signature = this.getSignature();
 		if (signature.length() < 3) {
 			return null;
