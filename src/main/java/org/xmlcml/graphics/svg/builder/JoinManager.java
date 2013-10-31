@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGPolygon;
 import org.xmlcml.graphics.svg.SVGText;
 
 /** joins graphic components by chemical rules.
@@ -84,7 +85,9 @@ public class JoinManager {
 		List<Joinable> joinableList = new ArrayList<Joinable>();
 		for (SVGElement element : elementList) {
 			Joinable joinable = JoinManager.createJoinable(element);
-			joinableList.add(joinable);
+			if (joinable != null) {
+				joinableList.add(joinable);
+			}
 		}
 		return joinableList;
 	}
@@ -97,6 +100,8 @@ public class JoinManager {
 			joinable = new JoinableLine((SVGLine) element);
 		} else if (element instanceof SVGText) {
 			joinable = new JoinableText((SVGText) element);
+ 		} else if (element instanceof SVGPolygon) {
+			joinable = new JoinablePolygon((SVGPolygon) element);
  		} else {
  			LOG.debug("Unknown joinable: "+element);
  		}

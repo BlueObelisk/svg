@@ -51,11 +51,6 @@ public class SVGPolyline extends SVGPoly {
 	private static Logger LOG = Logger.getLogger(SVGPolyline.class);
 	
 	public final static String TAG ="polyline";
-	private Boolean isClosed = false;
-	
-	public Boolean getIsClosed() {
-		return isClosed;
-	}
 
 	public Boolean getIsBox() {
 		return isBox;
@@ -150,14 +145,6 @@ public class SVGPolyline extends SVGPoly {
 		return TAG;
 	}
 
-	public Boolean isClosed() {
-		return isClosed;
-	}
-	
-	public void setClosed(boolean isClosed) {
-		this.isClosed = isClosed;
-	}
-
 	@Override
 	protected void drawElement(Graphics2D g2d) {
 		super.drawPolylineOrGon(g2d, false);
@@ -196,14 +183,14 @@ public class SVGPolyline extends SVGPoly {
 		List<SVGPolyline> newList = new ArrayList<SVGPolyline>();
 		int size = polylineList.size();
 		int niter = size / 2;
-		for (int i = 0; i < niter*2; i += 2) {
+		for (int i = 0; i < niter * 2; i += 2) {
 			SVGPolyline line0 = polylineList.get(i);
 			SVGPolyline line1 = polylineList.get(i + 1);
 			SVGPolyline newLine = createMergedLine(line0, line1, eps);
 			newList.add(newLine);
 		}
 		if (size %2 != 0) {
-			newList.add(polylineList.get(size-1));
+			newList.add(polylineList.get(size - 1));
 		}
 		return newList;
 	}
@@ -383,9 +370,9 @@ public class SVGPolyline extends SVGPoly {
 			throw new RuntimeException("null real2Array");
 		}
 		if (real2Array.size() > 2) {
-			if (real2Array.get(0).isEqualTo(real2Array.get(real2Array.size()-1), eps)) {
+			if (real2Array.get(0).isEqualTo(real2Array.get(real2Array.size() - 1), eps)) {
 				Real2Array real2Array1 = new Real2Array(real2Array);
-				real2Array1.deleteElement(real2Array.size()-1);
+				real2Array1.deleteElement(real2Array.size() - 1);
 				polygon = new SVGPolygon(real2Array1);
 			} else if (this.isClosed()) {
 				Real2Array real2Array1 = new Real2Array(real2Array);
@@ -488,7 +475,7 @@ public class SVGPolyline extends SVGPoly {
 		ParentNode parent = polyline.getParent();
 		if (parent != null) {
 			int index = parent.indexOf(polyline);
-			for (int i = lines.size()-1; i >= 0; i--) {
+			for (int i = lines.size() - 1; i >= 0; i--) {
 				parent.insertChild(lines.get(i), index);
 			}
 			polyline.detach();

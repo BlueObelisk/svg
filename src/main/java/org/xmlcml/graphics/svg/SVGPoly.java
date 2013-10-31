@@ -69,6 +69,8 @@ public abstract class SVGPoly extends SVGShape {
 	protected Real2Array real2Array;
 	protected List<SVGLine> lineList;
 	protected List<SVGMarker> pointList;
+
+	protected Boolean isClosed = false;
 	
 	/** constructor
 	 */
@@ -91,6 +93,18 @@ public abstract class SVGPoly extends SVGShape {
 	protected void init() {
 		super.setDefaultStyle();
 		setDefaultStyle(this);
+	}
+	
+	public Boolean getIsClosed() {
+		return isClosed;
+	}
+
+	public Boolean isClosed() {
+		return isClosed;
+	}
+	
+	public void setClosed(boolean isClosed) {
+		this.isClosed = isClosed;
 	}
 	
 	public static void setDefaultStyle(SVGElement line) {
@@ -313,7 +327,7 @@ public abstract class SVGPoly extends SVGShape {
 			pointList.add(lastPoint);
 			SVGLine line;
 			for (int i = 1; i < real2Array.size(); i++) {
-				line = new SVGLine(real2Array.elementAt(i-1), real2Array.elementAt(i));
+				line = new SVGLine(real2Array.elementAt(i - 1), real2Array.elementAt(i));
 				copyNonSVGAttributes(this, line);
 				SVGMarker point = new SVGMarker(real2Array.get(i));
 				pointList.add(point);
@@ -325,6 +339,15 @@ public abstract class SVGPoly extends SVGShape {
 				lineList.add(line);
 				lastPoint = point;
 			}
+			line = new SVGLine(real2Array.elementAt(real2Array.size() - 1), real2Array.elementAt(0));
+			copyNonSVGAttributes(this, line);
+			SVGMarker point = new SVGMarker(real2Array.get(0));
+			lastPoint.addLine(line);
+			point.addLine(line);
+			if (line.getEuclidLine().getLength() < 0.0000001) {
+				LOG.trace("ZERO LINE");
+			}
+			lineList.add(line);
 			setReal2Array(real2Array);
 		}
 		ensureLineList();

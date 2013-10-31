@@ -936,7 +936,7 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	protected boolean boundingBoxNeedsUpdating() {
-		return boundingBox == null || !boundingBoxCached ;
+		return boundingBox == null || !boundingBoxCached;
 	}
 	
 	public void setBoundingBoxCached(boolean boundingBoxCached) {
