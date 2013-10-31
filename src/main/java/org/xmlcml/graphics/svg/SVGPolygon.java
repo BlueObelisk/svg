@@ -41,18 +41,21 @@ public class SVGPolygon extends SVGPoly {
 	public SVGPolygon() {
 		super(TAG);
 		init();
+		setClosed(true);
 	}
 	
 	/** constructor
 	 */
 	public SVGPolygon(SVGElement element) {
         super((SVGElement) element);
+		setClosed(true);
 	}
 	
 	/** constructor
 	 */
 	public SVGPolygon(Element element) {
         super((SVGElement) element);
+		setClosed(true);
 	}
 	
 	/** constructor.

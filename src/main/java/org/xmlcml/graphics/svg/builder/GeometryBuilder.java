@@ -5,13 +5,17 @@ import java.util.List;
 
 import nu.xom.Attribute;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGMarker;
 import org.xmlcml.graphics.svg.SVGPath;
+import org.xmlcml.graphics.svg.SVGPolygon;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGText;
@@ -119,6 +123,7 @@ public class GeometryBuilder {
 			createExplicitShapeAndPathLists();
 			createImplicitShapesFromPaths();
 			createExplicitTextList();
+			abstractPolygons();
 		}
 		return highLevelPrimitives;
 	}
@@ -148,7 +153,7 @@ public class GeometryBuilder {
 	}
 	
 	/**
-	 * Try to create highLevel primitives from paths.
+	 * Try to create high-level primitives from paths.
 	 * 
 	 * <p>Uses Path2ShapeConverter.
 	 * Where successful the path is removed from currentPathlist
@@ -198,9 +203,9 @@ public class GeometryBuilder {
 		double width = rect.getWidth();
 		double height = rect.getHeight();
 		SVGLine line = null;
-		if (width < minRectThickness ) {
+		if (width < minRectThickness) {
 			line = new SVGLine(origin, origin.plus(new Real2(0.0, height)));
-		} else if (height < minRectThickness ) {
+		} else if (height < minRectThickness) {
 			line = new SVGLine(origin, origin.plus(new Real2(width, 0.0)));
 		}
 		return line;
@@ -224,7 +229,72 @@ public class GeometryBuilder {
 		singleLineList.addAll(explicitLineList);
 		return singleLineList;
 	}
-
+	
+	public void abstractPolygons() {
+		for (int i = currentShapeList.size() - 1; i >= 0; i--) {
+			SVGShape s = currentShapeList.get(i);
+			if (s instanceof SVGPolygon) {
+				double longestLine = 0.0;
+				ArrayList<ArrayList<Real2>> sections = new ArrayList<ArrayList<Real2>>();
+				SVGPolygon polygon = (SVGPolygon) s;
+				Real2Array points = polygon.getReal2Array(); 
+				Real2 previousPoint = points.get(points.size() - 1);
+				for (int j = 0; j < points.size(); j++) {
+					Real2 p = points.get(j);
+					if (p.getDistance(previousPoint) > longestLine) {
+						longestLine = p.getDistance(previousPoint);
+					}
+					previousPoint = p;
+				}
+				Real2 previousPreviousPoint = points.get(0);
+				previousPoint = points.get(points.size() - 1);
+				ArrayList<Real2> currentSection = new ArrayList<Real2>();
+				sections.add(currentSection);
+				for (int j = points.size() - 2; j >= 0; j--) {
+					SVGLine l = new SVGLine(points.get(j), previousPreviousPoint);
+					if (l.getNearestPointOnLine(previousPoint).getDistance(previousPoint) < 0.08 * longestLine) {
+						currentSection.add(previousPoint);
+					} else {
+						currentSection = new ArrayList<Real2>();
+						sections.add(currentSection);
+					}
+					previousPreviousPoint = previousPoint;
+					previousPoint = points.get(j);
+				}
+				int j = points.size() - 1;
+				SVGLine line = new SVGLine(points.get(j), previousPreviousPoint);
+				if (line.getNearestPointOnLine(previousPoint).getDistance(previousPoint) < 0.08 * longestLine) {
+					currentSection.add(previousPoint);
+					sections.get(0).addAll(currentSection);
+					sections.remove(currentSection);
+				}
+				double area = polygon.getBoundingBox().getDimension().getHeight() * polygon.getBoundingBox().getDimension().getWidth();
+				for (ArrayList<Real2> section : sections) {
+					int position = 0;
+					for (int k = points.size() - 1; k >= 0; k--) {
+						for (Real2 l : section) {
+							if (points.get(k).isEqualTo(l, 1.0E-10)) {
+								points.deleteElement(k);
+								position = k;
+								break;
+							}
+						}
+					}
+					polygon.setBoundingBoxCached(false);
+					if (polygon.getBoundingBox().getDimension().getHeight() * polygon.getBoundingBox().getDimension().getWidth() < 0.92 * area) {
+						Real2Array pointsNew = points.createSubArray(0, position - 1);
+						pointsNew.add(section.get(section.size() / 2));
+						pointsNew.add(points.createSubArray(position, points.size() - 1));
+						points = pointsNew;
+					}
+					polygon.setReal2Array(points);
+				}
+				implicitShapeList.add(polygon);
+				currentShapeList.remove(i);
+			}
+		}
+	}
+	
 	public List<SVGText> createExplicitTextList() {
 		if (explicitTextList == null) {
 			explicitTextList = SVGText.extractSelfAndDescendantTexts(svgRoot);
@@ -259,7 +329,11 @@ public class GeometryBuilder {
 	public void createJoinableList() {
 		if (joinableList == null) {
 			createExplicitAndImplicitLines();
-			joinableList = JoinManager.makeJoinableList(singleLineList);
+			abstractPolygons();
+			List<SVGElement> toJoin = new ArrayList<SVGElement>();
+			toJoin.addAll(singleLineList);
+			toJoin.addAll(implicitShapeList);
+			joinableList = JoinManager.makeJoinableList(toJoin);
 		}
 	}
 
@@ -348,6 +422,16 @@ public class GeometryBuilder {
 	private void ensureExplicitPathList() {
 		if (explicitPathList == null) {
 			explicitPathList = new ArrayList<SVGPath>();
+		}
+	}
+	
+	public List<SVGShape> getImplicitShapeList() {
+		return implicitShapeList;
+	}
+
+	private void ensureImplicitShapeList() {
+		if (implicitShapeList == null) {
+			implicitShapeList = new ArrayList<SVGShape>();
 		}
 	}
 

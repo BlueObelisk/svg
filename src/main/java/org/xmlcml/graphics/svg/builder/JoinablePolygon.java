@@ -1,34 +1,38 @@
 package org.xmlcml.graphics.svg.builder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGPolygon;
 
-public class JoinableLine implements Joinable {
+public class JoinablePolygon implements Joinable {
 	
-	private final static Logger LOG = Logger.getLogger(JoinableLine.class);
+	private final static Logger LOG = Logger.getLogger(JoinablePolygon.class);
 
-	private static final double LINE_PRORITY = 1.0;
+	private static final double POLYGON_PRORITY = 3.0;
 
-	private SVGLine svgLine;
+	private SVGPolygon svgPolygon;
 	private JoinManager joinManager;
 
-	public JoinableLine(SVGLine svgLine) {
-		this.svgLine = svgLine;
+	public JoinablePolygon(SVGPolygon svgPolygon) {
+		this.svgPolygon = svgPolygon;
 		createJoinerAndAddPoints();
 	}
 
 	public double getPriority() {
-		return LINE_PRORITY;
+		return POLYGON_PRORITY;
 	}
 	public void createJoinerAndAddPoints() {
 		joinManager = new JoinManager();
-		joinManager.add(new JoinPoint(this, svgLine.getXY(0)));
-		joinManager.add(new JoinPoint(this, svgLine.getXY(1)));
+		for (SVGLine l : svgPolygon.getLineList()) {
+			joinManager.add(new JoinPoint(this, l.getXY(0)));
+			joinManager.add(new JoinPoint(this, Real2.getCentroid(Arrays.asList(l.getXY(0), l.getXY(1)))));
+		}
 	}
 
 	public JoinPoint getIntersectionPoint(Joinable joinable) {
@@ -50,21 +54,21 @@ public class JoinableLine implements Joinable {
 	public JoinPoint getIntersectionPoint(JoinablePolygon polygon) {
 		return joinManager.getCommonPoint(polygon);
 	}
-	
+
 	public JoinManager getJoinPointList() {
 		return joinManager;
 	}
 
 	public String getId() {
-		return svgLine.getId();
+		return svgPolygon.getId();
 	}
 
 	public SVGElement getSVGElement() {
-		return svgLine;
+		return svgPolygon;
 	}
 
 	public SVGLine getBackbone() {
-		return svgLine;
+		throw new UnsupportedOperationException("Polygons have no backbone");//TODO
 	}
 
 	/** returns null.
@@ -100,6 +104,6 @@ public class JoinableLine implements Joinable {
 	}
 	
 	public String toString() {
-		return svgLine.toXML()+"\n ... "+joinManager;
+		return svgPolygon.toXML()+"\n ... "+joinManager;
 	}
 }

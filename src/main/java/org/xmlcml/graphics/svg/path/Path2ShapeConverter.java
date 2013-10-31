@@ -51,7 +51,7 @@ public class Path2ShapeConverter {
 	private static final double MOVE_EPS = 0.001;
 	private static final double RECT_EPS = 0.01;
 	private static final double _ROUNDED_BOX_EPS = 0.4;
-	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.015, Units.RADIANS);
+	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.12, Units.RADIANS);
 	private static final double DEFAULT_MAX_WIDTH_FOR_PARALLEL = 2.0;
 	
 	private static final String SVG = "svg";
@@ -125,7 +125,7 @@ public class Path2ShapeConverter {
 
 	public SVGShape convertPathToShape(SVGElement path) {
 		this.setSVGPath((SVGPath)path);
-		SVGShape  shape = this.convertPathToShape();
+		SVGShape shape = this.convertPathToShape();
 		return shape;
 	}
 
