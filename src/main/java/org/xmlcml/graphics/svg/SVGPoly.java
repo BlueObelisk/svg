@@ -32,6 +32,7 @@ import nu.xom.Node;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Axis.Axis2;
+import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
@@ -68,10 +69,12 @@ public abstract class SVGPoly extends SVGShape {
 	
 	protected Real2Array real2Array;
 	protected List<SVGLine> lineList;
-	protected List<SVGMarker> pointList;
+	protected List<SVGMarker> markerList;
 
 	protected Boolean isClosed = false;
-	
+	protected Boolean isBox;
+	protected Boolean isAligned = null;
+
 	/** constructor
 	 */
 	public SVGPoly(String name) {
@@ -93,18 +96,6 @@ public abstract class SVGPoly extends SVGShape {
 	protected void init() {
 		super.setDefaultStyle();
 		setDefaultStyle(this);
-	}
-	
-	public Boolean getIsClosed() {
-		return isClosed;
-	}
-
-	public Boolean isClosed() {
-		return isClosed;
-	}
-	
-	public void setClosed(boolean isClosed) {
-		this.isClosed = isClosed;
 	}
 	
 	public static void setDefaultStyle(SVGElement line) {
@@ -161,9 +152,9 @@ public abstract class SVGPoly extends SVGShape {
 		}
 	}
 
-	public List<SVGMarker> createPointList() {
+	public List<SVGMarker> createMarkerList() {
 		createLineList();
-		return pointList;
+		return markerList;
 	}
 	
 	public Line2D.Double createAndSetLine2D() {
@@ -298,10 +289,10 @@ public abstract class SVGPoly extends SVGShape {
 	}
 
 	public List<SVGMarker> getPointList() {
-		if (pointList == null) {
-			createPointList();
+		if (markerList == null) {
+			createMarkerList();
 		}
-		return pointList;
+		return markerList;
 	}
 
 	public List<SVGLine> createLineList() {
@@ -322,15 +313,15 @@ public abstract class SVGPoly extends SVGShape {
 			}
 			String id = this.getId();
 			lineList = new ArrayList<SVGLine>();
-			pointList = new ArrayList<SVGMarker>();
+			markerList = new ArrayList<SVGMarker>();
 			SVGMarker lastPoint = new SVGMarker(real2Array.get(0));
-			pointList.add(lastPoint);
+			markerList.add(lastPoint);
 			SVGLine line;
 			for (int i = 1; i < real2Array.size(); i++) {
 				line = new SVGLine(real2Array.elementAt(i - 1), real2Array.elementAt(i));
 				copyNonSVGAttributes(this, line);
 				SVGMarker point = new SVGMarker(real2Array.get(i));
-				pointList.add(point);
+				markerList.add(point);
 				lastPoint.addLine(line);
 				point.addLine(line);
 				if (line.getEuclidLine().getLength() < 0.0000001) {
@@ -339,15 +330,17 @@ public abstract class SVGPoly extends SVGShape {
 				lineList.add(line);
 				lastPoint = point;
 			}
-			line = new SVGLine(real2Array.elementAt(real2Array.size() - 1), real2Array.elementAt(0));
-			copyNonSVGAttributes(this, line);
-			SVGMarker point = new SVGMarker(real2Array.get(0));
-			lastPoint.addLine(line);
-			point.addLine(line);
-			if (line.getEuclidLine().getLength() < 0.0000001) {
-				LOG.trace("ZERO LINE");
+			if (getIsClosed()) {
+				line = new SVGLine(real2Array.elementAt(real2Array.size() - 1), real2Array.elementAt(0));
+				copyNonSVGAttributes(this, line);
+				SVGMarker point = new SVGMarker(real2Array.get(0));
+				lastPoint.addLine(line);
+				point.addLine(line);
+				if (line.getEuclidLine().getLength() < 0.0000001) {
+					LOG.trace("ZERO LINE");
+				}
+				lineList.add(line);
 			}
-			lineList.add(line);
 			setReal2Array(real2Array);
 		}
 		ensureLineList();
@@ -389,10 +382,10 @@ public abstract class SVGPoly extends SVGShape {
 	}
 
 	protected List<SVGMarker> ensurePointList() {
-		if (pointList == null) {
-			pointList = new ArrayList<SVGMarker>();
+		if (markerList == null) {
+			markerList = new ArrayList<SVGMarker>();
 		}
-		return pointList;
+		return markerList;
 	}
 
 	@Override
@@ -421,9 +414,79 @@ public abstract class SVGPoly extends SVGShape {
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
+	public SVGRect createRect(double epsilon) {
+		SVGRect rect = null;
+		if (this != null && isBox(epsilon)) {
+			Real2Range r2r = this.getBoundingBox();
+			rect = new SVGRect(r2r.getCorners()[0], r2r.getCorners()[1]);
+			rect.setFill("none");
+		}
+		return rect;
+	}
+
+	public Boolean getIsClosed() {
+		return isClosed;
+	}
+
+	public Boolean getIsBox() {
+		return isBox;
+	}
+	
+	public void setIsClosed(boolean isClosed) {
+		this.isClosed = isClosed;
+	}
+
+	/** calculates whether 4 lines form a rectangle aligned with the axes
+	 * 
+	 * @param epsilon tolerance in coords
+	 * @return is rectangle
+	 */
+	public boolean isBox(double epsilon) {
+		if (isBox == null) {
+			isBox = false;
+			createLineList();
+			if (lineList == null) {
+			} else if (lineList.size() == 4 || (lineList.size() == 3 && isClosed)) {
+				SVGLine line0 = lineList.get(0);
+				SVGLine line2 = lineList.get(2);
+				Real2 point0 = line0.getXY(0);
+				Real2 point1 = line0.getXY(1);
+				Real2 point2 = line2.getXY(0);
+				Real2 point3 = line2.getXY(1);
+				// vertical
+				// so we can debug!
+				double point0x = point0.getX();
+				double point1x = point1.getX();
+				double point2x = point2.getX();
+				double point3x = point3.getX();
+				double point0y = point0.getY();
+				double point1y = point1.getY();
+				double point2y = point2.getY();
+				double point3y = point3.getY();
+				
+				isBox = 
+					Real.isEqual(point0x, point1x, epsilon) &&
+					Real.isEqual(point2x, point3x, epsilon) &&
+					Real.isEqual(point1y, point2y, epsilon) &&
+					Real.isEqual(point3y, point0y, epsilon);
+				if (!isBox) {
+					isBox = Real.isEqual(point0y, point1y, epsilon) &&
+							Real.isEqual(point2y, point3y, epsilon) &&
+							Real.isEqual(point1x, point2x, epsilon) &&
+							Real.isEqual(point3x, point0x, epsilon);
+				}
+			}
+		}
+		return isBox;
+	}
+
+	public Boolean getIsAligned() {
+		return isAligned;
+	}
+
 	public static void replacePolyLinesBySplitLines(SVGElement svgElement) {
 		List<SVGPolyline> polylineList = SVGPolyline.extractSelfAndDescendantPolylines(svgElement);
-		for (SVGPolyline polyline : polylineList) {
+		for (SVGPoly polyline : polylineList) {
 			SVGPolyline.replacePolyLineBySplitLines(polyline);
 		}		
 	}

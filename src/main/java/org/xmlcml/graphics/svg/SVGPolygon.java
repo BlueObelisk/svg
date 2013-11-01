@@ -41,21 +41,20 @@ public class SVGPolygon extends SVGPoly {
 	public SVGPolygon() {
 		super(TAG);
 		init();
-		setClosed(true);
 	}
 	
 	/** constructor
 	 */
 	public SVGPolygon(SVGElement element) {
         super((SVGElement) element);
-		setClosed(true);
+        init();
 	}
 	
 	/** constructor
 	 */
 	public SVGPolygon(Element element) {
         super((SVGElement) element);
-		setClosed(true);
+        init();
 	}
 	
 	/** constructor.
@@ -65,7 +64,13 @@ public class SVGPolygon extends SVGPoly {
 	 */
 	public SVGPolygon(Real2Array real2Array) {
 		this();
+		init();
 		setReal2Array(real2Array);
+	}
+	
+	protected void init() {
+		super.init();
+		isClosed = true;
 	}
 	
     /**

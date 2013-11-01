@@ -32,10 +32,20 @@ public class GeometryBuilderTest {
 	public static final Angle MAX_ANGLE = new Angle(0.12, Units.RADIANS);
 	public static final Double MAX_WIDTH = 2.0;
 
+	File IMAGE_2_11_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg");
+	File IMAGE_2_13_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.15.svg");
+	File IMAGE_2_16_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.16.svg");
+	File IMAGE_2_18_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.18.svg");
+	File IMAGE_2_23_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.23.svg");
+	File IMAGE_2_25_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.25.svg");
+	File IMAGE_5_11_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.5.11.svg");
+	File IMAGE_5_12_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.5.12.svg");
+	File IMAGE_5_13_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.5.13.svg");
+	File IMAGE_5_14_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.5.13.svg");
 	
 	@Test
 	public void testAllLists() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_11_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_11_SVG));
 		geometryBuilder.createExplicitAndImplicitLines();
 		Assert.assertEquals("implicit", 6, geometryBuilder.getImplicitLineList().size());
 		Assert.assertEquals("explicit", 0, geometryBuilder.getExplicitLineList().size());
@@ -52,7 +62,7 @@ public class GeometryBuilderTest {
 
 	@Test
 	public void testJunction() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_11_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_11_SVG));
 		geometryBuilder.createExplicitAndImplicitLines();
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		Assert.assertEquals("tram", 1, geometryBuilder.getTramLineList().size());
@@ -64,7 +74,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testnonWedgeBondsAndElements() {
-		SVGElement svgRoot = SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_13_SVG);
+		SVGElement svgRoot = SVGElement.readAndCreateSVG(IMAGE_2_13_SVG);
 		GeometryBuilder geometryBuilder = new GeometryBuilder(svgRoot);
 		geometryBuilder.createExplicitAndImplicitLines();
 		Assert.assertEquals("lines", 13, geometryBuilder.getSingleLineList().size());
@@ -73,7 +83,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testnonWedgeBondsAndElements1() {
-		SVGElement svgRoot = SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_16_SVG);
+		SVGElement svgRoot = SVGElement.readAndCreateSVG(IMAGE_2_16_SVG);
 		GeometryBuilder geometryBuilder = new GeometryBuilder(svgRoot);
 		geometryBuilder.createExplicitAndImplicitLines();
 		Assert.assertEquals("lines", 20, geometryBuilder.getSingleLineList().size());
@@ -81,7 +91,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testSubscripts() {
-		SVGElement svgRoot = SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_11_SVG);
+		SVGElement svgRoot = SVGElement.readAndCreateSVG(IMAGE_2_11_SVG);
 		GeometryBuilder geometryBuilder = new GeometryBuilder(svgRoot);
 		geometryBuilder.createExplicitAndImplicitLines();
 		Assert.assertEquals("lines", 6, geometryBuilder.getSingleLineList().size());
@@ -90,58 +100,58 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testWedges() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_18_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_18_SVG));
 		geometryBuilder.createExplicitAndImplicitLines();
 		Assert.assertEquals("lines", 22, geometryBuilder.getSingleLineList().size());
 	}
 
 	@Test
 	public void testNoRingsOrWedges() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_23_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_23_SVG));
 		geometryBuilder.createExplicitAndImplicitLines();
 		Assert.assertEquals("lines", 24, geometryBuilder.getSingleLineList().size());
 	}
 	
 	@Test
 	public void testHard() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_25_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_25_SVG));
 		geometryBuilder.createExplicitAndImplicitLines();
 		Assert.assertEquals("lines", 25, geometryBuilder.getSingleLineList().size());
 	}
 	
-	@Test
+	/*@Test
 	public void test00100() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_02_00100_65_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_02_00100_65_SVG));
 		geometryBuilder.createExplicitAndImplicitLines(); // should be 27??
 		Assert.assertEquals("lines", 32, geometryBuilder.getSingleLineList().size()); // should be 34
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		Assert.assertEquals("lines", 6, geometryBuilder.getTramLineList().size());
-	}
+	}*/
 		
 	@Test
 	public void testWithElementPNG5_11() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_11_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_11_SVG));
 		geometryBuilder.createExplicitAndImplicitLines();
 		drawFromGeometryBuilder(geometryBuilder);
 		Assert.assertEquals("lines", 46, geometryBuilder.getSingleLineList().size());//FIXME should be 47
 	}
 	@Test
 	public void testWithElementPNG5_12() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_12_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_12_SVG));
 		geometryBuilder.createExplicitAndImplicitLines();
 		drawFromGeometryBuilder(geometryBuilder);
 		Assert.assertEquals("lines", 46, geometryBuilder.getSingleLineList().size());//FIXME should be 47
 	}		
 	@Test
 	public void testWithElementPNG5_13() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_13_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_13_SVG));
 		geometryBuilder.createExplicitAndImplicitLines();
 		drawFromGeometryBuilder(geometryBuilder);
 		Assert.assertEquals("lines", 87, geometryBuilder.getSingleLineList().size());//FIXME should be 88; missing lines in SVG
 	}		
 	@Test
 	public void testWithElementPNG5_14() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_14_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_14_SVG));
 		geometryBuilder.createExplicitAndImplicitLines();
 		drawFromGeometryBuilder(geometryBuilder);
 		Assert.assertEquals("lines", 96, geometryBuilder.getSingleLineList().size());//FIXME should be 95
@@ -149,7 +159,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testTramLinesG2_11() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_11_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_11_SVG));
 		List<SVGLine> lineList = geometryBuilder.createExplicitAndImplicitLines();
 		Assert.assertEquals("lines", 6, geometryBuilder.getSingleLineList().size());
 		TramLineManager tramLineManager = new TramLineManager();
@@ -159,7 +169,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testTramLines() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_13_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_13_SVG));
 		Assert.assertNull("singleLines", geometryBuilder.getSingleLineList());
 		Assert.assertNull("explicitLines", geometryBuilder.getExplicitLineList());
 		Assert.assertNull("implicitLines", geometryBuilder.getImplicitLineList());
@@ -180,7 +190,7 @@ public class GeometryBuilderTest {
 	}
 	@Test
 	public void testTramLines2_11() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_11_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_11_SVG));
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		Assert.assertEquals("lines", 4, geometryBuilder.getSingleLineList().size());
 		Assert.assertEquals("tramLines", 1, geometryBuilder.getTramLineList().size());
@@ -188,14 +198,14 @@ public class GeometryBuilderTest {
 	}
 	@Test
 	public void testTramLines2_13() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_13_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_13_SVG));
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		Assert.assertEquals("tramLines", 3, geometryBuilder.getTramLineList().size());
 		Assert.assertEquals("singleLines", 13, geometryBuilder.getImplicitLineList().size());
 	}
 	@Test
 	public void testTramLines2_18() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_18_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_18_SVG));
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		Assert.assertEquals("paths", 1, geometryBuilder.getExplicitLineList().size());
 		Assert.assertEquals("tramLines", 5, geometryBuilder.getTramLineList().size());
@@ -204,7 +214,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testTramLines2_23() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_23_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_23_SVG));
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		Assert.assertEquals("tramLines", 4, geometryBuilder.getTramLineList().size());
 		Assert.assertEquals("paths", 0, geometryBuilder.getExplicitLineList().size());
@@ -212,7 +222,7 @@ public class GeometryBuilderTest {
 	}
 	@Test
 	public void testTramLines2_25() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_25_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_25_SVG));
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		Assert.assertEquals("tramLines", 5, geometryBuilder.getTramLineList().size());
 		Assert.assertEquals("paths", 1, geometryBuilder.getExplicitLineList().size());
@@ -220,7 +230,7 @@ public class GeometryBuilderTest {
 	}
 	@Test
 	public void testTramLines5_11() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_11_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_11_SVG));
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		drawFromGeometryBuilder(geometryBuilder);
 		Assert.assertEquals("tramLines", 4, geometryBuilder.getTramLineList().size());
@@ -229,7 +239,7 @@ public class GeometryBuilderTest {
 	}
 	@Test
 	public void testTramLines5_12() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_12_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_12_SVG));
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		drawFromGeometryBuilder(geometryBuilder);
 		Assert.assertEquals("tramLines", 6, geometryBuilder.getTramLineList().size());
@@ -238,7 +248,7 @@ public class GeometryBuilderTest {
 	}
 	@Test
 	public void testTramLines5_13() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_13_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_13_SVG));
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		drawFromGeometryBuilder(geometryBuilder);
 		Assert.assertEquals("tramLines", 11, geometryBuilder.getTramLineList().size());
@@ -247,16 +257,16 @@ public class GeometryBuilderTest {
 	}
 	@Test
 	public void testTramLines5_14() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_14_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_14_SVG));
 		geometryBuilder.createTramLineListAndRemoveUsedLines();
 		Assert.assertEquals("tramLines", 13, geometryBuilder.getTramLineList().size());
 		Assert.assertEquals("paths", 1, geometryBuilder.getExplicitLineList().size());
 		Assert.assertEquals("paths", 70, geometryBuilder.getSingleLineList().size());//FIXME should be 69, above 0
-	}
+	} 
 	
 	@Test
 	public void testWedgeHash() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_18_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_18_SVG));
 		geometryBuilder.createExplicitAndImplicitLines();
 		// this contained a rect translated to a line
 		Assert.assertEquals("explicitLines", 1, geometryBuilder.getExplicitLineList().size());
@@ -279,7 +289,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testJunctionMerging2_11() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_11_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_11_SVG));
 		geometryBuilder.createMergedJunctions(); //, 6, 8, 6);    // fails
 		Assert.assertEquals("lines", 4, geometryBuilder.getSingleLineList().size());
 		Assert.assertEquals("lines", 6, geometryBuilder.getMergedJunctionList().size());
@@ -288,7 +298,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testJunctionMerging2_13() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_13_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_13_SVG));
 		geometryBuilder.createMergedJunctions(); //, 13, 17, 10);
 		Assert.assertEquals("lines", 10, geometryBuilder.getMergedJunctionList().size());
 		Assert.assertEquals("lines", 7, geometryBuilder.getSingleLineList().size());
@@ -297,7 +307,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testJunctionMerging2_18() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_18_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_18_SVG));
 		geometryBuilder.createMergedJunctions(); //, 21, 23, 14);
 		Assert.assertEquals("lines", 15, geometryBuilder.getMergedJunctionList().size());
 		Assert.assertEquals("lines", 12, geometryBuilder.getSingleLineList().size());
@@ -306,7 +316,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testJunctionMerging2_23() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_23_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_23_SVG));
 		geometryBuilder.createMergedJunctions(); //, 24, 37, 21);
 		Assert.assertEquals("lines", 22, geometryBuilder.getMergedJunctionList().size());
 		Assert.assertEquals("lines", 16, geometryBuilder.getSingleLineList().size());
@@ -315,7 +325,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testJunctionMerging2_25() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_25_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_25_SVG));
 		geometryBuilder.createMergedJunctions();//no hatches; should be 25, 32, 20; l of Cl not circular enough, =O too near other bonds
 		Assert.assertEquals("lines", 22, geometryBuilder.getMergedJunctionList().size());
 		Assert.assertEquals("lines", 15, geometryBuilder.getSingleLineList().size());
@@ -324,7 +334,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testJunctionMerging5_11() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_11_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_11_SVG));
 		geometryBuilder.createRawJunctionList();
 		drawFromGeometryBuilder(geometryBuilder);
 		geometryBuilder.createMergedJunctions();//hatches and arrow; should be 36, 49, 26
@@ -346,7 +356,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testJunctionMerging5_12() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_12_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_12_SVG));
 		geometryBuilder.createMergedJunctions();
 		Assert.assertEquals("lines", 23, geometryBuilder.getMergedJunctionList().size());
 		Assert.assertEquals("lines", 31, geometryBuilder.getSingleLineList().size());
@@ -355,7 +365,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testJunctionMerging5_13() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_5_13_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_5_13_SVG));
 		geometryBuilder.createMergedJunctions();//first 37, 48, 26; second 39, 51, 27
 		Assert.assertEquals("lines", 42, geometryBuilder.getMergedJunctionList().size());
 		Assert.assertEquals("lines", 59, geometryBuilder.getSingleLineList().size());
@@ -364,7 +374,7 @@ public class GeometryBuilderTest {
 	
 	@Test
 	public void testJunctionWithTram() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_11_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_11_SVG));
 		List<SVGLine> lineList = geometryBuilder.createExplicitAndImplicitLines();
 		Assert.assertEquals("lines", 6, geometryBuilder.getSingleLineList().size());
 		TramLineManager tramLineManager = new TramLineManager();
@@ -381,7 +391,7 @@ public class GeometryBuilderTest {
 
 	@Test
 	public void testJunctionWithTramAndText() {
-		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(Fixtures.IMAGE_2_11_SVG));
+		GeometryBuilder geometryBuilder = new GeometryBuilder(SVGElement.readAndCreateSVG(IMAGE_2_11_SVG));
 		List<SVGLine> lineList = geometryBuilder.createExplicitAndImplicitLines();
 		Assert.assertEquals("lines", 6, geometryBuilder.getSingleLineList().size());
 		TramLineManager tramLineManager = new TramLineManager();
