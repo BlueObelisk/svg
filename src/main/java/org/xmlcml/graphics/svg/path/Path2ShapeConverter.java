@@ -20,7 +20,10 @@ import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGPathPrimitive;
+import org.xmlcml.graphics.svg.SVGPoly;
+import org.xmlcml.graphics.svg.SVGPolygon;
 import org.xmlcml.graphics.svg.SVGPolyline;
+import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGUtil;
 import org.xmlcml.graphics.svg.StyleBundle;
@@ -38,7 +41,6 @@ import org.xmlcml.xml.XMLUtil;
  */
 public class Path2ShapeConverter {
 
-
 	private final static Logger LOG = Logger.getLogger(Path2ShapeConverter.class);
 	
 	private static final String MLCCLCC = "MLCCLCC";
@@ -51,20 +53,29 @@ public class Path2ShapeConverter {
 	private static final double MOVE_EPS = 0.001;
 	private static final double RECT_EPS = 0.01;
 	private static final double _ROUNDED_BOX_EPS = 0.4;
+	
 	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.12, Units.RADIANS);
 	private static final double DEFAULT_MAX_WIDTH_FOR_PARALLEL = 2.0;
+	public static final Angle DEFAULT_MAX_ANGLE = new Angle(0.12, Units.RADIANS);
+	public static final Double DEFAULT_MAX_WIDTH = 2.0;
+	private static final Double DEFAULT_MIN_RECT_THICKNESS = 0.99;
+	private static final double DEFAULT_MAX_PATH_WIDTH = 1.0;
+	private static final int DEFAULT_LINES_IN_POLYLINE = 8;
+	private static final int DEFAULT_DECIMAL_PLACES = 3;
 	
 	private static final String SVG = "svg";
-	private static final Integer DEFAULT_DECIMAL_PLACES = 3;
-	private static final Angle ANGLE_EPS = new Angle(0.001);
+	private static final Angle ANGLE_EPS = new Angle(0.01);
 
 
 	private Integer decimalPlaces = DEFAULT_DECIMAL_PLACES;
-	private Integer minLinesInPolyline = 8;
+	private Integer minLinesInPolyline = DEFAULT_LINES_IN_POLYLINE;
 	private boolean removeDuplicatePaths = true;
 	private boolean removeRedundantMoveCommands = true;
 	private boolean splitAtMoveCommands = true;
-	private double maxPathWidth = 1.0;
+	private double maxPathWidth = DEFAULT_MAX_PATH_WIDTH;
+	private double maxWidth = DEFAULT_MAX_WIDTH;
+	private Angle maxAngle = DEFAULT_MAX_ANGLE;
+	private Double minRectThickness = DEFAULT_MIN_RECT_THICKNESS;
 	
 	/** input and output */
 	private List<SVGPath> pathListIn;
@@ -94,6 +105,14 @@ public class Path2ShapeConverter {
 		this.maxPathWidth = maxPathWidth;
 	}
 
+	public void setMaxWidth(double maxWidth) {
+		this.maxWidth = maxWidth;
+	}
+
+	public void setMaxAngle(Angle maxAngle) {
+		this.maxAngle = maxAngle;
+	}
+	
 	
 	/** main routine if pathList has been read in.
 	 * 
@@ -165,39 +184,79 @@ public class Path2ShapeConverter {
 	 */
 	public SVGShape convertPathToShape() {
 		if (svgPath == null) return null;
-		SVGShape newSvg = null;
-		newSvg = svgPath.createRectangle(RECT_EPS);
-		if (newSvg == null) {
-			newSvg = createLineFromMLLLorMLCCLCC(svgPath);
+		SVGShape shape = null;
+		shape = createRectOrAxialLine(RECT_EPS);
+		if (shape == null) {
+			shape = svgPath.createRoundedBox(_ROUNDED_BOX_EPS);
 		}
-		if (newSvg == null) {
-			newSvg = svgPath.createRoundedBox(_ROUNDED_BOX_EPS);
+		if (shape == null) {
+			shape = svgPath.createCircle(_CIRCLE_EPS);
 		}
-		if (newSvg == null) {
-			newSvg = svgPath.createCircle(_CIRCLE_EPS);
-		}
-		if (newSvg == null) {
-			SVGPolyline polyline = svgPath.createPolyline();
+		if (shape == null) {
+			SVGPolyline polyline = (SVGPolyline) svgPath.createPolyline();
 			// not a polyline, return unchanged path
 			if (polyline == null) {
-				newSvg = new SVGPath(svgPath);
+				shape = new SVGPath(svgPath);
 			} else {
 				// SVG is a polyline, try the variants
 					// is it a line?
-				newSvg = polyline.createSingleLine();
-				if (newSvg == null) {
+				shape = polyline.createSingleLine();
+				if (shape == null) {
 					// or a polygon?
-					newSvg = polyline.createPolygon(RECT_EPS);
+					shape = createPolygonRectOrLine(shape, polyline);
+					LOG.trace("polygon "+shape);
 				}
 				// no, reset to polyline
-				if (newSvg == null) {
-					newSvg = polyline;
+				if (shape == null || shape instanceof SVGPolygon) {
+					shape = createNarrowLine((SVGPolygon) shape);
+					if (shape == null) {
+						shape = polyline;
+					} 
 				}
 			}
 		}
-		copyAttributes(svgPath, newSvg);
-		newSvg.format(decimalPlaces);
-		return newSvg;
+		copyAttributes(svgPath, shape);
+		shape.format(decimalPlaces);
+		return shape;
+	}
+
+	private SVGShape createNarrowLine(SVGPolygon polygon) {
+		SVGLine line = null;
+		if (polygon != null && (polygon.size() == 4 || polygon.size() == 3)) {
+			SVGLine line0 = polygon.getLineList().get(0);
+			SVGLine line2 = polygon.getLineList().get(2);
+			line = createNarrowLine(line0, line2);
+		}
+		return line;
+	}
+
+	private SVGShape createPolygonRectOrLine(SVGShape shape, SVGPolyline polyline) {
+		SVGPolygon polygon = (SVGPolygon)polyline.createPolygon(RECT_EPS);
+		if (polygon != null) {
+			SVGRect rect = polygon.createRect(RECT_EPS);
+			SVGLine line = createLineFromRect(rect); 
+			if (line != null) {
+				shape = line;
+			} else if (rect != null){
+				shape = rect;
+			} else {
+				shape = polygon;
+			}
+		}
+		return shape;
+	}
+
+	private SVGShape createRectOrAxialLine(double eps) {
+		SVGShape shape;
+		SVGRect rect = svgPath.createRectangle(eps);
+		SVGLine line = null;
+		if (rect == null) {
+			line = createLineFromMLLLorMLCCLCC(svgPath);
+		} else {
+			line = createLineFromRect(rect); 
+		}
+		shape = (line != null) ? null : rect;
+		return shape;
 	}
 
 	/**
@@ -382,7 +441,7 @@ public class Path2ShapeConverter {
 		List<SVGLine> totalSplitLineList = new ArrayList<SVGLine>();
 		for (SVGShape shape : shapeList) {
 			if (shape instanceof SVGPolyline) {
-				SVGPolyline polyline = (SVGPolyline) shape;
+				SVGPoly polyline = (SVGPoly) shape;
 				List<SVGLine> lines = polyline.createLineList();
 				if (lines.size() < minLinesInPolyline) {
 					annotateLinesAndAddToParentAndList(totalSplitLineList, polyline, lines);
@@ -395,7 +454,7 @@ public class Path2ShapeConverter {
 	}
 
 	private void annotateLinesAndAddToParentAndList (
-			List<SVGLine> totalSplitLineList, SVGPolyline polyline, List<SVGLine> linesToAdd) {
+			List<SVGLine> totalSplitLineList, SVGPoly polyline, List<SVGLine> linesToAdd) {
 		ParentNode parent = polyline.getParent();
 		for (int i = 0; i < linesToAdd.size(); i++) {
 			SVGLine line = linesToAdd.get(i);
@@ -554,23 +613,6 @@ public class Path2ShapeConverter {
 		return shapeListOut;
 	}
 
-//	private SVGShape createRoundCapLine(SVGPath svgPath, double roundedBoxEps) {
-//		String signature = svgPath.getSignature();
-//		LOG.debug("SIG "+signature);
-//		return null;
-//	}
-	
-//	private LinePrimitive condenseRoundedCaps(LinePrimitive preceeding, CubicPrimitive cubic1, CubicPrimitive cubic2) {
-//		LinePrimitive linePrimitive = null;
-//		if (preceeding != null && cubic1 != null && cubic2 != null) {
-//			Angle angle1 = cubic1.getAngle();
-//			Angle angle2 = cubic2.getAngle();
-//			Angle angleTot = angle1.plus(angle2);
-//			LOG.debug(angle1+" "+angle2+" "+angleTot);
-//		}
-//		return linePrimitive;
-//	}
-
 	public SVGLine createNarrowLine() {
 		maxPathWidth = 1.0;
 		if (svgPath == null) return null;
@@ -580,14 +622,20 @@ public class Path2ShapeConverter {
 			PathPrimitiveList primList = svgPath.ensurePrimitives();
 			SVGLine line0 = primList.getLine(1);
 			SVGLine line1 = primList.getLine(3);
-			if (line0.isParallelOrAntiParallelTo(line1, ANGLE_EPS)) {
-				double dist = line0.calculateUnsignedDistanceBetweenLines(line1, ANGLE_EPS);
-				if (dist < maxPathWidth) {
-					Real2 end0 = line0.getXY(0).getMidPoint(line1.getXY(0));
-					Real2 end1 = line0.getXY(1).getMidPoint(line1.getXY(1));
-					line = new SVGLine(end0, end1);
-					LOG.trace("line: "+line);
-				}
+			line = createNarrowLine(line0, line1);
+		}
+		return line;
+	}
+
+	private SVGLine createNarrowLine(SVGLine line0, SVGLine line1) {
+		SVGLine line = null;
+		if (line0.isParallelOrAntiParallelTo(line1, ANGLE_EPS)) {
+			double dist = line0.calculateUnsignedDistanceBetweenLines(line1, ANGLE_EPS);
+			if (dist < maxPathWidth) {
+				Real2 end0 = line0.getXY(0).getMidPoint(line1.getXY(0));
+				Real2 end1 = line0.getXY(1).getMidPoint(line1.getXY(1));
+				line = new SVGLine(end0, end1);
+				LOG.trace("line: "+line);
 			}
 		}
 		return line;
@@ -603,4 +651,39 @@ public class Path2ShapeConverter {
 		}
 		return newPath;
 	}
+
+	public SVGCircle convertToCircle(SVGPolygon polygon) {
+		Real2Range bbox = polygon.getBoundingBox();
+		SVGCircle circle = null;
+		double eps = 10. * RECT_EPS; // why not?
+		if (Math.abs(bbox.getXRange().getRange() - bbox.getYRange().getRange()) < eps) {
+			Real2 centre = bbox.getCentroid();
+			RealArray radArray = new RealArray();
+			for (Real2 point : polygon.getReal2Array()) {
+				radArray.addElement(centre.getDistance(point));
+			}
+			circle = new SVGCircle();
+			circle.copyAttributesFrom(polygon);
+			circle.setRad(radArray.getMean());
+			circle.setCXY(centre);
+		}
+		return circle;
+	}
+	
+	public SVGLine createLineFromRect(SVGRect rect) {
+		SVGLine line = null;
+		if (rect != null) {
+			Real2 origin = rect.getXY();
+			double width = rect.getWidth();
+			double height = rect.getHeight();
+			if (width < minRectThickness ) {
+				line = new SVGLine(origin, origin.plus(new Real2(0.0, height)));
+			} else if (height < minRectThickness ) {
+				line = new SVGLine(origin, origin.plus(new Real2(width, 0.0)));
+			}
+		}
+		return line;
+	}
+	
+
 }

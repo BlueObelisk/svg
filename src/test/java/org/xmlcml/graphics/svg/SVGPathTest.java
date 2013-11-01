@@ -34,7 +34,7 @@ public class SVGPathTest {
 	public void testCreatePolyline() {
 		String d = "M379.558 218.898 L380.967 212.146 L380.134 212.146 L378.725 218.898 L379.558 218.898";
 		SVGPath path = new SVGPath(d);
-		SVGPolyline polyline = path.createPolyline();
+		SVGPoly polyline = path.createPolyline();
 		Assert.assertNotNull(polyline);
 		Real2Array r2a = polyline.getReal2Array();
 		String errmsg = EuclidTestUtils.testEquals("xarray", new double[] {379.558,380.967,380.134,378.725,379.558}, r2a.getXArray().getArray(), 0.001);
@@ -161,7 +161,7 @@ public class SVGPathTest {
 	
 	@Test
 	public void testRemoveRoundedCaps() {
-		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg"))
+		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg"))
 				.getChildElements().get(0).getChildElements().get(0);
 		PathPrimitiveList primList = svgPath.ensurePrimitives();
 		String signature = svgPath.getSignature();
@@ -176,7 +176,7 @@ public class SVGPathTest {
 
 	@Test
 	public void testRemoveRoundedCaps1() {
-		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg"))
+		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg"))
 				.getChildElements().get(0).getChildElements().get(0);
 		PathPrimitiveList primList = svgPath.ensurePrimitives();
 		String signature = svgPath.getSignature();
@@ -190,7 +190,7 @@ public class SVGPathTest {
 
 	@Test
 	public void testCreateLine() {
-		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg"))
+		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg"))
 				.getChildElements().get(0).getChildElements().get(0);
 		SVGPath newPath = svgPath.replaceAllUTurnsByButt(ANGLE_EPS);
 		SVGLine line = newPath.createLineFromMLLLL(ANGLE_EPS, LINE_EPS);
@@ -202,7 +202,7 @@ public class SVGPathTest {
 
 	@Test
 	public void testCreateLines() {
-		List<SVGPath> pathList = SVGPath.extractPaths(SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg")));
+		List<SVGPath> pathList = SVGPath.extractPaths(SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg")));
 		Angle angleEps = new Angle(2., Units.RADIANS);
 		Assert.assertEquals("paths", 13, pathList.size());
 		SVGG g = new SVGG();
@@ -232,7 +232,7 @@ public class SVGPathTest {
 
 	@Test
 	public void testCreateLine9() {
-		List<SVGPath> pathList = SVGPath.extractPaths(SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULE_DIR, "image.g.2.13.svg")));
+		List<SVGPath> pathList = SVGPath.extractPaths(SVGElement.readAndCreateSVG(new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg")));
 		SVGPath path = pathList.get(9);
 		Angle angle2 = new Angle(0.02, Units.RADIANS);
 		Assert.assertEquals("old sig", "MLCCLCC", path.getSignature());

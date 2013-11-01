@@ -29,7 +29,7 @@ public class SVGPolylineTest {
 	public void testCreateLineList() {
 		String d = "M379.558 218.898 L380.967 212.146 L380.134 212.146 L378.725 218.898 L379.558 218.898";
 		SVGPath path = new SVGPath(d);
-		SVGPolyline polyline = path.createPolyline();
+		SVGPoly polyline = path.createPolyline();
 //		polyline.debug("POLY");
 		List<SVGLine> lineList = polyline.createLineList();
 		Assert.assertEquals("line count", 4, lineList.size());
@@ -48,7 +48,7 @@ public class SVGPolylineTest {
 	public void testReplacePolyLineBySplitLines() {
 		String d = "M379.558 118.898 L480.967 212.146 L380.134 312.146 L278.725 218.898 L379.558 118.898";
 		SVGPath path = new SVGPath(d);
-		SVGPolyline polyline = path.createPolyline();
+		SVGPoly polyline = path.createPolyline();
 		SVGSVG svg = new SVGSVG();
 		SVGCircle circle1 = new SVGCircle(new Real2(100., 200.), 10.);
 		svg.appendChild(circle1);
