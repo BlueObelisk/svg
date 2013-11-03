@@ -335,6 +335,7 @@ public class SimpleBuilder {
 					}
 				}
 			}
+			higherPrimitives.setRawJunctionList(rawJunctionList);
 		}
 		return rawJunctionList;
 	}

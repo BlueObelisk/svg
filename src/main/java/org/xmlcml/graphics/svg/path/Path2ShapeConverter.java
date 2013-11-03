@@ -231,16 +231,18 @@ public class Path2ShapeConverter {
 	}
 
 	private SVGShape createPolygonRectOrLine(SVGShape shape, SVGPolyline polyline) {
-		SVGPolygon polygon = (SVGPolygon)polyline.createPolygon(RECT_EPS);
-		if (polygon != null) {
-			SVGRect rect = polygon.createRect(RECT_EPS);
-			SVGLine line = createLineFromRect(rect); 
-			if (line != null) {
-				shape = line;
-			} else if (rect != null){
-				shape = rect;
-			} else {
-				shape = polygon;
+		if (polyline != null) {
+			SVGPolygon polygon = (SVGPolygon)polyline.createPolygon(RECT_EPS);
+			if (polygon != null) {
+				SVGRect rect = polygon.createRect(RECT_EPS);
+				SVGLine line = createLineFromRect(rect); 
+				if (line != null) {
+					shape = line;
+				} else if (rect != null){
+					shape = rect;
+				} else {
+					shape = polygon;
+				}
 			}
 		}
 		return shape;
