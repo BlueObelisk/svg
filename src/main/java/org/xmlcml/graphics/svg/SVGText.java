@@ -70,6 +70,8 @@ public class SVGText extends SVGElement {
 
 	private static final double MIN_FONT_SIZE = 0.01;
 
+	private static final Double DEFAULT_CHARACTER_WIDTH = 500.0;
+
 	// these are all when text is used for concatenation, etc.
 	private double estimatedHorizontallength = Double.NaN; 
 	private double currentFontSize = Double.NaN;
@@ -835,6 +837,19 @@ public class SVGText extends SVGElement {
 	public Double getScaledWidth() {
 		Double scaledWidth = null;
 		Double width = this.getSVGXFontWidth();
+		Double fontSize = this.getFontSize();
+		if (width != null && fontSize != null) {
+			scaledWidth = width * SCALE1000 * fontSize;
+		}
+		return scaledWidth;
+	}
+
+	public Double getScaledWidth(boolean guessWidth) {
+		Double scaledWidth = null;
+		Double width = this.getSVGXFontWidth();
+		if (width == null && guessWidth) {
+			width = DEFAULT_CHARACTER_WIDTH;
+		}
 		Double fontSize = this.getFontSize();
 		if (width != null && fontSize != null) {
 			scaledWidth = width * SCALE1000 * fontSize;

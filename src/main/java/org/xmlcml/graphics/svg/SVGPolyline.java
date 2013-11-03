@@ -61,11 +61,6 @@ public class SVGPolyline extends SVGPoly {
 	 */
 	public SVGPolyline(SVGLine line) {
         this();
-//        CMLElement.copyAttributesFromTo(line, this);
-//        CMLElement.deleteAttribute(this, X1);
-//        CMLElement.deleteAttribute(this, Y1);
-//        CMLElement.deleteAttribute(this, X2);
-//        CMLElement.deleteAttribute(this, Y2);
         XMLUtil.copyAttributesFromTo(line, this);
         XMLUtil.deleteAttribute(this, X1);
         XMLUtil.deleteAttribute(this, Y1);

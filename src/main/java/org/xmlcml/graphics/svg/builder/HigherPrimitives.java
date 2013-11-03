@@ -53,6 +53,10 @@ public class HigherPrimitives {
 		return rawJunctionList;
 	}
 
+	public void setRawJunctionList(List<Junction> junctionList) {
+		this.rawJunctionList = junctionList;
+	}
+
 	public void addJoinableList(List<Joinable> joinableList) {
 		ensureJoinableList();
 		this.joinableList.addAll(joinableList);

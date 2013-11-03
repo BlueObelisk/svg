@@ -330,7 +330,7 @@ public abstract class SVGPoly extends SVGShape {
 				lineList.add(line);
 				lastPoint = point;
 			}
-			if (getIsClosed()) {
+			if (isClosed()) {
 				line = new SVGLine(real2Array.elementAt(real2Array.size() - 1), real2Array.elementAt(0));
 				copyNonSVGAttributes(this, line);
 				SVGMarker point = new SVGMarker(real2Array.get(0));
@@ -424,7 +424,7 @@ public abstract class SVGPoly extends SVGShape {
 		return rect;
 	}
 
-	public Boolean getIsClosed() {
+	public Boolean isClosed() {
 		return isClosed;
 	}
 
@@ -432,7 +432,7 @@ public abstract class SVGPoly extends SVGShape {
 		return isBox;
 	}
 	
-	public void setIsClosed(boolean isClosed) {
+	public void setClosed(boolean isClosed) {
 		this.isClosed = isClosed;
 	}
 
