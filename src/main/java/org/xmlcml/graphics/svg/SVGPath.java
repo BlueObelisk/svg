@@ -216,7 +216,7 @@ public class SVGPath extends SVGShape {
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
-	/** extract polyline if path is M followed by L's
+	/** extract polyline if path is M followed by Ls
 	 * @return
 	 */
 	public void createCoordArray() {
@@ -246,7 +246,7 @@ public class SVGPath extends SVGShape {
 		createCoordArray();
 		if (isPolyline && allCoords.size() > 1) {
 			polyline = new SVGPolyline(allCoords);
-			polyline.setClosed(isClosed);
+			polyline.setIsClosed(isClosed);
 		}
 		return polyline;
 	}
