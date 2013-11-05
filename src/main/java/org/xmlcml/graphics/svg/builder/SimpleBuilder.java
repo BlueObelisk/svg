@@ -147,7 +147,7 @@ public class SimpleBuilder {
 					LOG.trace("shape "+shape.getClass().getSimpleName());
 					addId(i, shape, path);
 					derivedPrimitives.addShapeToSubclassedLists(shape);
-					LOG.trace("Lines "+derivedPrimitives.getLineList().size());
+					LOG.trace("Lines " + (derivedPrimitives.getLineList() == null ? 0 : derivedPrimitives.getLineList().size()));
 					currentPathList.remove(i);
 				}
 			}
@@ -155,7 +155,7 @@ public class SimpleBuilder {
 	}
 
 	public List<SVGLine> createRawAndDerivedLines() {
-		if (rawPrimitives  == null) {
+		if (rawPrimitives == null) {
 			createDerivedShapesFromPaths();
 			ensureHigherPrimitives();
 			ensureRawContainer();
@@ -272,48 +272,58 @@ public class SimpleBuilder {
 		List<Joinable> joinableList = higherPrimitives.getJoinableList();
 		if (joinableList == null) {
 			createRawAndDerivedLines();
-			abstractPolygons();
-			List<SVGElement> toJoin = new ArrayList<SVGElement>();
-			toJoin.addAll(higherPrimitives.getSingleLineList());
-			toJoin.addAll(highLevelPrimitives);
-			joinableList = JoinManager.makeJoinableList(toJoin);
+			joinableList = createJoinableListIncludingPolygons();
 			higherPrimitives.addJoinableList(joinableList);
 		}
 		return joinableList;
 	}
 
 	public List<TramLine> createTramLineListAndRemoveUsedLines() {
+		ensureHigherPrimitives();
 		List<TramLine> tramLineList = higherPrimitives.getTramLineList();
 		if (tramLineList == null) {
 			createRawAndDerivedLines();
 			TramLineManager tramLineManager = new TramLineManager();
-			tramLineList = tramLineManager.createTramLineList(higherPrimitives.getSingleLineList());
-			tramLineManager.removeUsedTramLinePrimitives(higherPrimitives.getSingleLineList());
+			if (higherPrimitives.getSingleLineList() != null) {
+				tramLineList = tramLineManager.createTramLineList(higherPrimitives.getSingleLineList());
+				tramLineManager.removeUsedTramLinePrimitives(higherPrimitives.getSingleLineList());
+				higherPrimitives.setTramLineList(tramLineList);
+			}
 		}
 		return tramLineList;
 	}
 
 	public List<Junction> createMergedJunctions() {
+		ensureHigherPrimitives();
 		List<Junction> junctionList = higherPrimitives.getMergedJunctionList();
 		if (junctionList == null) {
 			createTramLineListAndRemoveUsedLines();
-			abstractPolygons();
-			List<SVGElement> toJoin = new ArrayList<SVGElement>();
-			toJoin.addAll(higherPrimitives.getSingleLineList());
-			toJoin.addAll(highLevelPrimitives);
-			List<Joinable> joinableList = JoinManager.makeJoinableList(toJoin);
+			List<Joinable> joinableList = createJoinableListIncludingPolygons();
 			joinableList.addAll(higherPrimitives.getTramLineList());
 			createRawTextList();
 			for (SVGText svgText : derivedPrimitives.getTextList()) {
 				joinableList.add(new JoinableText(svgText));
 			}
 			junctionList = this.mergeJunctions();
+			higherPrimitives.setMergedJunctionList(junctionList);
 		}
 		return junctionList;
 		
 	}
 
+	private List<Joinable> createJoinableListIncludingPolygons() {
+		abstractPolygons();
+		List<SVGElement> toJoin = new ArrayList<SVGElement>();
+		toJoin.addAll(higherPrimitives.getSingleLineList());
+		if (highLevelPrimitives != null) {
+			toJoin.addAll(highLevelPrimitives);
+		}
+		List<Joinable> joinableList = JoinManager.makeJoinableList(toJoin);
+		return joinableList;
+	}
+
 	public List<Junction> createRawJunctionList() {
+		ensureHigherPrimitives();
 		List<Junction> rawJunctionList = higherPrimitives.getRawJunctionList();
 		if (rawJunctionList == null) {
 			List<Joinable> joinableList = createJoinableList();

@@ -56,7 +56,7 @@ public class Path2ShapeConverter {
 	
 	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.12, Units.RADIANS);
 	private static final double DEFAULT_MAX_WIDTH_FOR_PARALLEL = 2.0;
-	public static final Angle DEFAULT_MAX_ANGLE = new Angle(0.12, Units.RADIANS);
+	public static final Angle DEFAULT_MAX_ANGLE = new Angle(0.15, Units.RADIANS);
 	public static final Double DEFAULT_MAX_WIDTH = 2.0;
 	private static final Double DEFAULT_MIN_RECT_THICKNESS = 0.99;
 	private static final double DEFAULT_MAX_PATH_WIDTH = 1.0;
@@ -143,7 +143,7 @@ public class Path2ShapeConverter {
 	}
 
 	public SVGShape convertPathToShape(SVGElement path) {
-		this.setSVGPath((SVGPath)path);
+		this.setSVGPath((SVGPath) path);
 		SVGShape shape = this.convertPathToShape();
 		return shape;
 	}
@@ -231,7 +231,7 @@ public class Path2ShapeConverter {
 	}
 
 	private SVGShape createPolygonRectOrLine(SVGShape shape, SVGPolyline polyline) {
-		SVGPolygon polygon = (SVGPolygon)polyline.createPolygon(RECT_EPS);
+		SVGPolygon polygon = (SVGPolygon) polyline.createPolygon(RECT_EPS);
 		if (polygon != null) {
 			SVGRect rect = polygon.createRect(RECT_EPS);
 			SVGLine line = createLineFromRect(rect); 
@@ -629,12 +629,16 @@ public class Path2ShapeConverter {
 
 	private SVGLine createNarrowLine(SVGLine line0, SVGLine line1) {
 		SVGLine line = null;
-		if (line0.isParallelOrAntiParallelTo(line1, ANGLE_EPS)) {
-			double dist = line0.calculateUnsignedDistanceBetweenLines(line1, ANGLE_EPS);
+		if (line0.isParallelOrAntiParallelTo(line1, maxAngle)) {
+			double dist = line0.calculateUnsignedDistanceBetweenLines(line1, maxAngle);
 			if (dist < maxPathWidth) {
-				Real2 end0 = line0.getXY(0).getMidPoint(line1.getXY(0));
-				Real2 end1 = line0.getXY(1).getMidPoint(line1.getXY(1));
-				line = new SVGLine(end0, end1);
+				Real2 end0Parallel = line0.getXY(0).getMidPoint(line1.getXY(0));
+				Real2 end1Parallel = line0.getXY(1).getMidPoint(line1.getXY(1));
+				Real2 end0AntiParallel = line0.getXY(0).getMidPoint(line1.getXY(1));
+				Real2 end1AntiParallel = line0.getXY(1).getMidPoint(line1.getXY(0));
+				SVGLine lineParallel = new SVGLine(end0Parallel, end1Parallel);
+				SVGLine lineAntiParallel = new SVGLine(end0AntiParallel, end1AntiParallel);
+				line = (lineParallel.getLength() > lineAntiParallel.getLength() ? lineParallel : lineAntiParallel);
 				LOG.trace("line: "+line);
 			}
 		}
@@ -676,10 +680,10 @@ public class Path2ShapeConverter {
 			Real2 origin = rect.getXY();
 			double width = rect.getWidth();
 			double height = rect.getHeight();
-			if (width < minRectThickness ) {
-				line = new SVGLine(origin, origin.plus(new Real2(0.0, height)));
-			} else if (height < minRectThickness ) {
-				line = new SVGLine(origin, origin.plus(new Real2(width, 0.0)));
+			if (width < minRectThickness) {
+				line = new SVGLine(origin.plus(new Real2(width / 2, 0.0)), origin.plus(new Real2(width / 2, height)));
+			} else if (height < minRectThickness) {
+				line = new SVGLine(origin.plus(new Real2(0.0, height / 2)), origin.plus(new Real2(width, height / 2)));
 			}
 		}
 		return line;
