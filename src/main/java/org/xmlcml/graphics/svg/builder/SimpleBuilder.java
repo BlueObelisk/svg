@@ -6,18 +6,12 @@ import java.util.List;
 import nu.xom.Attribute;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGPolygon;
-import org.xmlcml.graphics.svg.SVGPolyline;
-import org.xmlcml.graphics.svg.SVGRect;
-import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.graphics.svg.path.Path2ShapeConverter;
@@ -68,7 +62,7 @@ public class SimpleBuilder {
 	private final static Logger LOG = Logger.getLogger(SimpleBuilder.class);
 	
 	protected SVGElement svgRoot;
-	private List<SVGElement> highLevelPrimitives;
+	private List<SVGElement> complexShapes;
 	
 	protected SVGPrimitives derivedPrimitives;
 	protected SVGPrimitives rawPrimitives;
@@ -101,15 +95,15 @@ public class SimpleBuilder {
 	 * 
 	 * @return
 	 */
-	public List<SVGElement> createHighLevelPrimitivesFromPaths() {
-		if (highLevelPrimitives == null) {
-			highLevelPrimitives = new ArrayList<SVGElement>();
+	public List<SVGElement> createComplexShapesFromPaths() {
+		if (complexShapes == null) {
+			complexShapes = new ArrayList<SVGElement>();
 			createRawShapeAndPathLists();
 			createDerivedShapesFromPaths();
 			abstractPolygons();
 			createRawTextList();
 		}
-		return highLevelPrimitives;
+		return complexShapes;
 	}
 	
 	private void createRawShapeAndPathLists() {
@@ -207,7 +201,7 @@ public class SimpleBuilder {
 					sections.get(0).addAll(currentSection);
 					sections.remove(currentSection);
 				}
-				double area = polygon.getBoundingBox().getDimension().getHeight() * polygon.getBoundingBox().getDimension().getWidth();
+				double area = polygon.getBoundingBox().calculateArea();
 				for (ArrayList<Real2> section : sections) {
 					int position = 0;
 					for (int k = points.size() - 1; k >= 0; k--) {
@@ -220,7 +214,7 @@ public class SimpleBuilder {
 						}
 					}
 					polygon.setBoundingBoxCached(false);
-					if (polygon.getBoundingBox().getDimension().getHeight() * polygon.getBoundingBox().getDimension().getWidth() < 0.92 * area) {
+					if (polygon.getBoundingBox().calculateArea() < 0.92 * area) {
 						Real2Array pointsNew = points.createSubArray(0, position - 1);
 						pointsNew.add(section.get(section.size() / 2));
 						pointsNew.add(points.createSubArray(position, points.size() - 1));
@@ -228,7 +222,7 @@ public class SimpleBuilder {
 					}
 					polygon.setReal2Array(points);
 				}
-				highLevelPrimitives.add(polygon);
+				complexShapes.add(polygon);
 				rawPrimitives.getPathList().remove(i);
 			}
 		}
@@ -275,7 +269,7 @@ public class SimpleBuilder {
 			abstractPolygons();
 			List<SVGElement> toJoin = new ArrayList<SVGElement>();
 			toJoin.addAll(higherPrimitives.getSingleLineList());
-			toJoin.addAll(highLevelPrimitives);
+			toJoin.addAll(complexShapes);
 			joinableList = JoinManager.makeJoinableList(toJoin);
 			higherPrimitives.addJoinableList(joinableList);
 		}
@@ -300,7 +294,7 @@ public class SimpleBuilder {
 			abstractPolygons();
 			List<SVGElement> toJoin = new ArrayList<SVGElement>();
 			toJoin.addAll(higherPrimitives.getSingleLineList());
-			toJoin.addAll(highLevelPrimitives);
+			toJoin.addAll(complexShapes);
 			List<Joinable> joinableList = JoinManager.makeJoinableList(toJoin);
 			joinableList.addAll(higherPrimitives.getTramLineList());
 			createRawTextList();
