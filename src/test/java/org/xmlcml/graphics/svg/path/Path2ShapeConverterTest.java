@@ -125,9 +125,9 @@ public class Path2ShapeConverterTest {
 	@Test
 	public void testReplaceTwoQuadrantCapsByButt() {
 		SVGElement svgElement = createAndProcessElement(new File(Fixtures.PATHS_DIR, "roundedline.svg"));
-		SVGLine line = (SVGLine)svgElement.getChildElements().get(0).getChildElements().get(0);
+		SVGLine line = (SVGLine) svgElement.getChildElements().get(0).getChildElements().get(0);
 		Assert.assertEquals("path converted to line", 
-				"<line fill=\"#000000\" stroke=\"black\" stroke-width=\"0.0\" x1=\"172.14\" y1=\"504.3\" x2=\"172.14\" y2=\"512.58\" id=\"line.0\" />",
+				"<line fill=\"#000000\" stroke=\"black\" stroke-width=\"0.0\" x1=\"172.38\" y1=\"504.3\" x2=\"172.38\" y2=\"512.58\" id=\"line.0\" />",
 				line.toXML());
 	}
 	
