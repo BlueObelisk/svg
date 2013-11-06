@@ -63,11 +63,6 @@ public class SVGPolyline extends SVGPoly {
 	 */
 	public SVGPolyline(SVGLine line) {
         this();
-//        CMLElement.copyAttributesFromTo(line, this);
-//        CMLElement.deleteAttribute(this, X1);
-//        CMLElement.deleteAttribute(this, Y1);
-//        CMLElement.deleteAttribute(this, X2);
-//        CMLElement.deleteAttribute(this, Y2);
         XMLUtil.copyAttributesFromTo(line, this);
         XMLUtil.deleteAttribute(this, X1);
         XMLUtil.deleteAttribute(this, Y1);
@@ -330,7 +325,7 @@ public class SVGPolyline extends SVGPoly {
 				Real2Array real2Array1 = new Real2Array(real2Array);
 				real2Array1.deleteElement(real2Array.size() - 1);
 				polygon = new SVGPolygon(real2Array1);
-			} else if (this.getIsClosed()) {
+			} else if (this.isClosed()) {
 				Real2Array real2Array1 = new Real2Array(real2Array);
 				polygon = new SVGPolygon(real2Array1);
 			}

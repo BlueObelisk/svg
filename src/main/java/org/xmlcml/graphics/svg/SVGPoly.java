@@ -413,15 +413,20 @@ public abstract class SVGPoly extends SVGShape {
 		return rect;
 	}
 
-	public Boolean getIsClosed() {
+	public Boolean isClosed() {
 		return isClosed;
 	}
 
+	public Boolean isBox() {
+		return isBox;
+	}
+
+	@Deprecated
 	public Boolean getIsBox() {
 		return isBox;
 	}
 	
-	public void setIsClosed(boolean isClosed) {
+	public void setClosed(boolean isClosed) {
 		this.isClosed = isClosed;
 	}
 
@@ -469,6 +474,11 @@ public abstract class SVGPoly extends SVGShape {
 		return isBox;
 	}
 
+	public Boolean isAligned() {
+		return isAligned;
+	}
+
+	@Deprecated
 	public Boolean getIsAligned() {
 		return isAligned;
 	}

@@ -36,6 +36,7 @@ public class JoinManager {
 			for (int j = 0; j < otherJoinPoints.size(); j++) {
 				JoinPoint otherJoinPoint = otherJoinPoints.get(j);
 				double distanceToOther = joinPoint.getDistanceTo(otherJoinPoint);
+				LOG.trace("join distance "+distanceToOther);
 				if (joinPoint.getRadius() + otherJoinPoint.getRadius() > distanceToOther) {
 					JoinPoint commonJoinPoint = null;
 					if (joinPoint.getPriority() > otherJoinPoint.getPriority()) {

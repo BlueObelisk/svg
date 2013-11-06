@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
@@ -14,7 +15,6 @@ import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
-import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGText;
@@ -26,9 +26,10 @@ import org.xmlcml.graphics.svg.SVGText;
  * @author pm286
  *
  */
-public class GeometryBuilderTest {
+@Ignore
+public class SimpleBuilderTest {
 
-	private final static Logger LOG = Logger.getLogger(GeometryBuilderTest.class);
+	private final static Logger LOG = Logger.getLogger(SimpleBuilderTest.class);
 	public static final Angle MAX_ANGLE = new Angle(0.12, Units.RADIANS);
 	public static final Double MAX_WIDTH = 2.0;
 
@@ -427,7 +428,7 @@ public class GeometryBuilderTest {
 		} catch (Exception e) {
 			
 		}
-		for (SVGElement l : simpleBuilder.createHighLevelPrimitivesFromPaths()) {
+		for (SVGElement l : simpleBuilder.createComplexShapesFromPaths()) {
 			SVGShape o = (SVGShape) l.copy();
 			o.setStrokeWidth(0.1);
 			o.setFill("white");
