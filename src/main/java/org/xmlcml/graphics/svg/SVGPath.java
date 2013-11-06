@@ -246,7 +246,7 @@ public class SVGPath extends SVGShape {
 		createCoordArray();
 		if (isPolyline && allCoords.size() > 1) {
 			polyline = new SVGPolyline(allCoords);
-			polyline.setIsClosed(isClosed);
+			polyline.setClosed(isClosed);
 		}
 		return polyline;
 	}
