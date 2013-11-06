@@ -1230,6 +1230,11 @@ public class SVGElement extends GraphicsElement {
 		return bbox == null ? null : bbox.getRealRange(direction);
 	}
 
+	public static List<SVGElement> extractSelfAndDescendantElements(SVGElement element) {
+		return SVGUtil.getQuerySVGElements(element, ALL_ELEMENT_XPATH);
+	}
+
+	@Deprecated
 	public static List<SVGElement> extractSelfAndDescendantElements(SVGG g) {
 		return SVGUtil.getQuerySVGElements(g, ALL_ELEMENT_XPATH);
 	}
