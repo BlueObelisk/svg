@@ -689,8 +689,8 @@ public class SVGPath extends SVGShape {
 		return SVGPath.extractPaths(SVGUtil.getQuerySVGElements(svgElement, ALL_PATH_XPATH));
 	}
 
-	public static List<SVGPath> extractSelfAndDescendantPaths(SVGG g) {
-		return SVGPath.extractPaths(SVGUtil.getQuerySVGElements(g, ALL_PATH_XPATH));
+	public static List<SVGPath> extractSelfAndDescendantPaths(SVGElement svgElement) {
+		return SVGPath.extractPaths(SVGUtil.getQuerySVGElements(svgElement, ALL_PATH_XPATH));
 	}
 
 	/** not finished
