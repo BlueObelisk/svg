@@ -12,10 +12,9 @@ import java.util.List;
 
 public class CompacterTest {
 
-	List<String> ATTNAMES = Arrays.asList(new String[] {"a", "b", "x"});
-	List<String> SVGNAMES = Arrays.asList(new String[] {
-			"stroke", "fill", "clip-path", "fontName", "font-family", "font-weight", "font-size", "font-style", "stroke-width"
-			/*"x", "y", "width"*/});
+	List<String> ATTNAMES = Arrays.asList("a", "b", "x");
+	List<String> SVGNAMES = Arrays.asList("stroke", "fill", "clip-path", "fontName", "font-family", "font-weight", "font-size", "font-style", "stroke-width"
+			/*"x", "y", "width"*/);
 	
 	@Test
 	public void testRemoveAttributes() {

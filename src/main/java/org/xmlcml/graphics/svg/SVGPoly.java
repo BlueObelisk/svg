@@ -53,10 +53,7 @@ public abstract class SVGPoly extends SVGShape {
 		POINTS
 	};
 	public final static List<String> SVG_ATTS = Arrays.asList(
-		new String[] {
-			POINTS
-		}
-	);
+            POINTS);
 	
 	
 	protected Real2Array real2Array;
