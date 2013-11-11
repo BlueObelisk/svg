@@ -25,9 +25,9 @@
         </license>
     </licenses>
     <scm>
-        <url>https://bitbucket.org/petermr/svg/src</url>
-        <connection>scm:hg:http://bitbucket.org/petermr/svg</connection>
-        <developerConnection>scm:hg:https://bitbucket.org/petermr/svg</developerConnection>
+        <url>https://bitbucket.org/petermr/svg-dev/src</url>
+        <connection>scm:hg:http://bitbucket.org/petermr/svg-dev</connection>
+        <developerConnection>scm:hg:https://bitbucket.org/petermr/svg-dev</developerConnection>
     </scm>
 
     <developers>
@@ -40,7 +40,7 @@
     <inceptionYear>2007</inceptionYear>
     <ciManagement>
         <system>hudson</system>
-        <url>http://hudson.ch.cam.ac.uk/job/svg</url>
+        <url>https://hudson.ch.cam.ac.uk/job/svg-dev/</url>
     </ciManagement>
 
     <organization>
