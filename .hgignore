@@ -7,3 +7,4 @@ foo
 ^target/.*
 /target/
 ^\.idea/
+svg-dev.iml
