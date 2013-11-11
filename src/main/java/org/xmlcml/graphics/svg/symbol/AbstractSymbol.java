@@ -35,9 +35,9 @@ public abstract class AbstractSymbol extends SVGG {
 		ROTPI2,
 		ROTPI,
 		ROT3PI4,
-	};
+	}
 
-	public enum SymbolFill {
+    public enum SymbolFill {
 		NONE,
 		ALL,
 		LEFT,
@@ -48,9 +48,9 @@ public abstract class AbstractSymbol extends SVGG {
 		SE,
 		SW,
 		NW
-	};
-	
-	// "reasonable defaults"
+	}
+
+    // "reasonable defaults"
 	private String unicodeString = "?!"; 
 	private SymbolFill fill = SymbolFill.NONE;
 	private SymbolOrientation orientation = SymbolOrientation.ROT0;
