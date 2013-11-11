@@ -1,25 +1,18 @@
 package org.xmlcml.graphics.svg;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test;
+import org.xmlcml.euclid.*;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealRange;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.euclid.Vector2;
 
 public class SVGUtilTest {
 

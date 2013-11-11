@@ -1,9 +1,5 @@
 package org.xmlcml.graphics.svg.image;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,8 +8,11 @@ import org.xmlcml.graphics.svg.Fixtures;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGImage;
 import org.xmlcml.graphics.svg.SVGUtil;
-import org.xmlcml.graphics.svg.image.ImageConverter;
 import org.xmlcml.xml.XMLUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 
 public class ImageConverterTest {

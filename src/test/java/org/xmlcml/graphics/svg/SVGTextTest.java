@@ -16,22 +16,17 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.io.File;
-import java.util.List;
-
 import nu.xom.Element;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.cml.testutil.JumboTestUtils;
-import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.euclid.Vector2;
+import org.xmlcml.euclid.*;
 import org.xmlcml.xml.XMLUtil;
+
+import java.io.File;
+import java.util.List;
 
 public class SVGTextTest {
 	private static Logger LOG = Logger.getLogger(SVGTextTest.class);

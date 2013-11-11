@@ -1,13 +1,13 @@
 package org.xmlcml.graphics.svg.symbol;
 
-import java.io.File;
-
 import org.junit.Test;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Vector2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.symbol.AbstractSymbol.SymbolFill;
+
+import java.io.File;
 
 public class SymbolTest {
 	

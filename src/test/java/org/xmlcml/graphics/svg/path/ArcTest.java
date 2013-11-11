@@ -1,9 +1,6 @@
 package org.xmlcml.graphics.svg.path;
 
-import java.io.File;
-
 import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.xmlcml.euclid.Real2;
@@ -12,6 +9,8 @@ import org.xmlcml.graphics.svg.Fixtures;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGSVG;
+
+import java.io.File;
 
 public class ArcTest {
 

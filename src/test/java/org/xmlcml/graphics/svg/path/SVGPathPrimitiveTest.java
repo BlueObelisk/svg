@@ -1,7 +1,6 @@
 package org.xmlcml.graphics.svg.path;
 
 import junit.framework.Assert;
-
 import org.junit.Test;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGPath;

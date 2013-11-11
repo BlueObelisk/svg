@@ -1,12 +1,11 @@
 package org.xmlcml.graphics.svg.image;
 
+import org.apache.log4j.Logger;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Arrays;
-
-import javax.imageio.ImageIO;
-
-import org.apache.log4j.Logger;
 
 /**
  * <p><em>This software has been released into the public domain.

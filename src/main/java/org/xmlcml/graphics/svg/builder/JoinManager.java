@@ -1,13 +1,13 @@
 package org.xmlcml.graphics.svg.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPolygon;
 import org.xmlcml.graphics.svg.SVGText;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** joins graphic components by chemical rules.
  * 

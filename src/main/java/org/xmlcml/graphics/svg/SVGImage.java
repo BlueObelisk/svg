@@ -16,38 +16,25 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import nu.xom.Attribute;
+import nu.xom.Element;
+import nu.xom.Node;
+import org.apache.log4j.Logger;
+import org.apache.xerces.impl.dv.util.Base64;
+import org.xmlcml.euclid.*;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
-
-import nu.xom.Attribute;
-import nu.xom.Element;
-import nu.xom.Node;
-
-import org.apache.log4j.Logger;
-import org.apache.xerces.impl.dv.util.Base64;
-import org.xmlcml.euclid.Real;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealSquareMatrix;
-import org.xmlcml.euclid.Transform2;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** supports defs
  * 

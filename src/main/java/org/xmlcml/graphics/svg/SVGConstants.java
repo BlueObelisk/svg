@@ -17,7 +17,6 @@
 package org.xmlcml.graphics.svg;
 
 import nu.xom.XPathContext;
-
 import org.xmlcml.xml.XMLConstants;
 
 public interface SVGConstants extends XMLConstants {

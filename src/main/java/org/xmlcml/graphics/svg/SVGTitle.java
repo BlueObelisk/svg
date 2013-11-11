@@ -16,14 +16,13 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Graphics2D;
-
 import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.Text;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Array;
+
+import java.awt.*;
 
 /** draws a straight line.
  * 

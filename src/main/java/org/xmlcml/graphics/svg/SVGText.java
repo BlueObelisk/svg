@@ -1,30 +1,15 @@
 package org.xmlcml.graphics.svg;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.List;
-
-import nu.xom.Attribute;
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.Nodes;
-import nu.xom.Text;
-
+import nu.xom.*;
 import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.EuclidConstants;
-import org.xmlcml.euclid.Real;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealSquareMatrix;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.euclid.Util;
-import org.xmlcml.euclid.Vector2;
+import org.xmlcml.euclid.*;
 import org.xmlcml.graphics.svg.fonts.FontWidths;
 import org.xmlcml.xml.XMLConstants;
 import org.xmlcml.xml.XMLUtil;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** draws text.
  * 

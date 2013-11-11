@@ -1,10 +1,9 @@
 package org.xmlcml.graphics.svg.builder;
 
+import org.xmlcml.graphics.svg.SVGLine;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.xmlcml.graphics.svg.SVGLine;
-import org.xmlcml.graphics.svg.SVGPath;
 
 /** holds primitives that are being built.
  * 

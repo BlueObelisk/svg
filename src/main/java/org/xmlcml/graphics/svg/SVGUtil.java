@@ -1,17 +1,6 @@
 package org.xmlcml.graphics.svg;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import nu.xom.Attribute;
-import nu.xom.Builder;
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.Nodes;
-
+import nu.xom.*;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
@@ -19,6 +8,12 @@ import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Vector2;
 import org.xmlcml.xml.XMLConstants;
 import org.xmlcml.xml.XMLUtil;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SVGUtil {
 

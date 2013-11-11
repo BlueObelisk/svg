@@ -16,15 +16,14 @@
 
 package org.xmlcml.graphics.svg;
 
+import nu.xom.Attribute;
+import org.apache.log4j.Logger;
+import org.xmlcml.xml.XMLConstants;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import nu.xom.Attribute;
-
-import org.apache.log4j.Logger;
-import org.xmlcml.xml.XMLConstants;
 
 public class StyleBundle implements XMLConstants {
 

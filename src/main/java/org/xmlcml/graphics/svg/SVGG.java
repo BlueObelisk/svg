@@ -17,16 +17,15 @@
 package org.xmlcml.graphics.svg;
 
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Range;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
