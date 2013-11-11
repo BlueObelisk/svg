@@ -74,7 +74,7 @@ public class SVGPolyline extends SVGPoly {
 	/** constructor
 	 */
 	public SVGPolyline(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

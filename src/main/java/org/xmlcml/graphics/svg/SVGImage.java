@@ -82,7 +82,7 @@ public class SVGImage extends SVGShape {
 	/** constructor
 	 */
 	public SVGImage(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor
@@ -552,7 +552,7 @@ public class SVGImage extends SVGShape {
 		int w = img.getWidth();
 	    int h = img.getHeight();
 	    BufferedImage rot = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-		Graphics2D graphic = (Graphics2D) rot.createGraphics();
+		Graphics2D graphic = rot.createGraphics();
 		graphic.drawImage(img, affineTransform, null);
 		return rot;
 	}

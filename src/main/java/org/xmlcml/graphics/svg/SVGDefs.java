@@ -37,7 +37,7 @@ public class SVGDefs extends SVGElement {
 	/** constructor
 	 */
 	public SVGDefs(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

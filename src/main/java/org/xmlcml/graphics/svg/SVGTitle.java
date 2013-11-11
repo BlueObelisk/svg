@@ -47,7 +47,7 @@ public class SVGTitle extends SVGElement {
 	/** constructor
 	 */
 	public SVGTitle(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

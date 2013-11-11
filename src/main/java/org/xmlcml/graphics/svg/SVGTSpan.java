@@ -52,7 +52,7 @@ public class SVGTSpan extends SVGText {
 	/** constructor
 	 */
 	public SVGTSpan(SVGTSpan element) {
-        super((SVGElement) element, TAG);
+        super(element, TAG);
 	}
 	
 	/** constructor

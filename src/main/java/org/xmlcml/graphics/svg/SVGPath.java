@@ -82,7 +82,7 @@ public class SVGPath extends SVGShape {
 	/** constructor
 	 */
 	public SVGPath(SVGPath element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

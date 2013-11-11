@@ -77,12 +77,12 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	public SVGElement(SVGElement element) {
-        super((GraphicsElement) element);
+        super(element);
         this.userElement = element.userElement;
 	}
 	
 	public SVGElement(SVGElement element, String tag) {
-        super((GraphicsElement) element, tag);
+        super(element, tag);
         this.userElement = element.userElement;
 	}
 	
@@ -148,7 +148,7 @@ public class SVGElement extends GraphicsElement {
 	 */
 	public static SVGElement readAndCreateSVG(File file) {
 		Element element = XMLUtil.parseQuietlyToDocument(file).getRootElement();
-		return (element == null) ? null : (SVGElement) readAndCreateSVG(element);
+		return (element == null) ? null : readAndCreateSVG(element);
 	}
 	
 	/** converts an SVG file to SVGElement
@@ -158,7 +158,7 @@ public class SVGElement extends GraphicsElement {
 	 */
 	public static SVGElement readAndCreateSVG(InputStream is) {
 		Element element = XMLUtil.parseQuietlyToDocument(is).getRootElement();
-		return (element == null) ? null : (SVGElement) readAndCreateSVG(element);
+		return (element == null) ? null : readAndCreateSVG(element);
 	}
 	
 	protected static void createSubclassedChildren(Element oldElement, SVGElement newElement) {

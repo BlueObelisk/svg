@@ -40,7 +40,7 @@ public class SVGClipPath extends SVGElement {
 	/** constructor
 	 */
 	public SVGClipPath(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

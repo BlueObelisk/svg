@@ -50,7 +50,7 @@ public class SVGRect extends SVGShape {
 	/** constructor
 	 */
 	public SVGRect(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

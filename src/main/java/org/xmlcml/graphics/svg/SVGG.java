@@ -49,7 +49,7 @@ public class SVGG extends SVGElement {
 	}
 
 	public SVGG(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

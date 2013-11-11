@@ -42,7 +42,7 @@ public class SVGScript extends SVGElement {
 	/** constructor
 	 */
 	public SVGScript(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

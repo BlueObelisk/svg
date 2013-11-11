@@ -39,7 +39,7 @@ public class SVGTextTest {
 	@Ignore
 	public void testSetup() {
 		Element element = JumboTestUtils.parseValidString(STRING1);
-		SVGElement text = (SVGElement) SVGElement.readAndCreateSVG(element);
+		SVGElement text = SVGElement.readAndCreateSVG(element);
 		Assert.assertNotNull(text);
 		Assert.assertEquals("class", SVGText.class, text.getClass());
 		Assert.assertEquals("fontsize", 6.2023, text.getFontSize(), 0.0001);
