@@ -17,29 +17,21 @@
 package org.xmlcml.graphics.svg;
 
 
-import java.awt.BasicStroke;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
+import nu.xom.Attribute;
+import nu.xom.Element;
+import nu.xom.Node;
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Axis.Axis2;
+import org.xmlcml.euclid.*;
+import org.xmlcml.euclid.RealArray.Monotonicity;
+import org.xmlcml.xml.XMLConstants;
+
+import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import nu.xom.Attribute;
-import nu.xom.Element;
-import nu.xom.Node;
-
-import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Axis.Axis2;
-import org.xmlcml.euclid.Real;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealArray;
-import org.xmlcml.euclid.RealArray.Monotonicity;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.xml.XMLConstants;
 
 /** draws a straight line.
  * 

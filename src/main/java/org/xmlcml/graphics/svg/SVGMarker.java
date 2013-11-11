@@ -16,16 +16,15 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import nu.xom.Element;
 import nu.xom.Node;
-
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** a virtual point. May not correspond completely with SVG <marker>
  * creates a "point", drawn by an arbitrary symbol

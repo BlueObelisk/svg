@@ -1,10 +1,10 @@
 package org.xmlcml.graphics.svg.path;
 
-import java.awt.geom.GeneralPath;
-
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGPathPrimitive;
+
+import java.awt.geom.GeneralPath;
 
 public class UnknownPrimitive extends SVGPathPrimitive {
 

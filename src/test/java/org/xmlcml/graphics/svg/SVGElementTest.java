@@ -16,11 +16,7 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nu.xom.Element;
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,6 +26,9 @@ import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.RealRange.Direction;
 import org.xmlcml.euclid.RealRangeArray;
 import org.xmlcml.xml.XMLConstants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SVGElementTest {
 

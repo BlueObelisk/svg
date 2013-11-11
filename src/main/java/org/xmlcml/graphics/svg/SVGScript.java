@@ -19,7 +19,6 @@ package org.xmlcml.graphics.svg;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
-
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.xml.XMLConstants;

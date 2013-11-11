@@ -16,17 +16,16 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
-
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
+
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 /** draws a straight line.
  * NOT TESTED

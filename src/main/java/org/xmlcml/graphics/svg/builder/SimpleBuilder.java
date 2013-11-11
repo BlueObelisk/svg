@@ -1,20 +1,14 @@
 package org.xmlcml.graphics.svg.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nu.xom.Attribute;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.graphics.svg.SVGElement;
-import org.xmlcml.graphics.svg.SVGLine;
-import org.xmlcml.graphics.svg.SVGPath;
-import org.xmlcml.graphics.svg.SVGPolygon;
-import org.xmlcml.graphics.svg.SVGShape;
-import org.xmlcml.graphics.svg.SVGText;
+import org.xmlcml.graphics.svg.*;
 import org.xmlcml.graphics.svg.path.Path2ShapeConverter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Builds higher-level primitives from SVGPaths, SVGLines, etc. to create SVG objects 

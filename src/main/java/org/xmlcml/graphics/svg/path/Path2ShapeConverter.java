@@ -1,33 +1,17 @@
 package org.xmlcml.graphics.svg.path;
 
+import nu.xom.Attribute;
+import nu.xom.ParentNode;
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.*;
+import org.xmlcml.euclid.Angle.Units;
+import org.xmlcml.graphics.svg.*;
+import org.xmlcml.xml.XMLUtil;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import nu.xom.Attribute;
-import nu.xom.ParentNode;
-
-import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Angle.Units;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealArray;
-import org.xmlcml.graphics.svg.SVGCircle;
-import org.xmlcml.graphics.svg.SVGElement;
-import org.xmlcml.graphics.svg.SVGLine;
-import org.xmlcml.graphics.svg.SVGPath;
-import org.xmlcml.graphics.svg.SVGPathPrimitive;
-import org.xmlcml.graphics.svg.SVGPoly;
-import org.xmlcml.graphics.svg.SVGPolygon;
-import org.xmlcml.graphics.svg.SVGPolyline;
-import org.xmlcml.graphics.svg.SVGRect;
-import org.xmlcml.graphics.svg.SVGShape;
-import org.xmlcml.graphics.svg.SVGUtil;
-import org.xmlcml.graphics.svg.StyleBundle;
-import org.xmlcml.xml.XMLUtil;
 
 /** converts a SVGPath or list of SVGPaths to SVGShape(s).
  * 

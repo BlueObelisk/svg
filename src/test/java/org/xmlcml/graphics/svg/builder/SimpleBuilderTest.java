@@ -1,8 +1,5 @@
 package org.xmlcml.graphics.svg.builder;
 
-import java.io.File;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -10,14 +7,10 @@ import org.junit.Test;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Real2;
-import org.xmlcml.graphics.svg.Fixtures;
-import org.xmlcml.graphics.svg.SVGCircle;
-import org.xmlcml.graphics.svg.SVGElement;
-import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGLine;
-import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.graphics.svg.SVGShape;
-import org.xmlcml.graphics.svg.SVGText;
+import org.xmlcml.graphics.svg.*;
+
+import java.io.File;
+import java.util.List;
 
 /** test reading molecules
  * 

@@ -1,10 +1,6 @@
 package org.xmlcml.graphics.svg.image;
 
-import org.xmlcml.euclid.Int2;
-import org.xmlcml.euclid.IntMatrix;
-import org.xmlcml.euclid.Line2;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.*;
 
 public class FloodFill {
 

@@ -16,16 +16,15 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Graphics2D;
-import java.io.File;
-import java.io.FileOutputStream;
-
 import nu.xom.Attribute;
 import nu.xom.Node;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.xml.XMLConstants;
+
+import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
 
 /** container for SVG
  * "svg"

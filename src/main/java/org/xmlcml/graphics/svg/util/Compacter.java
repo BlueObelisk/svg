@@ -1,17 +1,11 @@
 package org.xmlcml.graphics.svg.util;
 
-import java.util.ArrayList;
-
-import java.util.List;
-
-import org.xmlcml.graphics.svg.SVGConstants;
-import org.xmlcml.graphics.svg.SVGElement;
-import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.graphics.svg.SVGUtil;
-
 import nu.xom.Attribute;
 import nu.xom.Element;
+import org.xmlcml.graphics.svg.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Compacter {
 	

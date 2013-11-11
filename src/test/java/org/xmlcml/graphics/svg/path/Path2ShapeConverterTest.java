@@ -1,24 +1,15 @@
 package org.xmlcml.graphics.svg.path;
 
+import junit.framework.Assert;
+import org.apache.log4j.Logger;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.xmlcml.graphics.svg.*;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-
-import junit.framework.Assert;
-
-import org.apache.log4j.Logger;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.xmlcml.graphics.svg.Fixtures;
-import org.xmlcml.graphics.svg.SVGCircle;
-import org.xmlcml.graphics.svg.SVGElement;
-import org.xmlcml.graphics.svg.SVGLine;
-import org.xmlcml.graphics.svg.SVGPath;
-import org.xmlcml.graphics.svg.SVGPolygon;
-import org.xmlcml.graphics.svg.SVGRect;
-import org.xmlcml.graphics.svg.SVGShape;
-import org.xmlcml.graphics.svg.SVGUtil;
 
 public class Path2ShapeConverterTest {
 

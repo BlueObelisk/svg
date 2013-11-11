@@ -1,14 +1,14 @@
 package org.xmlcml.graphics.svg.builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPolygon;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class JoinablePolygon implements Joinable {
 	
