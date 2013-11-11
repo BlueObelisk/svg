@@ -394,8 +394,8 @@ public abstract class SVGPoly extends SVGShape {
 			Real2 xy = real2Array.elementAt(i);
 			xy = transform(xy, cumulativeTransform);
 		    poly.lineTo(xy.getX(), xy.getY());
-		};
-		if (closed) {
+		}
+        if (closed) {
 			poly.closePath();
 		}
 		fill(g2d, poly);

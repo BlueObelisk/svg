@@ -554,9 +554,9 @@ public class FontWidths {
 			fontWidthMap.put(HELVETICA, SANS_SERIF);
 			fontWidthMap.put("sans-serif", SANS_SERIF);
 		}
-	};
-	
-	public final static double[] getFontWidths(String family) {
+	}
+
+    public final static double[] getFontWidths(String family) {
 		ensureFontWidthMap();
 		double[] widths = (family == null) ? null : fontWidthMap.get(family.toLowerCase());
 		return (widths == null) ? fontWidthMap.get(HELVETICA) : widths;
