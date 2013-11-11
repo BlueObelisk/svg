@@ -43,7 +43,7 @@ public class SVGAnimateTransform extends AbstractAnimate {
 	/** constructor
 	 */
 	public SVGAnimateTransform(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

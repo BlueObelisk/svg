@@ -40,7 +40,7 @@ public class SVGPattern extends SVGElement {
 	/** constructor
 	 */
 	public SVGPattern(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

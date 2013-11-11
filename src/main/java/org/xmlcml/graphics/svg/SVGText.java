@@ -121,13 +121,13 @@ public class SVGText extends SVGElement {
 	/** constructor
 	 */
 	public SVGText(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor
 	 */
 	protected SVGText(SVGElement element, String tag) {
-        super((SVGElement) element, tag);
+        super(element, tag);
 	}
 	
 	/** constructor
@@ -873,7 +873,7 @@ public class SVGText extends SVGElement {
 	public Double getEnSpaceCount(SVGText nextText) {
 		Double separation = getSeparation(nextText);
 		Double enSpace = getScaledWidthOfEnSpace();
-		return (separation == null || enSpace == null || Math.abs(enSpace) < MIN_FONT_SIZE) ? null : (Double) (separation / enSpace);
+		return (separation == null || enSpace == null || Math.abs(enSpace) < MIN_FONT_SIZE) ? null : separation / enSpace;
 	}
 
 	/**

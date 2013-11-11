@@ -45,7 +45,7 @@ public class SVGPolygon extends SVGPoly {
 	/** constructor
 	 */
 	public SVGPolygon(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
         init();
 	}
 	

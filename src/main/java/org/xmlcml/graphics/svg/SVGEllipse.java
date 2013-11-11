@@ -55,7 +55,7 @@ public class SVGEllipse extends SVGShape {
 	/** constructor
 	 */
 	public SVGEllipse(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor

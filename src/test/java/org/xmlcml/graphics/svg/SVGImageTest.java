@@ -239,8 +239,8 @@ public class SVGImageTest {
 	@Test
 	public void testReadSVG() throws Exception {
 		SVGElement element = SVGElement.readAndCreateSVG(Fixtures.PLOS_GRAPH_SVG);
-		SVGImage svgImage = 
-				(SVGImage) SVGImage.extractImages(SVGUtil.getQuerySVGElements(element, "//*[local-name()='image']")).get(0);
+		SVGImage svgImage =
+                SVGImage.extractImages(SVGUtil.getQuerySVGElements(element, "//*[local-name()='image']")).get(0);
 		svgImage.writeImage("target/testReadSvg.png", SVGImage.IMAGE_PNG);
 	}
 	

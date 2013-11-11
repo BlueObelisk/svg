@@ -96,7 +96,7 @@ public class SVGUtil {
 
 	public static Double decimalPlaces(Double width, int i) {
 		int ii = (int) Math.pow(10., i);
-		return (double)Math.round(width*(int)ii) / (double)ii;
+		return (double)Math.round(width* ii) / (double)ii;
 	}
 
 	/** applies to leaf nodes
@@ -189,7 +189,7 @@ public class SVGUtil {
 			g.getAttribute("font-size").detach();
 			List<SVGElement> texts = SVGUtil.getQuerySVGElements(g, "./svg:text[not(@font-size)]");
 			for (SVGElement text : texts) {
-				((SVGElement)text).setFontSize(fontSize);
+				text.setFontSize(fontSize);
 			}
 		}
 	}

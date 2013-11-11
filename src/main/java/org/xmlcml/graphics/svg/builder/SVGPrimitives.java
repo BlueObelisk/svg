@@ -77,7 +77,7 @@ public class SVGPrimitives {
 		} else if (shape instanceof SVGRect) {
 			add((SVGRect) shape);
 		} else {
-			add((SVGShape) shape);
+			add(shape);
 		}
 	}
 		

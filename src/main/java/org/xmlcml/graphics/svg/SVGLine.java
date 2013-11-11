@@ -63,7 +63,7 @@ public class SVGLine extends SVGShape {
 	/** constructor
 	 */
 	public SVGLine(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor
@@ -187,7 +187,7 @@ public class SVGLine extends SVGShape {
 
 	public void applyAttributes(Graphics2D g2d) {
 		if (g2d != null) {
-			double width = (double) this.getStrokeWidth();
+			double width = this.getStrokeWidth();
 			Stroke s = new BasicStroke((float)width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 			g2d.setStroke(s);
 			super.applyAttributes(g2d);

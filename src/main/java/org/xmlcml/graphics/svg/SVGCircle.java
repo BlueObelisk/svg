@@ -71,7 +71,7 @@ public class SVGCircle extends SVGShape {
 	/** constructor
 	 */
 	public SVGCircle(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor
