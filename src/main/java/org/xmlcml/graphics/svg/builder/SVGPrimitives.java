@@ -281,7 +281,7 @@ public class SVGPrimitives {
 
 	public void addTexts(List<SVGText> textList) {
 		ensureTextList();
-		textList.addAll(textList);
+		this.textList.addAll(textList);
 	}
 
 }

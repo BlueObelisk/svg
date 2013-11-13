@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
 
@@ -16,6 +18,10 @@ public class JoinableLine implements Joinable {
 
 	private SVGLine svgLine;
 	private JoinManager joinManager;
+
+	private static final double DEFAULT_RELATIVE_DISTANCE_TO_INTERSECTION = 1.5;
+	
+	private double relativeDistance = DEFAULT_RELATIVE_DISTANCE_TO_INTERSECTION;
 
 	public JoinableLine(SVGLine svgLine) {
 		this.svgLine = svgLine;
@@ -79,11 +85,36 @@ public class JoinableLine implements Joinable {
 		if (otherJoinable != null) {
 			SVGLine otherBackbone = otherJoinable.getBackbone();
 			Real2 otherPoint = otherJoinable.getPoint();
-			if (this.getBackbone() != null && otherBackbone != null) {
-				intersectionPoint = this.getBackbone().getIntersection(otherBackbone);
-			} else if (this.getPoint() != null) {
+			if (getBackbone() != null && otherBackbone != null) {
+				intersectionPoint = getBackbone().getIntersection(otherBackbone);
+				if (Double.isNaN(intersectionPoint.getX()) || Double.isNaN(intersectionPoint.getY())) {
+					if (getBackbone().isParallelTo(otherBackbone, new Angle(1, Units.RADIANS))) {
+						double dist1 = getBackbone().getEuclidLine().getXY(0).getDistance(otherBackbone.getEuclidLine().getXY(1));
+						double dist2 = getBackbone().getEuclidLine().getXY(1).getDistance(otherBackbone.getEuclidLine().getXY(0));
+						if (dist1 < dist2) {
+							intersectionPoint = getBackbone().getEuclidLine().getXY(0).getMidPoint(otherBackbone.getEuclidLine().getXY(1));
+						} else {
+							intersectionPoint = getBackbone().getEuclidLine().getXY(1).getMidPoint(otherBackbone.getEuclidLine().getXY(0));
+						}
+					} else {
+						double dist1 = getBackbone().getEuclidLine().getXY(0).getDistance(otherBackbone.getEuclidLine().getXY(0));
+						double dist2 = getBackbone().getEuclidLine().getXY(1).getDistance(otherBackbone.getEuclidLine().getXY(1));
+						if (dist1 < dist2) {
+							intersectionPoint = getBackbone().getEuclidLine().getXY(0).getMidPoint(otherBackbone.getEuclidLine().getXY(0));
+						} else {
+							intersectionPoint = getBackbone().getEuclidLine().getXY(1).getMidPoint(otherBackbone.getEuclidLine().getXY(1));
+						}
+					}
+				}
+				if (getBackbone().getEuclidLine().getXY(0).getDistance(intersectionPoint) > getBackbone().getLength() * relativeDistance  && getBackbone().getEuclidLine().getXY(1).getDistance(intersectionPoint) > getBackbone().getLength() * relativeDistance) {
+					return null;
+				}
+				if (otherBackbone.getEuclidLine().getXY(0).getDistance(intersectionPoint) > otherBackbone.getLength() * relativeDistance && otherBackbone.getEuclidLine().getXY(1).getDistance(intersectionPoint) > otherBackbone.getLength() * relativeDistance) {
+					return null;
+				}
+			} else if (getPoint() != null) {
 				intersectionPoint = (otherPoint == null) ? 
-						this.getPoint() : this.getPoint().getMidPoint(otherPoint);
+						getPoint() : getPoint().getMidPoint(otherPoint);
 			} else {
 				intersectionPoint = otherPoint;
 			}
