@@ -66,6 +66,13 @@ public class HigherPrimitives {
 			joinableList = new ArrayList<Joinable>();
 		}
 	}
-
+	
+	public void setTramLineList(List<TramLine> tramLineList) {
+		this.tramLineList = tramLineList;
+	}
+	
+	public void setMergedJunctionList(List<Junction> mergedJunctionList) {
+		this.mergedJunctionList = mergedJunctionList;
+	}
 
 }

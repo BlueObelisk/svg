@@ -207,7 +207,7 @@ public class SVGPath extends SVGShape {
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
-	/** extract polyline if path is M followed by L's
+	/** extract polyline if path is M followed by Ls
 	 * @return
 	 */
 	public void createCoordArray() {

@@ -75,7 +75,7 @@ public class SimpleBuilder {
 		this.svgRoot = svgRoot;
 	}
 
-	/** complete processing chain for lowlevel SVG into highlevel SVG.
+	/** complete processing chain for low-level SVG into high-level SVG.
 	 * 
 	 */
 	public void createHigherLevelPrimitives() {
@@ -135,7 +135,7 @@ public class SimpleBuilder {
 					LOG.trace("shape "+shape.getClass().getSimpleName());
 					addId(i, shape, path);
 					derivedPrimitives.addShapeToSubclassedLists(shape);
-					LOG.trace("Lines "+derivedPrimitives.getLineList().size());
+					LOG.trace("Lines " + (derivedPrimitives.getLineList() == null ? 0 : derivedPrimitives.getLineList().size()));
 					currentPathList.remove(i);
 				}
 			}
@@ -143,7 +143,7 @@ public class SimpleBuilder {
 	}
 
 	public List<SVGLine> createRawAndDerivedLines() {
-		if (rawPrimitives  == null) {
+		if (rawPrimitives == null) {
 			createDerivedShapesFromPaths();
 			ensureHigherPrimitives();
 			ensureRawContainer();
@@ -229,8 +229,8 @@ public class SimpleBuilder {
 	}
 
 	public List<SVGText> createRawTextList() {
-		derivedPrimitives.addTexts(SVGText.extractSelfAndDescendantTexts(svgRoot));
-		return derivedPrimitives.getTextList();
+		rawPrimitives.addTexts(SVGText.extractSelfAndDescendantTexts(svgRoot));
+		return rawPrimitives.getTextList();
 	}
 
 	private void ensureIds(List<? extends SVGElement> elementList) {
@@ -261,47 +261,54 @@ public class SimpleBuilder {
 		if (joinableList == null) {
 			createRawAndDerivedLines();
 			abstractPolygons();
+			createTramLineListAndRemoveUsedLines();
 			List<SVGElement> toJoin = new ArrayList<SVGElement>();
-			toJoin.addAll(higherPrimitives.getSingleLineList());
-			toJoin.addAll(complexShapes);
+			if (higherPrimitives.getSingleLineList() != null) {
+				toJoin.addAll(higherPrimitives.getSingleLineList());
+			}
+			if (complexShapes != null) {
+				toJoin.addAll(complexShapes);
+			}
 			joinableList = JoinManager.makeJoinableList(toJoin);
+			joinableList.addAll(higherPrimitives.getTramLineList());
+			createRawTextList();
+			for (SVGText svgText : rawPrimitives.getTextList()) {
+				joinableList.add(new JoinableText(svgText));
+			}
 			higherPrimitives.addJoinableList(joinableList);
 		}
 		return joinableList;
 	}
 
 	public List<TramLine> createTramLineListAndRemoveUsedLines() {
+		ensureHigherPrimitives();
 		List<TramLine> tramLineList = higherPrimitives.getTramLineList();
 		if (tramLineList == null) {
 			createRawAndDerivedLines();
 			TramLineManager tramLineManager = new TramLineManager();
-			tramLineList = tramLineManager.createTramLineList(higherPrimitives.getSingleLineList());
-			tramLineManager.removeUsedTramLinePrimitives(higherPrimitives.getSingleLineList());
+			if (higherPrimitives.getSingleLineList() != null) {
+				tramLineList = tramLineManager.createTramLineList(higherPrimitives.getSingleLineList());
+				tramLineManager.removeUsedTramLinePrimitives(higherPrimitives.getSingleLineList());
+				higherPrimitives.setTramLineList(tramLineList);
+			}
 		}
 		return tramLineList;
 	}
 
 	public List<Junction> createMergedJunctions() {
+		ensureHigherPrimitives();
 		List<Junction> junctionList = higherPrimitives.getMergedJunctionList();
 		if (junctionList == null) {
-			createTramLineListAndRemoveUsedLines();
-			abstractPolygons();
-			List<SVGElement> toJoin = new ArrayList<SVGElement>();
-			toJoin.addAll(higherPrimitives.getSingleLineList());
-			toJoin.addAll(complexShapes);
-			List<Joinable> joinableList = JoinManager.makeJoinableList(toJoin);
-			joinableList.addAll(higherPrimitives.getTramLineList());
-			createRawTextList();
-			for (SVGText svgText : derivedPrimitives.getTextList()) {
-				joinableList.add(new JoinableText(svgText));
-			}
-			junctionList = this.mergeJunctions();
+			createJoinableList();
+			junctionList = mergeJunctions();
+			higherPrimitives.setMergedJunctionList(junctionList);
 		}
 		return junctionList;
 		
 	}
 
 	public List<Junction> createRawJunctionList() {
+		ensureHigherPrimitives();
 		List<Junction> rawJunctionList = higherPrimitives.getRawJunctionList();
 		if (rawJunctionList == null) {
 			List<Joinable> joinableList = createJoinableList();
@@ -395,6 +402,5 @@ public class SimpleBuilder {
 		Path2ShapeConverter path2ShapeConverter = new Path2ShapeConverter();
 		derivedPrimitives.addShapesToSubclassedLists(path2ShapeConverter.convertPathsToShapes(pathList));
 	}
-
 	
 }
