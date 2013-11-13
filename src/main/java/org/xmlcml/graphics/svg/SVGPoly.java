@@ -319,17 +319,6 @@ public abstract class SVGPoly extends SVGShape {
 				lineList.add(line);
 				lastPoint = point;
 			}
-			if (isClosed()) {
-				line = new SVGLine(real2Array.elementAt(real2Array.size() - 1), real2Array.elementAt(0));
-				copyNonSVGAttributes(this, line);
-				SVGMarker point = new SVGMarker(real2Array.get(0));
-				lastPoint.addLine(line);
-				point.addLine(line);
-				if (line.getEuclidLine().getLength() < 0.0000001) {
-					LOG.trace("ZERO LINE");
-				}
-				lineList.add(line);
-			}
 			setReal2Array(real2Array);
 		}
 		ensureLineList();
@@ -354,7 +343,7 @@ public abstract class SVGPoly extends SVGShape {
 
 
 	
-	private void copyNonSVGAttributes(SVGPoly svgPoly, SVGLine line) {
+	protected void copyNonSVGAttributes(SVGPoly svgPoly, SVGLine line) {
 		for (int i = 0; i < svgPoly.getAttributeCount(); i++) {
 			Attribute attribute = svgPoly.getAttribute(i);
 			if (!SVG_ATTS.contains(attribute.getLocalName())) {
@@ -417,6 +406,11 @@ public abstract class SVGPoly extends SVGShape {
 		return isClosed;
 	}
 
+	public Boolean isBox() {
+		return isBox;
+	}
+
+	@Deprecated
 	public Boolean getIsBox() {
 		return isBox;
 	}
@@ -469,6 +463,11 @@ public abstract class SVGPoly extends SVGShape {
 		return isBox;
 	}
 
+	public Boolean isAligned() {
+		return isAligned;
+	}
+
+	@Deprecated
 	public Boolean getIsAligned() {
 		return isAligned;
 	}
