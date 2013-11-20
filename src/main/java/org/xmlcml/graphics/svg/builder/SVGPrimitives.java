@@ -25,7 +25,27 @@ public class SVGPrimitives {
 	private List<SVGShape> unclassifiedShapeList;
 	
 	public SVGPrimitives() {
-		
+		circleList = new ArrayList<SVGCircle>();
+		lineList = new ArrayList<SVGLine>();
+		pathList = new ArrayList<SVGPath>();
+		polygonList = new ArrayList<SVGPolygon>();
+		polylineList = new ArrayList<SVGPolyline>();
+		rectList = new ArrayList<SVGRect>();
+		shapeList = new ArrayList<SVGShape>();
+		textList = new ArrayList<SVGText>();
+		unclassifiedShapeList = new ArrayList<SVGShape>();
+	}
+	
+	public SVGPrimitives(SVGPrimitives other) {
+		circleList = new ArrayList<SVGCircle>(other.getCircleList());
+		lineList = new ArrayList<SVGLine>(other.getLineList());
+		pathList = new ArrayList<SVGPath>(other.getPathList());
+		polygonList = new ArrayList<SVGPolygon>(other.getPolygonList());
+		polylineList = new ArrayList<SVGPolyline>(other.getPolylineList());
+		rectList = new ArrayList<SVGRect>(other.getRectList());
+		shapeList = new ArrayList<SVGShape>(other.getShapeList());
+		textList = new ArrayList<SVGText>(other.getTextList());
+		unclassifiedShapeList = new ArrayList<SVGShape>(other.getUnclassifiedShapeList());
 	}
 	
 /**
@@ -63,8 +83,7 @@ public class SVGPrimitives {
 	}
 
 	void addShapeToSubclassedLists(SVGShape shape) {
-		if (false) {
-		} else if (shape instanceof SVGCircle) {
+		if (shape instanceof SVGCircle) {
 			add((SVGCircle) shape);
 		} else if (shape instanceof SVGLine) {
 			add((SVGLine) shape);
@@ -86,154 +105,98 @@ public class SVGPrimitives {
 	 * @param shape
 	 */
 	public void addUnclassified(SVGShape shape) {
-		ensureUnclassifiedShapeList();
 		unclassifiedShapeList.add(shape);
 	}
 
-	private void ensureUnclassifiedShapeList() {
-		if (this.unclassifiedShapeList == null) {
-			unclassifiedShapeList = new ArrayList<SVGShape>();
-		}
+	public List<SVGShape> getUnclassifiedShapeList() {
+		return unclassifiedShapeList;
 	}
 
 	/** circle */
-	
-	private void ensureCircleList() {
-		if (this.circleList == null) {
-			circleList = new ArrayList<SVGCircle>();
-		}
-	}
 
 	public List<SVGCircle> getCircleList() {
 		return circleList;
 	}
 
 	public void add(SVGCircle circle) {
-		ensureCircleList();
 		circleList.add(circle);
 	}
 
 	public void addCircles(List<SVGCircle> circleList) {
-		ensureCircleList();
 		circleList.addAll(circleList);
 	}
 	
 	/** line */
-	
-	private void ensureLineList() {
-		if (this.lineList == null) {
-			lineList = new ArrayList<SVGLine>();
-		}
-	}
 
 	public List<SVGLine> getLineList() {
-//		ensureLineList();
 		return lineList;
 	}
 
 	public void add(SVGLine line) {
-		ensureLineList();
 		lineList.add(line);
 	}
 
 	public void addLines(List<SVGLine> lineList) {
-		ensureLineList();
 		lineList.addAll(lineList);
 	}
 
 	/** path */
-	
-	private void ensurePathList() {
-		if (this.pathList == null) {
-			pathList = new ArrayList<SVGPath>();
-		}
-	}
 
 	public List<SVGPath> getPathList() {
 		return pathList;
 	}
 
 	public void add(SVGPath path) {
-		ensurePathList();
 		pathList.add(path);
 	}
 
 	public void addPaths(List<SVGPath> pathList) {
-		ensurePathList();
 		pathList.addAll(pathList);
 	}
 
 	/** polygon */
-	
-	private void ensurePolygonList() {
-		if (this.polygonList == null) {
-			polygonList = new ArrayList<SVGPolygon>();
-		}
-	}
 
 	public List<SVGPolygon> getPolygonList() {
 		return polygonList;
 	}
 
 	public void add(SVGPolygon polygon) {
-		ensurePolygonList();
 		polygonList.add(polygon);
 	}
 
 	public void addPolygons(List<SVGPolygon> polygonList) {
-		ensurePolygonList();
 		polygonList.addAll(polygonList);
 	}
+	
 	/** polyline */
 	
-	private void ensurePolylineList() {
-		if (this.polylineList == null) {
-			polylineList = new ArrayList<SVGPolyline>();
-		}
-	}
-
 	public List<SVGPolyline> getPolylineList() {
 		return polylineList;
 	}
 
 	public void add(SVGPolyline polyline) {
-		ensurePolylineList();
 		polylineList.add(polyline);
 	}
 
 	public void addPolylines(List<SVGPolyline> polylineList) {
-		ensurePolylineList();
 		polylineList.addAll(polylineList);
 	}
-	/** rect */
 	
-	private void ensureRectList() {
-		if (this.rectList == null) {
-			rectList = new ArrayList<SVGRect>();
-		}
-	}
+	/** rect */
 
 	public List<SVGRect> getRectList() {
 		return rectList;
 	}
 
 	public void add(SVGRect rect) {
-		ensureRectList();
 		rectList.add(rect);
 	}
 
 	public void addRects(List<SVGRect> rectList) {
-		ensureRectList();
 		rectList.addAll(rectList);
 	}
 
 	/** shape */
-	
-	private void ensureShapeList() {
-		if (this.shapeList == null) {
-			shapeList = new ArrayList<SVGShape>();
-		}
-	}
 
 	public List<SVGShape> getShapeList() {
 		return shapeList;
@@ -244,34 +207,24 @@ public class SVGPrimitives {
 	 * @param shape
 	 */
 	void add(SVGShape shape) {
-		ensureShapeList();
 		shapeList.add(shape);
 	}
 
-//	public void addShapes(List<SVGShape> shapeList) {
-//		ensureShapeList();
-//		shapeList.addAll(shapeList);
-//	}
+	void addShapes(List<SVGShape> shapeList) {
+		shapeList.addAll(shapeList);
+	}
 
 	/** text */
-	
-	private void ensureTextList() {
-		if (this.textList == null) {
-			textList = new ArrayList<SVGText>();
-		}
-	}
 
 	public List<SVGText> getTextList() {
 		return textList;
 	}
 
 	public void add(SVGText text) {
-		ensureTextList();
 		textList.add(text);
 	}
 
 	public void addTexts(List<SVGText> textList) {
-		ensureTextList();
 		this.textList.addAll(textList);
 	}
 

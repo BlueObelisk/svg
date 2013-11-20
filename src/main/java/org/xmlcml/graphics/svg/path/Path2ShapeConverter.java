@@ -127,8 +127,8 @@ public class Path2ShapeConverter {
 	}
 
 	public SVGShape convertPathToShape(SVGElement path) {
-		this.setSVGPath((SVGPath) path);
-		SVGShape shape = this.convertPathToShape();
+		setSVGPath((SVGPath) path);
+		SVGShape shape = convertPathToShape();
 		return shape;
 	}
 
@@ -167,7 +167,9 @@ public class Path2ShapeConverter {
 	 * @param shapeListOut
 	 */
 	public SVGShape convertPathToShape() {
-		if (svgPath == null) return null;
+		if (svgPath == null) {
+			return null;
+		}
 		SVGShape shape = null;
 		shape = createRectOrAxialLine(RECT_EPS);
 		if (shape == null) {
