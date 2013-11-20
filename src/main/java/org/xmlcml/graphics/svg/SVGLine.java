@@ -188,7 +188,7 @@ public class SVGLine extends SVGShape {
 	public void applyAttributes(Graphics2D g2d) {
 		if (g2d != null) {
 			double width = this.getStrokeWidth();
-			Stroke s = new BasicStroke((float)width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+			Stroke s = new BasicStroke((float) width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 			g2d.setStroke(s);
 			super.applyAttributes(g2d);
 		}
@@ -356,7 +356,7 @@ public class SVGLine extends SVGShape {
 	}
 	
 	public String getXYString() {
-		return getXY(0)+ S_SPACE + getXY(1);
+		return getXY(0) + S_SPACE + getXY(1);
 	}
 
 	public static List<SVGLine> findHorizontalOrVerticalLines(SVGElement svgElement, double eps) {

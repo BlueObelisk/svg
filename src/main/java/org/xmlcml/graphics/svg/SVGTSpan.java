@@ -26,7 +26,7 @@ import java.util.List;
 
 /** draws text.
  * 
- * NOTE: Text can be rotated and the additonal fields manage some of the
+ * NOTE: Text can be rotated and the additional fields manage some of the
  * metrics for this. Still very experimental
  * 
  * @author pm286
@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class SVGTSpan extends SVGText {
 	private static Logger LOG = Logger.getLogger(SVGTSpan.class);
-	public final static String TAG ="tspan";
+	public final static String TAG = "tspan";
 	
 	
 	/** constructor

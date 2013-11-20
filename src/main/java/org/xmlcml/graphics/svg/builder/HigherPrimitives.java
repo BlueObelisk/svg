@@ -12,23 +12,22 @@ import java.util.List;
  */
 public class HigherPrimitives {
 
-	private List<SVGLine> singleLineList;
+	private List<SVGLine> lineList;
 	private List<TramLine> tramLineList;
 	private List<Junction> mergedJunctionList;
 	private List<Joinable> joinableList;
 	private List<Junction> rawJunctionList;
 
-	
-	public void addSingleLines(List<SVGLine> lineList) {
-		if (lineList != null) {
-			ensureSingleLineList();
-			singleLineList.addAll(lineList);
+	private void ensureLineList() {
+		if (lineList == null) {
+			lineList = new ArrayList<SVGLine>();
 		}
 	}
 
-	private void ensureSingleLineList() {
-		if (singleLineList == null) {
-			this.singleLineList = new ArrayList<SVGLine>();
+	public void addSingleLines(List<SVGLine> lineList) {
+		ensureLineList();
+		if (lineList != null) {
+			this.lineList.addAll(lineList);
 		}
 	}
 
@@ -44,8 +43,8 @@ public class HigherPrimitives {
 		return joinableList;
 	}
 
-	public List<SVGLine> getSingleLineList() {
-		return singleLineList;
+	public List<SVGLine> getLineList() {
+		return lineList;
 	}
 
 	public List<Junction> getRawJunctionList() {
