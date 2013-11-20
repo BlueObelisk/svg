@@ -56,12 +56,9 @@ public class SimpleBuilder {
 	private static final double POLYGON_ABSTRACTION_RELATIVE_AREA_THRESHOLD = 0.92;
 	private static final double POLYGON_ABSTRACTION_RELATIVE_DISTANCE_FROM_LINE_THRESHOLD = 0.08;
 
-	//private static final String TEXT = "text";
-
 	private final static Logger LOG = Logger.getLogger(SimpleBuilder.class);
 	
 	protected SVGElement svgRoot;
-	//private List<SVGElement> complexShapes;
 	
 	protected SVGPrimitives derivedPrimitives;
 	protected SVGPrimitives rawPrimitives;
@@ -70,8 +67,6 @@ public class SimpleBuilder {
 	private double relativeDistanceFromLineThreshold = POLYGON_ABSTRACTION_RELATIVE_DISTANCE_FROM_LINE_THRESHOLD;
 	private double relativeAreaThreshold = POLYGON_ABSTRACTION_RELATIVE_AREA_THRESHOLD;
 	
-//	protected List<SVGPath> currentPathList;
-
 	public SimpleBuilder() {
 		
 	}
@@ -83,39 +78,6 @@ public class SimpleBuilder {
 	public void setSvgRoot(SVGElement svgRoot) {
 		this.svgRoot = svgRoot;
 	}
-
-	/** complete processing chain for low-level SVG into high-level SVG.
-	 * 
-	 */
-	//public void createHigherLevelPrimitives() {
-	
-	//}
-
-	/**
-	 * turn SVGPaths into higher level primitives such as SVGLine.
-	 * Create collections of primitives.
-	 * Join them where possible.
-	 * 
-	 * @return
-	 */
-	/*public List<SVGElement> createComplexShapesFromPaths() {
-		if (complexShapes == null) {
-			complexShapes = new ArrayList<SVGElement>();
-			createRawShapeAndPathLists();
-			createDerivedShapesFromPaths();
-			abstractPolygons();
-			createRawTextList();
-		}
-		return complexShapes;
-	}*/
-	
-	/*private void createRawShapeAndPathLists() {
-		if (rawPrimitives == null) {
-			rawPrimitives = new SVGPrimitives();
-			List<SVGShape> shapeList = SVGShape.extractSelfAndDescendantShapes(svgRoot);
-			rawPrimitives.addShapesToSubclassedLists(shapeList);
-		}
-	}*/
 	
 	public void fillRawPrimitivesLists() {
 		if (rawPrimitives == null) {
@@ -125,38 +87,11 @@ public class SimpleBuilder {
 			rawPrimitives.addTexts(SVGText.extractSelfAndDescendantTexts(svgRoot));
 		}
 	}
-	
-	/*public void createDerivedPrimitives() {
-		fillRawPrimitivesLists();
-		derivedPrimitives = new SVGPrimitives(rawPrimitives);
-		Path2ShapeConverter path2ShapeConverter = new Path2ShapeConverter();
-		List<SVGPath> currentPathList = derivedPrimitives.getPathList();
-		if (currentPathList != null) {
-			for (int i = currentPathList.size() - 1; i >= 0; i--) {
-				SVGPath path = currentPathList.get(i);
-				SVGShape shape = path2ShapeConverter.convertPathToShape(path);
-				if (shape != null) {
-					LOG.trace("shape "+shape.getClass().getSimpleName());
-					addId(i, shape, path);
-					derivedPrimitives.addShapeToSubclassedLists(shape);
-					LOG.trace("Lines " + (derivedPrimitives.getLineList() == null ? 0 : derivedPrimitives.getLineList().size()));
-					currentPathList.remove(i);
-				}
-			}
-		}
-	}*/
-	
+
 	/**
-	 * Try to create high-level primitives from paths.
+	 * Turns SVGPaths into higher-level primitives such as SVGLine.
 	 * 
-	 * <p>Uses Path2ShapeConverter.
-	 * Where successful the path is removed from currentPathlist
-	 * and added to implicitShapeList.
-	 * </p>
-	 * 
-	 * @return List of newly created SVGShapes
 	 */
-	
 	public void createDerivedPrimitives() {
 		if (derivedPrimitives == null) {
 			fillRawPrimitivesLists();
@@ -165,7 +100,13 @@ public class SimpleBuilder {
 			abstractPolygons();
 		}
 	}
-	
+
+	/**
+	 * Complete processing chain for low-level SVG into high-level SVG and non-SVG primitives such as tramlines.
+	 * Handles junctions.
+	 * Runs createDerivedPrimitives.
+	 * 
+	 */
 	public void createHigherPrimitives() {
 		if (higherPrimitives == null) {
 			createDerivedPrimitives();
@@ -253,92 +194,6 @@ public class SimpleBuilder {
 		}
 	}
 	
-	/*public List<SVGLine> createRawAndDerivedLines() {
-		if (rawPrimitives == null) {
-			createDerivedShapesFromPaths();
-			ensureHigherPrimitives();
-			ensureRawContainer();
-			ensureDerivedContainer();
-			List<SVGLine> derivedLines = derivedPrimitives.getLineList();
-			higherPrimitives.addSingleLines(derivedLines);
-		}
-		return higherPrimitives.getSingleLineList();
-	}*/
-	
-	/*public void abstractPolygons() {
-		if (rawPrimitives.getPathList() != null) {
-			for (int i = rawPrimitives.getPathList().size() - 1; i >= 0; i--) {
-				SVGShape s = rawPrimitives.getPathList().get(i);
-				if (s instanceof SVGPolygon) {
-					double longestLine = 0.0;
-					ArrayList<ArrayList<Real2>> sections = new ArrayList<ArrayList<Real2>>();
-					SVGPolygon polygon = (SVGPolygon) s;
-					Real2Array points = polygon.getReal2Array(); 
-					Real2 previousPoint = points.get(points.size() - 1);
-					for (int j = 0; j < points.size(); j++) {
-						Real2 p = points.get(j);
-						if (p.getDistance(previousPoint) > longestLine) {
-							longestLine = p.getDistance(previousPoint);
-						}
-						previousPoint = p;
-					}
-					Real2 previousPreviousPoint = points.get(0);
-					previousPoint = points.get(points.size() - 1);
-					ArrayList<Real2> currentSection = new ArrayList<Real2>();
-					sections.add(currentSection);
-					for (int j = points.size() - 2; j >= 0; j--) {
-						SVGLine l = new SVGLine(points.get(j), previousPreviousPoint);
-						if (l.getNearestPointOnLine(previousPoint).getDistance(previousPoint) < 0.08 * longestLine) {
-							currentSection.add(previousPoint);
-						} else {
-							currentSection = new ArrayList<Real2>();
-							sections.add(currentSection);
-						}
-						previousPreviousPoint = previousPoint;
-						previousPoint = points.get(j);
-					}
-					int j = points.size() - 1;
-					SVGLine line = new SVGLine(points.get(j), previousPreviousPoint);
-					if (line.getNearestPointOnLine(previousPoint).getDistance(previousPoint) < 0.08 * longestLine) {
-						currentSection.add(previousPoint);
-						sections.get(0).addAll(currentSection);
-						sections.remove(currentSection);
-					}
-					double area = polygon.getBoundingBox().calculateArea();
-					for (ArrayList<Real2> section : sections) {
-						int position = 0;
-						for (int k = points.size() - 1; k >= 0; k--) {
-							for (Real2 l : section) {
-								if (points.get(k).isEqualTo(l, 1.0E-10)) {
-									points.deleteElement(k);
-									position = k;
-									break;
-								}
-							}
-						}
-						polygon.setBoundingBoxCached(false);
-						if (polygon.getBoundingBox().calculateArea() < 0.92 * area) {
-							Real2Array pointsNew = points.createSubArray(0, position - 1);
-							pointsNew.add(section.get(section.size() / 2));
-							pointsNew.add(points.createSubArray(position, points.size() - 1));
-							points = pointsNew;
-						}
-						polygon.setReal2Array(points);
-					}
-					complexShapes.add(polygon);
-					rawPrimitives.getPathList().remove(i);
-				}
-			}
-		}
-	}*/
-
-	/*private void ensureIds(List<? extends SVGElement> elementList) {
-		for (int i = 0; i < elementList.size(); i++){
-			SVGElement element = elementList.get(i);
-			addId(i, element, null);
-		}
-	}*/
-	
 	private void createMergedJunctions() {
 		createRawJunctionList();
 		List<Junction> junctionList = new ArrayList<Junction>(higherPrimitives.getRawJunctionList());
@@ -374,11 +229,6 @@ public class SimpleBuilder {
 		higherPrimitives.setTramLineList(tramLineList);
 	}
 
-	/*private void createMergedJunctions() {
-		List<Junction> junctionList = mergeJunctions();
-		higherPrimitives.setMergedJunctionList(junctionList);
-	}*/
-
 	private void createRawJunctionList() {
 		createJoinableList();
 		List<Joinable> joinableList = higherPrimitives.getJoinableList();
@@ -408,6 +258,14 @@ public class SimpleBuilder {
 		if (id == null) {
 			id = element.getLocalName()+"."+i;
 			element.setId(id);
+		}
+		
+	}
+	
+	private void ensureIds(List<? extends SVGElement> elementList) {
+		for (int i = 0; i < elementList.size(); i++){
+			SVGElement element = elementList.get(i);
+			addId(i, element, null);
 		}
 	}*/
 

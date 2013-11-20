@@ -69,7 +69,6 @@ public class SimpleBuilderTest {
 		Assert.assertEquals("junctions", 6, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
 	}
 
-	
 	@Test
 	public void testnonWedgeBondsAndElements() {
 		SVGElement svgRoot = SVGElement.readAndCreateSVG(IMAGE_2_13_SVG);
@@ -78,7 +77,6 @@ public class SimpleBuilderTest {
 		//simpleBuilder.createRawAndDerivedLines();
 		Assert.assertEquals("lines", 13, simpleBuilder.getDerivedPrimitives().getLineList().size());
 	}
-
 	
 	@Test
 	public void testnonWedgeBondsAndElements1() {
