@@ -312,9 +312,9 @@ public class SVGPolyline extends SVGPoly {
 //		pointList = null;
 	}
 	
-	public SVGPoly createPolygon(double eps) {
+	public SVGPolygon createPolygon(double eps) {
 		createLineList();
-		SVGPoly polygon = null;
+		SVGPolygon polygon = null;
 		if (real2Array == null) {
 			throw new RuntimeException("null real2Array");
 		}

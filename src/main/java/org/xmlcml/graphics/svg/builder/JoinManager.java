@@ -22,6 +22,7 @@ public class JoinManager {
 	private List<Junction> junctionList;
 
 	public JoinManager() {
+		
 	}
 	
 	List<JoinPoint> getCommonJoinPointList(JoinManager otherJoiner) {
@@ -85,7 +86,7 @@ public class JoinManager {
 	public static List<Joinable> makeJoinableList(List<? extends SVGElement> elementList) {
 		List<Joinable> joinableList = new ArrayList<Joinable>();
 		for (SVGElement element : elementList) {
-			Joinable joinable = JoinManager.createJoinable(element);
+			Joinable joinable = createJoinable(element);
 			if (joinable != null) {
 				joinableList.add(joinable);
 			}

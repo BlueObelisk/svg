@@ -31,6 +31,7 @@ public class JoinableLine implements Joinable {
 	public double getPriority() {
 		return LINE_PRORITY;
 	}
+	
 	public void createJoinerAndAddPoints() {
 		joinManager = new JoinManager();
 		joinManager.add(new JoinPoint(this, svgLine.getXY(0)));
@@ -106,7 +107,7 @@ public class JoinableLine implements Joinable {
 						}
 					}
 				}
-				if (getBackbone().getEuclidLine().getXY(0).getDistance(intersectionPoint) > getBackbone().getLength() * relativeDistance  && getBackbone().getEuclidLine().getXY(1).getDistance(intersectionPoint) > getBackbone().getLength() * relativeDistance) {
+				if (getBackbone().getEuclidLine().getXY(0).getDistance(intersectionPoint) > getBackbone().getLength() * relativeDistance && getBackbone().getEuclidLine().getXY(1).getDistance(intersectionPoint) > getBackbone().getLength() * relativeDistance) {
 					return null;
 				}
 				if (otherBackbone.getEuclidLine().getXY(0).getDistance(intersectionPoint) > otherBackbone.getLength() * relativeDistance && otherBackbone.getEuclidLine().getXY(1).getDistance(intersectionPoint) > otherBackbone.getLength() * relativeDistance) {

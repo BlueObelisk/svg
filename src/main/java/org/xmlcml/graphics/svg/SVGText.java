@@ -918,19 +918,19 @@ public class SVGText extends SVGElement {
 	 */
 	public Real2 getCentrePointOfFirstCharacter() {
 		getWidthOfFirstCharacter();
-		heightOfFirstCharacter = this.getFontSize();
+		heightOfFirstCharacter = getFontSize();
 		Real2 delta = new Real2(widthOfFirstCharacter / 2.0, - heightOfFirstCharacter / 2.0); 
-		Real2 xy = this.getXY();
+		Real2 xy = getXY();
 		return xy.plus(delta);
 	}
 
 	public Double getWidthOfFirstCharacter() {
-		widthOfFirstCharacter = this.getSVGXFontWidth() / 1000.0 * this.getFontSize();
+		widthOfFirstCharacter = getSVGXFontWidth() / 1000.0 * getFontSize();
 		return widthOfFirstCharacter;
 	}
 	
 	public Double getheightOfFirstCharacter() {
-		heightOfFirstCharacter = this.getFontSize();
+		heightOfFirstCharacter = getFontSize();
 		return heightOfFirstCharacter;
 	}
 	
@@ -938,7 +938,7 @@ public class SVGText extends SVGElement {
 		getWidthOfFirstCharacter();
 		getheightOfFirstCharacter();
 		return (heightOfFirstCharacter == null || widthOfFirstCharacter == null) ? null :
-			Math.sqrt(heightOfFirstCharacter * heightOfFirstCharacter + widthOfFirstCharacter * widthOfFirstCharacter) /2.;
+			Math.sqrt(heightOfFirstCharacter * heightOfFirstCharacter + widthOfFirstCharacter * widthOfFirstCharacter) / 2.;
 	}
 	
 	

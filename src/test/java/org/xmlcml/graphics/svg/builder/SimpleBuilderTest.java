@@ -28,6 +28,7 @@ public class SimpleBuilderTest {
 
 	File IMAGE_2_11_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.11.svg");
 	File IMAGE_2_13_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg");
+	File IMAGE_2_15_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.15.svg");
 	File IMAGE_2_16_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.16.svg");
 	File IMAGE_2_18_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.18.svg");
 	File IMAGE_2_23_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.23.svg");
@@ -37,6 +38,8 @@ public class SimpleBuilderTest {
 	File IMAGE_5_13_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.5.13.svg");
 	File IMAGE_5_14_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.5.14.svg");
 	File IMAGE_02_00100_65_SVG = new File(Fixtures.MOLECULES_DIR, "02.00100.g.6.5.svg");
+	File SMALL_TEST_1 = new File(Fixtures.MOLECULES_DIR, "smalltest1.svg");
+	File SMALL_TEST_2 = new File(Fixtures.MOLECULES_DIR, "smalltest2.svg");
 	
 	@Test
 	public void testAllLists() {
@@ -456,6 +459,33 @@ public class SimpleBuilderTest {
 		}
 		Assert.assertEquals("junction", 8, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
 	}
+	
+	@Test
+	public void testSmall1() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(SMALL_TEST_1));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+	}
+	
+	@Test
+	public void testSmall2() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(SMALL_TEST_2));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+	}
+	
+	@Test
+	public void test215() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_15_SVG));
+		simpleBuilder.createHigherPrimitives();
+		Assert.assertEquals("lines", 42, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("lines", 28, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("tramLines", 7, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("texts", 24, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("polylines", 2, simpleBuilder.getRawPrimitives().getPolylineList().size());
+		Assert.assertEquals("polylines", 2, simpleBuilder.getDerivedPrimitives().getPolylineList().size());
+		Assert.assertEquals("polylines", 61, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+	}
 
 	// ================= HELPERS ===============
 
@@ -463,18 +493,15 @@ public class SimpleBuilderTest {
 		SVGG out = new SVGG();
 		SVGG circles = new SVGG();
 		out.appendChild(circles);
-		try {
-			for (Junction j : simpleBuilder.higherPrimitives.getRawJunctionList()) {
-				SVGCircle c = new SVGCircle(j.getCoordinates(), 1.2);
-				c.setFill("#FF9999");
-				c.setOpacity(0.7);
-				c.setStrokeWidth(0.0);
-				circles.appendChild(c);
-				SVGText t = new SVGText(j.getCoordinates().plus(new Real2(1.5, 0)), j.getId());
-				out.appendChild(t);
-			}
-		} catch (Exception e) {
-			
+		for (Junction j : simpleBuilder.higherPrimitives.getRawJunctionList()) {
+			Real2 coords = (j.getCoordinates() == null ? new Real2(0, 0) : j.getCoordinates());
+			SVGCircle c = new SVGCircle(coords, 1.2);
+			c.setFill("#FF9999");
+			c.setOpacity(0.7);
+			c.setStrokeWidth(0.0);
+			circles.appendChild(c);
+			SVGText t = new SVGText(coords.plus(new Real2(1.5, 0)), j.getId());
+			out.appendChild(t);
 		}
 		/*for (SVGElement l : simpleBuilder.createComplexShapesFromPaths()) {
 			SVGShape o = (SVGShape) l.copy();
@@ -488,14 +515,14 @@ public class SimpleBuilderTest {
 			o.setFill("white");
 			out.appendChild(o);
 		}*/
-		try {
-			for (SVGLine l : simpleBuilder.getHigherPrimitives().getLineList()) {
-				SVGLine o = (SVGLine) l.copy();
-				o.setStrokeWidth(0.4);
-				out.appendChild(o);
-			}
-		} catch (Exception e) {
-			
+		for (SVGText t : simpleBuilder.getDerivedPrimitives().getTextList()) {
+			SVGText o = (SVGText) t.copy();
+			out.appendChild(o);
+		}
+		for (SVGLine l : simpleBuilder.getDerivedPrimitives().getLineList()) {
+			SVGLine o = (SVGLine) l.copy();
+			o.setStrokeWidth(0.4);
+			out.appendChild(o);
 		}
 		SVGSVG.wrapAndWriteAsSVG(out, new File("target/andy.svg"));
 	}
