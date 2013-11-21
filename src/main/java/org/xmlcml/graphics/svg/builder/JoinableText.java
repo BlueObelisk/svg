@@ -30,7 +30,7 @@ public class JoinableText implements Joinable {
 		Real2 coord = svgText.getCentrePointOfFirstCharacter();
 		if (coord != null) {
 			JoinPoint joinPoint = new JoinPoint(this, coord);
-			joinPoint.setRadius(svgText.getRadiusOfFirstCharacter() * radiusExpansion );
+			joinPoint.setRadius(svgText.getRadiusOfFirstCharacter() * radiusExpansion);
 			joinManager.add(joinPoint);
 		}
 	}

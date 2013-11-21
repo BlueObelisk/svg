@@ -377,8 +377,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	 * @return the font-size 
 	 */
 	public Double getFontSize() {
-		Double fontSize = getDouble(getSubStyle(StyleBundle.FONT_SIZE));
-		return (fontSize == null) ? null : fontSize.doubleValue();
+		return getDouble(getSubStyle(StyleBundle.FONT_SIZE));
 	}
 
 	/**
@@ -514,9 +513,9 @@ public class GraphicsElement extends Element implements SVGConstants {
 	private Object getSubStyle(String attName) {
 		if (useStyleAttribute) {
 			StyleBundle styleBundle = getStyleBundle();
-			return (styleBundle == null) ? null : styleBundle.getSubStyle(attName);
+			return (styleBundle == null ? null : styleBundle.getSubStyle(attName));
 		} else {
-			return this.getAttributeValue(attName);
+			return getAttributeValue(attName);
 		}
 	}
 

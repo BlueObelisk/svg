@@ -71,7 +71,7 @@ public interface Joinable {
 	
 	/** polymorphic intersections 
 	 * 
-	 * Must be implemented for each type of shape , shape
+	 * Must be implemented for each type of shape, shape
 	 * @param shape
 	 * @return
 	 */

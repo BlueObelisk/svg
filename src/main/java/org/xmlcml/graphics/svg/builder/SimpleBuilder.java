@@ -97,7 +97,23 @@ public class SimpleBuilder {
 			fillRawPrimitivesLists();
 			derivedPrimitives = new SVGPrimitives(rawPrimitives);
 			convertPathsToShapes();
+			convertPolylinesToPolygons();
 			abstractPolygons();
+		}
+	}
+
+	private void convertPolylinesToPolygons() {
+		Iterator<SVGPolyline> i = derivedPrimitives.getPolylineList().iterator();
+		while (i.hasNext()) {
+			SVGPolyline polyline = i.next();
+			SVGPolygon result = polyline.createPolygon(1e-10);
+			if (result != null) {
+				LOG.trace("polygon "+result.getClass().getSimpleName());
+				//addId(i, shape, path);
+				derivedPrimitives.addShapeToSubclassedLists(result);
+				//LOG.trace("Lines " + (derivedPrimitives.getLineList() == null ? 0 : derivedPrimitives.getLineList().size()));
+				i.remove();
+			}
 		}
 	}
 
@@ -127,7 +143,7 @@ public class SimpleBuilder {
 				LOG.trace("shape "+shape.getClass().getSimpleName());
 				//addId(i, shape, path);
 				derivedPrimitives.addShapeToSubclassedLists(shape);
-				LOG.trace("Lines " + (derivedPrimitives.getLineList() == null ? 0 : derivedPrimitives.getLineList().size()));
+				//LOG.trace("Lines " + (derivedPrimitives.getLineList() == null ? 0 : derivedPrimitives.getLineList().size()));
 				i.remove();
 			}
 		}
@@ -211,10 +227,9 @@ public class SimpleBuilder {
 		higherPrimitives.setMergedJunctionList(junctionList);
 	}
 
-	private void createJoinableList() {
-		List<SVGElement> toJoin = new ArrayList<SVGElement>();
-		toJoin.addAll(higherPrimitives.getLineList());
-		List<Joinable> joinableList = JoinManager.makeJoinableList(toJoin);
+	protected void createJoinableList() {
+		List<Joinable> joinableList = JoinManager.makeJoinableList(higherPrimitives.getLineList());
+		joinableList.addAll(JoinManager.makeJoinableList(derivedPrimitives.getPolygonList()));
 		joinableList.addAll(higherPrimitives.getTramLineList());
 		for (SVGText svgText : derivedPrimitives.getTextList()) {
 			joinableList.add(new JoinableText(svgText));
