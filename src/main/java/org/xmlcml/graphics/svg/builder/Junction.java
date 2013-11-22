@@ -124,7 +124,7 @@ public class Junction extends SVGCircle {
 
 	public String getSvgTextValue() {
 		SVGText svgText = getSvgText();
-		String name = (svgText == null) ? "" : svgText.getValue();
+		String name = (svgText == null ? "" : svgText.getValue());
 		return name;
 	}
 

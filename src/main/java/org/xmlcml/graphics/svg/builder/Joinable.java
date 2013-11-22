@@ -43,7 +43,7 @@ public interface Joinable {
 	 * 
 	 * @return the joiner
 	 */
-	JoinManager getJoinPointList();
+	//JoinManager getJoinPointList();
 
 	/** get the backbone.
 	 * 
@@ -53,7 +53,7 @@ public interface Joinable {
 	 * 
 	 * @return
 	 */
-	SVGLine getBackbone();
+	//SVGLine getBackbone();
 
 	/** get intersection with another joinable.
 	 * 
@@ -61,13 +61,13 @@ public interface Joinable {
 	 * 
 	 * @return intersection or null
 	 */
-	Real2 intersectionWith(Joinable joinable);
+	//Real2 intersectionWith(Joinable joinable);
 
 	/** some joinables such as single SVGText characters have a unique point.
 	 * 
 	 * @return the point or null for those which don't have points;
 	 */
-	Real2 getPoint();
+	//Real2 getPoint();
 	
 	/** polymorphic intersections 
 	 * 
@@ -80,7 +80,7 @@ public interface Joinable {
     JoinPoint getIntersectionPoint(JoinableText text);
     JoinPoint getIntersectionPoint(TramLine tramLine);
 
-	double getPriority();
+	//double getPriority();
 
 	void addJunction(Junction junction);
 
