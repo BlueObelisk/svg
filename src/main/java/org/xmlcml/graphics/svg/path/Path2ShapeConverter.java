@@ -114,7 +114,7 @@ public class Path2ShapeConverter {
 	 * @param pathList
 	 */
 	public List<SVGShape> convertPathsToShapes(List<SVGPath> pathList) {
-		this.setPathList(pathList);
+		setPathList(pathList);
 		shapeListOut = new ArrayList<SVGShape>();
 		int id = 0;
 		for (SVGElement path : pathList) {
@@ -133,11 +133,11 @@ public class Path2ShapeConverter {
 	}
 
 	public void setSVGPath(SVGPath path) {
-		this.svgPath = path;
+		svgPath = path;
 	}
 	
 	public void setDecimalPlaces(int places) {
-		this.decimalPlaces = places;
+		decimalPlaces = places;
 	}
 	
 	private SVGLine createLineFromMLLLorMLCCLCC(SVGPath path) {
@@ -243,7 +243,7 @@ public class Path2ShapeConverter {
 		} else {
 			line = createLineFromRect(rect); 
 		}
-		shape = (line != null) ? null : rect;
+		shape = (line != null ? null : rect);
 		return shape;
 	}
 
@@ -663,18 +663,20 @@ public class Path2ShapeConverter {
 	}
 	
 	public SVGLine createLineFromRect(SVGRect rect) {
-		SVGLine line = null;
+		SVGLine line1 = null;
+		SVGLine line2 = null;
 		if (rect != null) {
 			Real2 origin = rect.getXY();
 			double width = rect.getWidth();
 			double height = rect.getHeight();
 			if (width < minRectThickness) {
-				line = new SVGLine(origin.plus(new Real2(width / 2, 0.0)), origin.plus(new Real2(width / 2, height)));
-			} else if (height < minRectThickness) {
-				line = new SVGLine(origin.plus(new Real2(0.0, height / 2)), origin.plus(new Real2(width, height / 2)));
+				line1 = new SVGLine(origin.plus(new Real2(width / 2, 0.0)), origin.plus(new Real2(width / 2, height)));
+			} 
+			if (height < minRectThickness) {
+				line2 = new SVGLine(origin.plus(new Real2(0.0, height / 2)), origin.plus(new Real2(width, height / 2)));
 			}
 		}
-		return line;
+		return (line1 == null ? line2 : (line2 == null ? line1 : (line1.getLength() > line2.getLength() ? line1 : line2)));
 	}
 	
 

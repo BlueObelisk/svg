@@ -2,15 +2,19 @@ package org.xmlcml.graphics.svg.builder;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGMarker;
 import org.xmlcml.graphics.svg.SVGPolygon;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class JoinablePolygon implements Joinable {
+public class JoinablePolygon extends JoinableWithBackbone {
 	
 	private final static Logger LOG = Logger.getLogger(JoinablePolygon.class);
 
@@ -18,8 +22,15 @@ public class JoinablePolygon implements Joinable {
 
 	private SVGPolygon svgPolygon;
 	private JoinManager joinManager;
+	
+	private static final double DEFAULT_RELATIVE_DISTANCE_TO_INTERSECTION = 1.5;
+	
+	private double relativeDistance = DEFAULT_RELATIVE_DISTANCE_TO_INTERSECTION;
 
 	public JoinablePolygon(SVGPolygon svgPolygon) {
+		if (svgPolygon.getLineList().size() != 3) {
+			throw new IllegalArgumentException();
+		}
 		this.svgPolygon = svgPolygon;
 		createJoinerAndAddPoints();
 	}
@@ -27,12 +38,29 @@ public class JoinablePolygon implements Joinable {
 	public double getPriority() {
 		return POLYGON_PRORITY;
 	}
+	
 	public void createJoinerAndAddPoints() {
 		joinManager = new JoinManager();
-		for (SVGLine l : svgPolygon.getLineList()) {
-			joinManager.add(new JoinPoint(this, l.getXY(0)));
-			joinManager.add(new JoinPoint(this, Real2.getCentroid(Arrays.asList(l.getXY(0), l.getXY(1)))));
+		double shortestLineLength = Double.MAX_VALUE;
+		SVGLine shortestLine = null;
+		Real2 point = null;
+		List<Real2> allPoints = new ArrayList<Real2>();
+		for (SVGMarker l : svgPolygon.getPointList()) {
+			allPoints.add(((SVGCircle) l.getChild(0)).getXY());
 		}
+		for (SVGLine l : svgPolygon.getLineList()) {
+			if (l.getLength() < shortestLineLength) {
+				shortestLineLength = l.getLength();
+				shortestLine = l;
+				for (Real2 p : allPoints) {
+					if (!p.isEqualTo(l.getXY(0), 1e-10) && !p.isEqualTo(l.getXY(1), 1e-10)) {
+						point = p;
+					}
+				}
+			}
+		}
+		joinManager.add(new JoinPoint(this, point));
+		joinManager.add(new JoinPoint(this, Real2.getCentroid(Arrays.asList(shortestLine.getXY(0), shortestLine.getXY(1)))));
 	}
 
 	public JoinPoint getIntersectionPoint(Joinable joinable) {
@@ -55,6 +83,10 @@ public class JoinablePolygon implements Joinable {
 		return joinManager.getCommonPoint(polygon);
 	}
 
+	public JoinPoint getIntersectionPoint(HatchedPolygon polygon) {
+		return joinManager.getCommonPoint(polygon);
+	}
+
 	public JoinManager getJoinPointList() {
 		return joinManager;
 	}
@@ -68,7 +100,7 @@ public class JoinablePolygon implements Joinable {
 	}
 
 	public SVGLine getBackbone() {
-		throw new UnsupportedOperationException("Polygons have no backbone");//TODO
+		return new SVGLine(joinManager.getJoinPoints().get(0).getPoint(), joinManager.getJoinPoints().get(1).getPoint());
 	}
 
 	/** returns null.
@@ -76,23 +108,6 @@ public class JoinablePolygon implements Joinable {
 	 */
 	public Real2 getPoint() {
 		return null;
-	}
-
-	public Real2 intersectionWith(Joinable otherJoinable) {
-		Real2 intersectionPoint = null;
-		if (otherJoinable != null) {
-			SVGLine otherBackbone = otherJoinable.getBackbone();
-			Real2 otherPoint = otherJoinable.getPoint();
-			if (this.getBackbone() != null && otherBackbone != null) {
-				intersectionPoint = this.getBackbone().getIntersection(otherBackbone);
-			} else if (this.getPoint() != null) {
-				intersectionPoint = (otherPoint == null) ? 
-						this.getPoint() : this.getPoint().getMidPoint(otherPoint);
-			} else {
-				intersectionPoint = otherPoint;
-			}
-		}
-		return intersectionPoint;
 	}
 
 	public void addJunction(Junction junction) {
@@ -105,5 +120,10 @@ public class JoinablePolygon implements Joinable {
 	
 	public String toString() {
 		return svgPolygon.toXML()+"\n ... "+joinManager;
+	}
+
+	@Override
+	public Double getRelativeDistance() {
+		return relativeDistance;
 	}
 }

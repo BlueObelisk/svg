@@ -14,13 +14,14 @@ import java.util.List;
 /** two or more parallel lines with overlap.
  * 
  * <p>Used for double bonds, grid lines, etc.</p>
+ * TODO should this really be for grid lines? What with HatchedPolygon now existing...
  * 
- * extends SVGG so it can be used in place of SVGLines when needed
+ * originally extended SVGG so it could be used in place of SVGLines when needed but no longer does
  * 
  * @author pm286
  *
  */
-public class TramLine extends SVGG implements Joinable {
+public class TramLine extends JoinableWithBackbone {
 
 	@SuppressWarnings("unused")
 	private final static Logger LOG = Logger.getLogger(TramLine.class);
@@ -34,13 +35,15 @@ public class TramLine extends SVGG implements Joinable {
 	private JoinManager joinManager;
 	private SVGLine backbone;
 	
-
+	private static final double DEFAULT_RELATIVE_DISTANCE_TO_INTERSECTION = 1.5;
+	
+	private double relativeDistance = DEFAULT_RELATIVE_DISTANCE_TO_INTERSECTION;
+	
 	public TramLine(SVGLine linei, SVGLine linej) {
-		this.add(linei);
-		this.add(linej);
+		add(linei);
+		add(linej);
 		createJoinerAndAddJoinPoints();
 	}
-
 
 	private void createJoinerAndAddJoinPoints() {
 		Angle EPS = new Angle(0.1, Units.RADIANS); // we already know they are aligned
@@ -67,11 +70,13 @@ public class TramLine extends SVGG implements Joinable {
 	public double getPriority() {
 		return TRAM_LINE_PRORITY;
 	}
+	
 	public void add(SVGLine line) {
 //		this.appendChild(line);
 		ensureLineList();
 		lineList.add(line);
 	}
+	
 	public SVGLine getLine(int i) {
 		ensureLineList();
 		return (i < 0 || i >= lineList.size()) ? null : lineList.get(i);
@@ -79,7 +84,8 @@ public class TramLine extends SVGG implements Joinable {
 
 	private void ensureLineList() {
 		if (lineList == null) {
-			this.lineList = SVGLine.extractSelfAndDescendantLines(this);
+			lineList = new ArrayList<SVGLine>();
+			//lineList = SVGLine.extractSelfAndDescendantLines(this);
 		}
 	}
 
@@ -122,6 +128,10 @@ public class TramLine extends SVGG implements Joinable {
 		return joinManager.getCommonPoint(polygon);
 	}
 
+	public JoinPoint getIntersectionPoint(HatchedPolygon polygon) {
+		return joinManager.getCommonPoint(polygon);
+	}
+
 	public JoinManager getJoinPointList() {
 		return joinManager;
 	}
@@ -141,7 +151,13 @@ public class TramLine extends SVGG implements Joinable {
 	}
 
 	public SVGElement getSVGElement() {
-		return this;
+		return null;
+		//TODO change this if needed, likewise in HatchedPolygon
+		/*SVGG g = new SVGG();
+		for (SVGLine l : lineList) {
+			g.appendChild(l);
+		}
+		return g;*/
 	}
 	
 	public SVGLine getBackbone() {
@@ -168,14 +184,9 @@ public class TramLine extends SVGG implements Joinable {
 		return joinManager == null ? new ArrayList<Junction>() : joinManager.getJunctionList();
 	}
 	
-	/** returns intersection of backbones.
-	 * 
-	 * @return null if joinable has no backbone (e.g. text);
-	 */
-	public Real2 intersectionWith(Joinable joinable) {
-		return getBackbone().getIntersection(joinable.getBackbone());
+	@Override
+	public Double getRelativeDistance() {
+		return relativeDistance;
 	}
 
 }
-
-

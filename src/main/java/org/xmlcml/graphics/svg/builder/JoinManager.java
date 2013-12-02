@@ -60,7 +60,7 @@ public class JoinManager {
 		}
 	}
 	
-	List<JoinPoint> getJoinPoints() {
+	public List<JoinPoint> getJoinPoints() {
 		return joinPoints;
 	}
 	
@@ -96,13 +96,11 @@ public class JoinManager {
 
 	private static Joinable createJoinable(SVGElement element) {
 		Joinable joinable = null;
-		if (element instanceof TramLine) {
-			joinable = (TramLine) element;
-		} else if (element instanceof SVGLine) {
+		if (element instanceof SVGLine) {
 			joinable = new JoinableLine((SVGLine) element);
 		} else if (element instanceof SVGText) {
 			joinable = new JoinableText((SVGText) element);
- 		} else if (element instanceof SVGPolygon) {
+ 		} else if (element instanceof SVGPolygon && ((SVGPolygon) element).getLineList().size() == 3) {
 			joinable = new JoinablePolygon((SVGPolygon) element);
  		} else {
  			LOG.debug("Unknown joinable: "+element);

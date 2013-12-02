@@ -48,9 +48,8 @@ public class Junction extends SVGCircle {
 		if (svgText == null) {
 			ensureJoinableList();
 			for (Joinable joinable : joinableList) {
-				SVGElement element = joinable.getSVGElement();
-				if (element instanceof SVGText) {
-					svgText = (SVGText) element;
+				if (joinable instanceof JoinableText) {
+					svgText = (SVGText) joinable.getSVGElement();
 					break;
 				}
 			}
@@ -81,7 +80,7 @@ public class Junction extends SVGCircle {
 	}
 	
 	public boolean containsCommonPoints(Junction labile) {
-		double dist = this.joinPoint.getDistanceTo(labile.joinPoint);
+		double dist = joinPoint.getDistanceTo(labile.joinPoint);
 		if (dist < EPS) {
 			LOG.trace(dist);
 			return true;
@@ -96,13 +95,17 @@ public class Junction extends SVGCircle {
 				fixed.joinableList.add(joinable);
 			}
 			if (fixed.coordinates != null) {
-				fixed.coordinates = fixed.coordinates.getMidPoint(this.coordinates);
+				fixed.coordinates = fixed.coordinates.getMidPoint(coordinates);
 			}
 		}
 	}
 	
 	public List<Joinable> getJoinableList() {
 		return joinableList;
+	}
+	
+	public JoinPoint getJoinPoint() {
+		return joinPoint;
 	}
 
 	public String toString() {

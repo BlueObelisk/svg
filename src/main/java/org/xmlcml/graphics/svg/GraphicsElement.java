@@ -226,22 +226,22 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
     public void setSvgClass(String svgClass) {
-    	this.addAttribute(new Attribute(CLASS, svgClass));
+    	addAttribute(new Attribute(CLASS, svgClass));
     }
     
     public String getSvgClass() {
-    	return this.getAttributeValue(CLASS);
+    	return getAttributeValue(CLASS);
     }
     
 	/**
-	 * @return the clipPath
+	 * @return the clip path
 	 */
 	public String getClipPath() {
 		return (String) getSubStyle(StyleBundle.CLIP_PATH);
 	}
 
 	/**
-	 * @param clip-path
+	 * @param clipPath the clip path to set
 	 */
 	public void setClipPath(String clipPath) {
 		setSubStyle(StyleBundle.CLIP_PATH, clipPath);
@@ -262,14 +262,14 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
 	/**
-	 * @return the fill
+	 * @return the stroke
 	 */
 	public String getStroke() {
 		return (String) getSubStyle(StyleBundle.STROKE);
 	}
 
 	/**
-	 * @param fill the fill to set
+	 * @param stroke the stroke to set
 	 */
 	public void setStroke(String stroke) {
 		setSubStyle(StyleBundle.STROKE, stroke);
@@ -283,60 +283,60 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
 	/**
-	 * @param fill the fill to set
+	 * @param fontFamily the font to set
 	 */
 	public void setFontFamily(String fontFamily) {
 		setSubStyle(StyleBundle.FONT_FAMILY, fontFamily);
 	}
 
 	/**
-	 * @return the font
+	 * @return the font style
 	 */
 	public String getFontStyle() {
 		return (String) getSubStyle(StyleBundle.FONT_STYLE);
 	}
 
 	/**
-	 * @param fill the fill to set
+	 * @param fontStyle the font style to set
 	 */
 	public void setFontStyle(String fontStyle) {
 		setSubStyle(StyleBundle.FONT_STYLE, fontStyle);
 	}
 
 	/**
-	 * @param fill the fill to set
+	 * @param fontStyle the font style to set
 	 */
 	public void setFontStyle(FontStyle fontStyle) {
 		this.setFontStyle(fontStyle == null ? null : fontStyle.toString().toLowerCase());
 	}
 
 	/**
-	 * @return the font
+	 * @return the font weight
 	 */
 	public String getFontWeight() {
 		return (String) getSubStyle(StyleBundle.FONT_WEIGHT);
 	}
 
 	/**
-	 * @param fill the font weight to set
+	 * @param fontWeight the font weight to set
 	 */
 	public void setFontWeight(String fontWeight) {
 		setSubStyle(StyleBundle.FONT_WEIGHT, fontWeight);
 	}
 
 	/**
-	 * @param fill the font weight to set
+	 * @param fontWeight the font weight to set
 	 */
 	public void setFontWeight(FontWeight fontWeight) {
-		this.setFontWeight((fontWeight == null) ? null : fontWeight.toString().toLowerCase());
+		setFontWeight((fontWeight == null) ? null : fontWeight.toString().toLowerCase());
 	}
 
 	/**
-	 * @return the opacity (1.0 if not present or error
+	 * @return the opacity (1.0 if not present or error)
 	 */
 	public Double getOpacity() {
 		Double opacity = getDouble(getSubStyle(StyleBundle.OPACITY));
-		return (opacity == null) ? null : opacity.doubleValue();
+		return (opacity == null ? null : opacity.doubleValue());
 	}
 
 	/**
@@ -347,7 +347,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
 	/**
-	 * @return the stroke-width (default if not present or error)
+	 * @return the stroke width (default if not present or error)
 	 */
 	public Double getStrokeWidth() {
 		Double strokeWidth = getDouble(getSubStyle(StyleBundle.STROKE_WIDTH));
@@ -355,8 +355,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
 	/**
-	 * 
-	 * @param strokeWidth
+	 * @param strokeWidth the stroke width to set
 	 */
 	public void setStrokeWidth(Double strokeWidth) {
 		setSubStyle(StyleBundle.STROKE_WIDTH, getDouble(strokeWidth));
@@ -364,7 +363,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	
 	public String getStrokeDashArray() {
 		String dashes = (String) getSubStyle(StyleBundle.DASHARRAY);
-		return (dashes == null) ? null : dashes.toString();
+		return (dashes == null ? null : dashes.toString());
 	}
 
 	public void setStrokeDashArray(String dashArray) {
@@ -374,7 +373,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
 	/**
-	 * @return the font-size 
+	 * @return the font size 
 	 */
 	public Double getFontSize() {
 		return getDouble(getSubStyle(StyleBundle.FONT_SIZE));
@@ -382,7 +381,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 
 	/**
 	 * 
-	 * @param fontSize
+	 * @param fontSize the font size to set
 	 */
 	public void setFontSize(Double fontSize) {
 		if (fontSize == null) {
@@ -458,7 +457,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	public Transform2 getCumulativeTransform() {
 		Nodes transforms = this.query("ancestor-or-self::*/@transform");
 		cumulativeTransform = new Transform2();
-		for (int i = transforms.size()-1; i >= 0; i--) {
+		for (int i = transforms.size() - 1; i >= 0; i--) {
 			Transform2 t2 = ((SVGElement) transforms.get(i).getParent()).getTransform();
 			cumulativeTransform = t2.concatenate(cumulativeTransform);
 		}
@@ -606,7 +605,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 				Integer red = Integer.parseInt(hex.substring(0, 1), 16);
 				Integer green = Integer.parseInt(hex.substring(1, 2), 16);
 				Integer blue = Integer.parseInt(hex.substring(2, 3), 16);
-				strokeColor = new Color(red*16, green*16, blue*16);
+				strokeColor = new Color(red * 16, green * 16, blue * 16);
 			} else {
 				LOG.error("Cannot parse color: "+stroke);
 			}

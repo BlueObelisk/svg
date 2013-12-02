@@ -164,7 +164,7 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 
 	public void replaceUTurnsByButt(int quad) {
 		//maybe test radius later
-		CubicPrimitive cubic1 = (CubicPrimitive) this.primitiveList.get(quad + 1);
+		CubicPrimitive cubic1 = (CubicPrimitive) primitiveList.get(quad + 1);
 		Real2 point1 = cubic1.getLastCoord();
 		LinePrimitive linePrimitive = new LinePrimitive(point1);
 		primitiveList.remove(quad + 1);
@@ -181,7 +181,7 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 	public SVGLine getLine(int i) {
 		SVGLine line = null;
 		if (i > 0) {
-			SVGPathPrimitive primitive = this.get(i);
+			SVGPathPrimitive primitive = get(i);
 			if (primitive instanceof LinePrimitive) {
 				Real2 point0 = this.get(i - 1).getLastCoord();
 				Real2 point1 = primitive.getFirstCoord();
@@ -253,9 +253,9 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 	}
 
 	public LinePrimitive getLinePrimitive(int i) {
-		SVGPathPrimitive primitive = this.get(i);
-		return (primitive == null || !(primitive instanceof LinePrimitive)) ?
-			null : (LinePrimitive) primitive;
+		SVGPathPrimitive primitive = get(i);
+		return (primitive == null || !(primitive instanceof LinePrimitive) ?
+			null : (LinePrimitive) primitive);
 	}
 
 	public LinePrimitive createMeanLine(int i, int j) {
@@ -266,9 +266,9 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 	}
 
 	public CubicPrimitive getCubicPrimitive(int i) {
-		SVGPathPrimitive primitive = this.get(i);
-		return (primitive == null || !(primitive instanceof CubicPrimitive)) ?
-			null : (CubicPrimitive) primitive;
+		SVGPathPrimitive primitive = get(i);
+		return (primitive == null || !(primitive instanceof CubicPrimitive) ?
+			null : (CubicPrimitive) primitive);
 	}
 
 	public Arc createMeanCubic(int i, int j) {
@@ -283,39 +283,40 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 	}
 
 	public void remove(int i) {
-		SVGPathPrimitive primitive = this.get(i);
+		SVGPathPrimitive primitive = get(i);
 		if (primitive != null) {
 			primitiveList.remove(i);
 		}
 	}
 	
 	public SVGLine createLineFromMLLLL(Angle angleEps, double maxWidth) {
-		SVGLine line = null;
-		if (this.isAntiParallel(1, 3, angleEps) && this.isShort(2, maxWidth) && this.isShort(4, maxWidth)) {
-			line = this.createLineFromMidPoints(2, 4);
-		} else if (this.isAntiParallel(2, 4, angleEps) && this.isShort(1, maxWidth) && this.isShort(3, maxWidth)) {
-			line = this.createLineFromMidPoints(1, 3);
+		SVGLine line1 = null;
+		SVGLine line2 = null;
+		if (isAntiParallel(1, 3, angleEps) && isShort(2, maxWidth) && isShort(4, maxWidth)) {
+			line1 = createLineFromMidPoints(2, 4);
 		}
-		return line;
+		if (isAntiParallel(2, 4, angleEps) && isShort(1, maxWidth) && isShort(3, maxWidth)) {
+			line2 = createLineFromMidPoints(1, 3);
+		}
+		return (line1 == null ? line2 : (line2 == null ? line1 : (line1.getLength() > line2.getLength() ? line1 : line2)));
 	}
 
 	private SVGLine createLineFromMidPoints(int i, int j) {
-		SVGLine linei = this.getLine(i);
-		SVGLine linej = this.getLine(j);
+		SVGLine linei = getLine(i);
+		SVGLine linej = getLine(j);
 		return (linei == null || linej == null) ? null : 
 			new SVGLine(linei.getMidPoint(), linej.getMidPoint());
 	}
 
 	private boolean isShort(int i, double maxWidth) {
-		SVGLine line = this.getLine(i);
-		return (line == null) ? false : line.getLength() < maxWidth;
+		SVGLine line = getLine(i);
+		return (line == null ? false : line.getLength() < maxWidth);
 	}
 
 	private boolean isAntiParallel(int i, int j, Angle angleEps) {
-		SVGLine linei = this.getLine(i);
-		SVGLine linej = this.getLine(j);
-		return (linei == null || linej == null) ? false : linei.isAntiParallelTo(linej, angleEps);
+		SVGLine linei = getLine(i);
+		SVGLine linej = getLine(j);
+		return (linei == null || linej == null ? false : linei.isAntiParallelTo(linej, angleEps));
 	}
-
 
 }
