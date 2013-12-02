@@ -694,7 +694,7 @@ public class SVGPath extends SVGShape {
 	public SVGPath replaceAllUTurnsByButt(Angle angleEps) {
 		SVGPath path = null;
 		if (getSignature().contains(CC)) {
-			PathPrimitiveList primList = this.ensurePrimitives();
+			PathPrimitiveList primList = ensurePrimitives();
 			List<Integer> quadrantStartList = primList.getUTurnList(angleEps);
 			if (quadrantStartList.size() > 0) {
 				for (int quad = quadrantStartList.size() - 1; quad >= 0; quad--) {
@@ -717,7 +717,7 @@ public class SVGPath extends SVGShape {
 	 */
 	public SVGLine createLineFromMLLLL(Angle angleEps, Double maxWidth) {
 		SVGLine line = null;
-		String sig = this.getSignature();
+		String sig = getSignature();
 		if (MLLLL.equals(sig) || MLLLLZ.equals(sig)) {
 			ensurePrimitives();
 			line = primitiveList.createLineFromMLLLL(angleEps, maxWidth);

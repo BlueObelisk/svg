@@ -289,7 +289,7 @@ public abstract class SVGPoly extends SVGShape {
 	}
 	
 	public List<SVGLine> createLineList(boolean clear) {
-		Attribute pointsAtt = this.getAttribute(POINTS);
+		Attribute pointsAtt = getAttribute(POINTS);
 		if (clear) {
 			lineList = null;
 			if (pointsAtt != null) {
