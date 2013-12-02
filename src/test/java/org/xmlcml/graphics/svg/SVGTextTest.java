@@ -494,4 +494,5 @@ public class SVGTextTest {
 		transform2 = transform2.concatenate(new Transform2(new Vector2(text.getXY().multiplyBy(-1.0))));
 		text.setTransform(transform2);
 	}
+	
 }
