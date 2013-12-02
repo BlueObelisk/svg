@@ -26,6 +26,7 @@ public class SimpleBuilderTest {
 	public static final Angle MAX_ANGLE = new Angle(0.12, Units.RADIANS);
 	public static final Double MAX_WIDTH = 2.0;
 
+	File IMAGE_2_10_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.10.svg");
 	File IMAGE_2_11_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.11.svg");
 	File IMAGE_2_13_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg");
 	File IMAGE_2_15_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.15.svg");
@@ -40,6 +41,8 @@ public class SimpleBuilderTest {
 	File IMAGE_02_00100_65_SVG = new File(Fixtures.MOLECULES_DIR, "02.00100.g.6.5.svg");
 	File SMALL_TEST_1 = new File(Fixtures.MOLECULES_DIR, "smalltest1.svg");
 	File SMALL_TEST_2 = new File(Fixtures.MOLECULES_DIR, "smalltest2.svg");
+	File SMALL_TEST_3 = new File(Fixtures.MOLECULES_DIR, "smalltest3.svg");
+	File SMALL_TEST_4 = new File(Fixtures.MOLECULES_DIR, "smalltest4.svg");
 	
 	@Test
 	public void testAllLists() {
@@ -475,16 +478,55 @@ public class SimpleBuilderTest {
 	}
 	
 	@Test
+	public void testSmall3() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(SMALL_TEST_3));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("lines", 8, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("lines", 3, simpleBuilder.getHigherPrimitives().getLineList().size());
+	}
+	
+	@Test
+	public void testSmall4() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(SMALL_TEST_4));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("lines", 8, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("lines", 3, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("junctions", 7, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("junctions", 2, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	@Test
+	public void test210() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_10_SVG));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("lines", 44, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("lines", 20, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("tramLines", 7, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("texts", 19, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("polylines", 0, simpleBuilder.getRawPrimitives().getPolylineList().size());
+		Assert.assertEquals("polygons", 0, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("joinables", 48, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("junctions", 56, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("junctions", 24, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	@Test
 	public void test215() {
 		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_15_SVG));
 		simpleBuilder.createHigherPrimitives();
-		Assert.assertEquals("lines", 42, simpleBuilder.getDerivedPrimitives().getLineList().size());
-		Assert.assertEquals("lines", 28, simpleBuilder.getHigherPrimitives().getLineList().size());
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("lines", 40, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("lines", 21, simpleBuilder.getHigherPrimitives().getLineList().size());
 		Assert.assertEquals("tramLines", 7, simpleBuilder.getHigherPrimitives().getTramLineList().size());
 		Assert.assertEquals("texts", 24, simpleBuilder.getDerivedPrimitives().getTextList().size());
 		Assert.assertEquals("polylines", 2, simpleBuilder.getRawPrimitives().getPolylineList().size());
-		Assert.assertEquals("polylines", 2, simpleBuilder.getDerivedPrimitives().getPolylineList().size());
-		Assert.assertEquals("polylines", 61, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("polygons", 2, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("joinables", 55, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("junctions", 59, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("junctions", 24, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
 	}
 
 	// ================= HELPERS ===============
@@ -500,8 +542,13 @@ public class SimpleBuilderTest {
 			c.setOpacity(0.7);
 			c.setStrokeWidth(0.0);
 			circles.appendChild(c);
-			SVGText t = new SVGText(coords.plus(new Real2(1.5, 0)), j.getId());
-			out.appendChild(t);
+			SVGText t = new SVGText(coords.plus(new Real2(1.5, Math.random() * 6)), j.getId());
+			circles.appendChild(t);
+			for (Joinable joinable : j.getJoinableList()) {
+				SVGLine line = new SVGLine(coords, (joinable.getBackbone() != null ? joinable.getBackbone().getMidPoint() : joinable.getPoint()));
+				line.setStrokeWidth(0.05);
+				circles.appendChild(line);
+			}
 		}
 		/*for (SVGElement l : simpleBuilder.createComplexShapesFromPaths()) {
 			SVGShape o = (SVGShape) l.copy();
@@ -523,6 +570,23 @@ public class SimpleBuilderTest {
 			SVGLine o = (SVGLine) l.copy();
 			o.setStrokeWidth(0.4);
 			out.appendChild(o);
+		}
+		for (SVGPolygon p : simpleBuilder.getDerivedPrimitives().getPolygonList()) {
+			SVGPolygon o = (SVGPolygon) p.copy();
+			o.setStrokeWidth(0.4);
+			out.appendChild(o);
+		}
+		for (Joinable j : simpleBuilder.getHigherPrimitives().getJoinableList()) {
+			for (JoinPoint p : j.getJoinPointList().getJoinPoints()) {
+				Real2 coords = (p.getPoint() == null ? new Real2(0, 0) : p.getPoint());
+				SVGCircle c = new SVGCircle(coords, 0.6);
+				c.setFill("#9999FF");
+				c.setOpacity(0.7);
+				c.setStrokeWidth(0.0);
+				circles.appendChild(c);
+				//SVGText t = new SVGText(coords.plus(new Real2(1.5, Math.random() * 6)), j.getId());
+				//out.appendChild(t);
+			}
 		}
 		SVGSVG.wrapAndWriteAsSVG(out, new File("target/andy.svg"));
 	}

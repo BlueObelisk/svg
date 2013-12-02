@@ -18,7 +18,7 @@ public class JoinableText implements Joinable {
 	private JoinManager joinManager;
 	private SVGText svgText;
 
-	private Double radiusExpansion = 1.3;
+	private Double radiusExpansion = 1.1;
 
 	public JoinableText(SVGText svgText) {
 		this.svgText = svgText;
@@ -70,6 +70,10 @@ public class JoinableText implements Joinable {
 		return joinManager.getCommonPoint(polygon);
 	}
 
+	public JoinPoint getIntersectionPoint(HatchedPolygon polygon) {
+		return joinManager.getCommonPoint(polygon);
+	}
+
 	public JoinManager getJoinPointList() {
 		return joinManager;
 	}
@@ -100,7 +104,7 @@ public class JoinableText implements Joinable {
 	 * 
 	 */
 	public Real2 intersectionWith(Joinable joinable) {
-		return this.getPoint();
+		return getPoint();
 	}
 
 	public double getPriority() {

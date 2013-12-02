@@ -3,14 +3,22 @@ package org.xmlcml.graphics.svg.builder;
 import nu.xom.Attribute;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Angle.Units;
+import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.*;
 import org.xmlcml.graphics.svg.path.Path2ShapeConverter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.UnionFind;
 
 /**
  * Builds higher-level primitives from SVGPaths, SVGLines, etc. to create SVG objects 
@@ -53,8 +61,13 @@ import java.util.List;
  */
 public class SimpleBuilder {
 
-	private static final double POLYGON_ABSTRACTION_RELATIVE_AREA_THRESHOLD = 0.92;
-	private static final double POLYGON_ABSTRACTION_RELATIVE_DISTANCE_FROM_LINE_THRESHOLD = 0.08;
+	private static final double HATCH_DETECTION_DEFAULT_MAXIMUM_ANGLE_FOR_PARALLEL = 0.15;
+	private static final double HATCH_DETECTION_DEFAULT_MAXIMUM_LINE_LENGTH = 4;
+	private static final double HATCH_DETECTION_DEFAULT_MAXIMUM_SPACING = 4;
+	private static final double POLYGON_ABSTRACTION_DEFAULT_RELATIVE_AREA_THRESHOLD = 0.92;
+	private static final double POLYGON_ABSTRACTION_DEFAULT_RELATIVE_DISTANCE_FROM_LINE_THRESHOLD = 0.08;
+	private static final double HATCH_DETECTION_DEFAULT_LINE_OVERLAP_EPSILON = 1e-8;
+	private static final double DEFAULT_POINT_EQUIVALENCE_EPSILON = 1e-8;
 
 	private final static Logger LOG = Logger.getLogger(SimpleBuilder.class);
 	
@@ -64,15 +77,20 @@ public class SimpleBuilder {
 	protected SVGPrimitives rawPrimitives;
 	protected HigherPrimitives higherPrimitives;
 
-	private double relativeDistanceFromLineThreshold = POLYGON_ABSTRACTION_RELATIVE_DISTANCE_FROM_LINE_THRESHOLD;
-	private double relativeAreaThreshold = POLYGON_ABSTRACTION_RELATIVE_AREA_THRESHOLD;
+	private double relativeDistanceFromLineThreshold = POLYGON_ABSTRACTION_DEFAULT_RELATIVE_DISTANCE_FROM_LINE_THRESHOLD;
+	private double relativeAreaThreshold = POLYGON_ABSTRACTION_DEFAULT_RELATIVE_AREA_THRESHOLD;
+	private double hatchLineMaximumLength = HATCH_DETECTION_DEFAULT_MAXIMUM_LINE_LENGTH;
+	private double hatchLinesMaximumSpacing = HATCH_DETECTION_DEFAULT_MAXIMUM_SPACING;
+	private double maximumAngleForParallel = HATCH_DETECTION_DEFAULT_MAXIMUM_ANGLE_FOR_PARALLEL;
+	private double lineOverlapEpsilon = HATCH_DETECTION_DEFAULT_LINE_OVERLAP_EPSILON;
+	private double pointEquivalenceEpsilon = DEFAULT_POINT_EQUIVALENCE_EPSILON;
 	
 	public SimpleBuilder() {
 		
 	}
 
 	public SimpleBuilder(SVGElement svgRoot) {
-		this.setSvgRoot(svgRoot);
+		setSvgRoot(svgRoot);
 	}
 
 	public void setSvgRoot(SVGElement svgRoot) {
@@ -98,7 +116,20 @@ public class SimpleBuilder {
 			derivedPrimitives = new SVGPrimitives(rawPrimitives);
 			convertPathsToShapes();
 			convertPolylinesToPolygons();
+			removeHiddenLines();
 			abstractPolygons();
+		}
+	}
+
+	private void removeHiddenLines() {
+		Iterator<SVGLine> i = derivedPrimitives.getLineList().iterator();
+		while (i.hasNext()) {
+			SVGLine l = i.next();
+			for (SVGPolygon p : derivedPrimitives.getPolygonList()) {
+				if (p.includes(l)) {
+					i.remove();
+				}
+			}
 		}
 	}
 
@@ -106,7 +137,7 @@ public class SimpleBuilder {
 		Iterator<SVGPolyline> i = derivedPrimitives.getPolylineList().iterator();
 		while (i.hasNext()) {
 			SVGPolyline polyline = i.next();
-			SVGPolygon result = polyline.createPolygon(1e-10);
+			SVGPolygon result = polyline.createPolygon(pointEquivalenceEpsilon);
 			if (result != null) {
 				LOG.trace("polygon "+result.getClass().getSimpleName());
 				//addId(i, shape, path);
@@ -128,8 +159,66 @@ public class SimpleBuilder {
 			createDerivedPrimitives();
 			higherPrimitives = new HigherPrimitives();
 			higherPrimitives.addSingleLines(derivedPrimitives.getLineList());
+			combineHatchLines();
 			createTramLineList();
 			createMergedJunctions();
+		}
+	}
+
+	private void combineHatchLines() {
+		List<HatchedPolygon> hatchList = new ArrayList<HatchedPolygon>();
+		higherPrimitives.setHatchList(hatchList);
+		List<SVGLine> smallLines = new ArrayList<SVGLine>();
+		for (SVGLine l : derivedPrimitives.getLineList()) {
+			if (l.getLength() < hatchLineMaximumLength) {
+				smallLines.add(l);
+			}
+		}
+		if (smallLines.size() == 0) {
+			return;
+		}
+		UnionFind<SVGLine> disjointSets = UnionFind.create(smallLines);
+		for (SVGLine i : smallLines) {
+			for (SVGLine j : smallLines) {
+				Double dist = i.calculateUnsignedDistanceBetweenLines(j, new Angle(maximumAngleForParallel, Units.RADIANS));
+				if (dist != null && dist < hatchLinesMaximumSpacing && (i.overlapsWithLine(j, lineOverlapEpsilon) || j.overlapsWithLine(i, lineOverlapEpsilon))) {
+					disjointSets.union(i, j);
+				}
+			}
+		}
+		makeHatchedPolygons(disjointSets);
+	}
+
+	private void makeHatchedPolygons(UnionFind<SVGLine> disjointSets) {
+		List<HatchedPolygon> hatchList = higherPrimitives.getHatchList();
+		for (Set<SVGLine> set : disjointSets.snapshot()) {
+			ArrayList<SVGLine> lines1 = new ArrayList<SVGLine>(set);
+			ArrayList<SVGLine> lines2 = new ArrayList<SVGLine>(set);
+			Collections.sort(lines1, new Comparator<SVGLine>(){
+				public int compare(SVGLine i, SVGLine j) {
+					return (Real.isEqual(i.getMidPoint().getX(), j.getMidPoint().getX(), 0.1) ? Double.compare(i.getMidPoint().getY(), j.getMidPoint().getY()) : Double.compare(i.getMidPoint().getX(), j.getMidPoint().getX()));
+				}});
+			Collections.sort(lines2, new Comparator<SVGLine>(){
+				public int compare(SVGLine i, SVGLine j) {
+					return (Real.isEqual(i.getMidPoint().getY(), j.getMidPoint().getY(), 0.1) ? Double.compare(i.getMidPoint().getX(), j.getMidPoint().getX()) : Double.compare(i.getMidPoint().getY(), j.getMidPoint().getY()));
+				}});
+			List<SVGLine> lines3 = (ArrayList<SVGLine>) lines1.clone();
+			Collections.reverse(lines3);
+			if (lines1.equals(lines2) || lines3.equals(lines2)) {
+				try {
+					double direction = Math.signum(lines1.get(1).getLength() - lines1.get(0).getLength());
+					double firstLength = lines1.get(0).getLength();
+					for (int i = 2; i < lines1.size(); i++) {
+						if (Math.signum(lines1.get(i).getLength() - firstLength) != direction) {
+							return;
+						}
+					}
+				} catch (IndexOutOfBoundsException e) {
+					
+				}
+				hatchList.add(new HatchedPolygon(lines1));
+				higherPrimitives.getLineList().removeAll(lines1);
+			}
 		}
 	}
 
@@ -191,7 +280,7 @@ public class SimpleBuilder {
 				int position = 0;
 				for (int k = points.size() - 1; k >= 0; k--) {
 					for (Real2 l : section) {
-						if (points.get(k).isEqualTo(l, 1.0e-10)) {
+						if (points.get(k).isEqualTo(l, pointEquivalenceEpsilon)) {
 							points.deleteElement(k);
 							position = k;
 							break;
@@ -231,6 +320,7 @@ public class SimpleBuilder {
 		List<Joinable> joinableList = JoinManager.makeJoinableList(higherPrimitives.getLineList());
 		joinableList.addAll(JoinManager.makeJoinableList(derivedPrimitives.getPolygonList()));
 		joinableList.addAll(higherPrimitives.getTramLineList());
+		joinableList.addAll(higherPrimitives.getHatchList());
 		for (SVGText svgText : derivedPrimitives.getTextList()) {
 			joinableList.add(new JoinableText(svgText));
 		}
@@ -258,10 +348,10 @@ public class SimpleBuilder {
 					rawJunctionList.add(junction);
 					String junctAttVal = "junct"+"."+rawJunctionList.size();
 					junction.addAttribute(new Attribute(SVGElement.ID, junctAttVal));
-					/*if (junction.getCoordinates() == null && commonPoint.getPoint() != null) {
+					if (junction.getCoordinates() == null && commonPoint.getPoint() != null) {
 						junction.setCoordinates(commonPoint.getPoint());
-					}*/
-					LOG.debug("junct: "+junction.getId()+" coords "+junction.getCoordinates()+" "+commonPoint.getPoint());
+					}
+					LOG.debug("junct: "+junction.getId()+" between " + joinablei.getClass() + " and " + joinablej.getClass() + " with coords "+junction.getCoordinates()+" "+commonPoint.getPoint());
 				}
 			}
 		}
