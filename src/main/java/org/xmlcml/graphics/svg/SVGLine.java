@@ -522,10 +522,10 @@ public class SVGLine extends SVGShape {
 	 */
 	public SVGLine getMeanLine(SVGLine line, Angle angleEps) {
 		SVGLine meanLine = null;
-		if (this.isParallelTo(line, angleEps)) {
+		if (isParallelTo(line, angleEps)) {
 			meanLine = new SVGLine(getXY(0).getMidPoint(line.getXY(0)), 
 			                       getXY(1).getMidPoint(line.getXY(1)));
-		} else if (this.isAntiParallelTo(line, angleEps)) {
+		} else if (isAntiParallelTo(line, angleEps)) {
 			meanLine = new SVGLine(getXY(0).getMidPoint(line.getXY(1)), 
                     getXY(1).getMidPoint(line.getXY(0)));
 		}
@@ -533,7 +533,7 @@ public class SVGLine extends SVGShape {
 	}
 
 	public Real2 getIntersection(SVGLine line) {
-		return (line == null) ? null : this.getEuclidLine().getIntersection(line.getEuclidLine());
+		return (line == null ? null : this.getEuclidLine().getIntersection(line.getEuclidLine()));
 	}
 
 }

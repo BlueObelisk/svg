@@ -1012,7 +1012,7 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	public SVGRect drawBox(String stroke, String fill, double strokeWidth, double opacity) {
-		return SVGElement.drawBox(this.getBoundingBox(), this, stroke, fill, strokeWidth, opacity);
+		return SVGElement.drawBox(getBoundingBox(), this, stroke, fill, strokeWidth, opacity);
 	}
 
 	public static void applyTransformsWithinElementsAndFormat(SVGElement svgElement) {
@@ -1036,21 +1036,21 @@ public class SVGElement extends GraphicsElement {
 	}
 	
 	public void setTitle(String title) {
-		this.addAttribute(new Attribute(TITLE, title));
+		addAttribute(new Attribute(TITLE, title));
 	}
 	
 	public String getTitle() {
-		return this.getAttributeValue(TITLE);
+		return getAttributeValue(TITLE);
 	}
 	
 	public void setId(String id) {
 		if (id != null) {
-			this.addAttribute(new Attribute(ID, id));
+			addAttribute(new Attribute(ID, id));
 		}
 	}
 	
 	public String getId() {
-		return this.getAttributeValue(ID);
+		return getAttributeValue(ID);
 	}
 
 	/** removes all transformation attributes
@@ -1059,7 +1059,7 @@ public class SVGElement extends GraphicsElement {
 	 * also dangerous as the ancestor may govern other descendants
 	 */
 	public void removeAncestorTransformations() {
-		Nodes ancestorAttributes = this.query("ancestor::*/@transform");
+		Nodes ancestorAttributes = query("ancestor::*/@transform");
 		for (int i = 0; i < ancestorAttributes.size(); i++) {
 			ancestorAttributes.get(i).detach();
 		}
