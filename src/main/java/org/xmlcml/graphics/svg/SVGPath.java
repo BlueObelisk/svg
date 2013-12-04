@@ -37,14 +37,13 @@ import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.List;
 
-/** draws a straight line.
- * 
+/** 
  * @author pm286
- *
  */
 public class SVGPath extends SVGShape {
 
 	private static Logger LOG = Logger.getLogger(SVGPath.class);
+	
 	static {
 		LOG.setLevel(Level.DEBUG);
 	}

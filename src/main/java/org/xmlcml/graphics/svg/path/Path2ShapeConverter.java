@@ -2,6 +2,7 @@ package org.xmlcml.graphics.svg.path;
 
 import nu.xom.Attribute;
 import nu.xom.ParentNode;
+
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.*;
 import org.xmlcml.euclid.Angle.Units;
@@ -10,18 +11,17 @@ import org.xmlcml.xml.XMLUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-/** converts a SVGPath or list of SVGPaths to SVGShape(s).
- * 
+/** 
+ * Converts SVGPaths to SVGShape(s).
  * <p>
  * Uses a variety of heuristics to split and combine primitives.
  * Customisable through setters.
- * </p>
  * 
  * @author pm286
- *
  */
 public class Path2ShapeConverter {
 
@@ -33,15 +33,14 @@ public class Path2ShapeConverter {
 	private static final String MLLL = "MLLL";
 	private static final String MCLC = "MCLC";
 
-	private static final double _CIRCLE_EPS = 0.7;
+	private static final double CIRCLE_EPS = 0.7;
 	private static final double MOVE_EPS = 0.001;
 	private static final double RECT_EPS = 0.01;
-	private static final double _ROUNDED_BOX_EPS = 0.4;
+	private static final double ROUNDED_BOX_EPS = 0.4;
 	
 	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.12, Units.RADIANS);
 	private static final double DEFAULT_MAX_WIDTH_FOR_PARALLEL = 2.0;
 	public static final Angle DEFAULT_MAX_ANGLE = new Angle(0.15, Units.RADIANS);
-	public static final Double DEFAULT_MAX_WIDTH = 2.0;
 	private static final Double DEFAULT_MIN_RECT_THICKNESS = 0.99;
 	private static final double DEFAULT_MAX_PATH_WIDTH = 1.0;
 	private static final int DEFAULT_LINES_IN_POLYLINE = 8;
@@ -57,31 +56,40 @@ public class Path2ShapeConverter {
 	private boolean removeRedundantMoveCommands = true;
 	private boolean splitAtMoveCommands = true;
 	private double maxPathWidth = DEFAULT_MAX_PATH_WIDTH;
-	private double maxWidth = DEFAULT_MAX_WIDTH;
 	private Angle maxAngle = DEFAULT_MAX_ANGLE;
 	private Double minRectThickness = DEFAULT_MIN_RECT_THICKNESS;
 	
 	/** input and output */
 	private List<SVGPath> pathListIn;
-	private List<SVGShape> shapeListOut;
 	private List<SVGPath> splitPathList;
 	private SVGPath svgPath;
+	private List<SVGShape> shapeListOut;
 
 	private Angle maxAngleForParallel = DEFAULT_MAX_ANGLE_FOR_PARALLEL;
 	private double maxWidthForParallel = DEFAULT_MAX_WIDTH_FOR_PARALLEL;
 
 	public Path2ShapeConverter() {
+		
 	}
 
+	/**
+	 * @param svgPath the path to process
+	 */
+	@Deprecated
 	public Path2ShapeConverter(SVGPath svgPath) {
-		this.svgPath = svgPath;
+		setSVGPath(svgPath);
 	}
 	
+	/**
+	 * @param pathListIn the paths to process
+	 */
+	@Deprecated
 	public Path2ShapeConverter(List<SVGPath> pathListIn) {
-		this.setPathList(pathListIn);
+		setPathList(pathListIn);
 	}
 	
-	/** maximum width to be considered for condensing outline paths.
+	/** 
+	 * Maximum width to be considered for condensing outline paths
 	 * 
 	 * @param maxPathWidth
 	 */
@@ -89,53 +97,91 @@ public class Path2ShapeConverter {
 		this.maxPathWidth = maxPathWidth;
 	}
 
-	public void setMaxWidth(double maxWidth) {
-		this.maxWidth = maxWidth;
-	}
-
+	/** 
+	 * Maximum angle TODO
+	 * 
+	 * @param maxPathWidth
+	 */	
 	public void setMaxAngle(Angle maxAngle) {
 		this.maxAngle = maxAngle;
 	}
 	
-	
-	/** main routine if pathList has been read in.
+	/** 
+	 * Main routine if path list has been read in
+	 * <p>
+	 * @deprecated Use {@link convertPathsToShapes(pathList)}
 	 * 
-	 * @param pathList
+	 * @return a list of shapes; each a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
 	 */
+	@Deprecated
 	public List<SVGShape> convertPathsToShapes() {
+		List<SVGShape> shapeListOut = null;
 		if (pathListIn != null) {
-			convertPathsToShapes(pathListIn);
+			shapeListOut = convertPathsToShapes(pathListIn);
 		}
 		return shapeListOut;
 	}
 
-	/** main routine?
+	/** Main routine for list of paths
 	 * 
 	 * @param pathList
+	 * @return a list of shapes; each a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
 	 */
 	public List<SVGShape> convertPathsToShapes(List<SVGPath> pathList) {
 		setPathList(pathList);
-		shapeListOut = new ArrayList<SVGShape>();
+		List<SVGShape> shapeListOut = new ArrayList<SVGShape>();
 		int id = 0;
+		if (removeRedundantMoveCommands) {
+			pathList = removeRedundantMoveCommands(pathList);
+		}
+		if (splitAtMoveCommands) {
+			pathList = splitAtMoveCommands(pathList);
+		}
 		for (SVGElement path : pathList) {
 			SVGShape shape = convertPathToShape(path);
 			shape.setId(shape.getClass().getSimpleName().toLowerCase().substring(SVG.length())+"."+id);
 			shapeListOut.add(shape);
 			id++;
 		}
+		if (removeDuplicatePaths) {
+			shapeListOut = removeDuplicateShapes(shapeListOut);
+		}
 		return shapeListOut;
 	}
 
+	private static List<SVGPath> removeRedundantMoveCommands(List<SVGPath> pathList) {
+		List<SVGPath> newPaths = new ArrayList<SVGPath>();
+		for (SVGPath path : pathList) {
+			newPaths.add(removeRedundantMoveCommands(path, MOVE_EPS));
+		}
+		return newPaths;
+	}
+
+	/** Main routine for a single path
+	 * 
+	 * @param path
+	 * @return a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
+	 */
 	public SVGShape convertPathToShape(SVGElement path) {
-		setSVGPath((SVGPath) path);
-		SVGShape shape = convertPathToShape();
+		SVGShape shape = convertPathToShape(path);
 		return shape;
 	}
 
+	/** Set the path to use
+	 * <p>
+	 * @deprecated Use {@link convertPathToShape(path)}
+	 * 
+	 * @param path
+	 */
+	@Deprecated
 	public void setSVGPath(SVGPath path) {
 		svgPath = path;
 	}
 	
+	/** Set the number of decimal places TODO
+	 * 
+	 * @param places
+	 */
 	public void setDecimalPlaces(int places) {
 		decimalPlaces = places;
 	}
@@ -161,11 +207,15 @@ public class Path2ShapeConverter {
 		return path;
 	}
 
-	/** create best guess at higher SVGElement
-	 * try rect, circle, line, polygon, polyline, else original path
+	/** 
+	 * Creates best guess at higher SVGElement
+	 * <p>
+	 * @deprecated Use {@link #convertPathToShape(path)}
 	 * 
 	 * @param shapeListOut
+	 * @return a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
 	 */
+	@Deprecated
 	public SVGShape convertPathToShape() {
 		if (svgPath == null) {
 			return null;
@@ -173,10 +223,10 @@ public class Path2ShapeConverter {
 		SVGShape shape = null;
 		shape = createRectOrAxialLine(RECT_EPS);
 		if (shape == null) {
-			shape = svgPath.createRoundedBox(_ROUNDED_BOX_EPS);
+			shape = svgPath.createRoundedBox(ROUNDED_BOX_EPS);
 		}
 		if (shape == null) {
-			shape = svgPath.createCircle(_CIRCLE_EPS);
+			shape = svgPath.createCircle(CIRCLE_EPS);
 		}
 		if (shape == null) {
 			SVGPolyline polyline = (SVGPolyline) svgPath.createPolyline();
@@ -185,7 +235,7 @@ public class Path2ShapeConverter {
 				shape = new SVGPath(svgPath);
 			} else {
 				// SVG is a polyline, try the variants
-					// is it a line?
+				//Is it a line?
 				shape = polyline.createSingleLine();
 				if (shape == null) {
 					// or a polygon?
@@ -248,10 +298,10 @@ public class Path2ShapeConverter {
 	}
 
 	/**
-	 * Replaces any paths by their converted equivalents.
+	 * Replaces paths with their converted equivalents in their parent nodes
 	 * 
-	 * @param shapeList SVG equivalents from pathList
-	 * @param pathList original paths
+	 * @param shapeList SVG equivalents of pathList
+	 * @param pathList the original paths
 	 */
 	private static void replacePathsByShapes(List<SVGShape> shapeList, List<SVGPath> pathList) {
 		if (shapeList.size() != pathList.size()){
@@ -274,115 +324,120 @@ public class Path2ShapeConverter {
 	}
 
 	
-	/** its seems many paths are drawn twice
-	 * if their paths are equal, remove the later one(s)
+	/** 
+	 * Many paths are drawn twice; if two or more paths are equal, remove the later one(s) if removeDuplicatePaths is set
 	 */
+	@Deprecated
 	public void removeDuplicatePaths() {
-		if (this.removeDuplicatePaths) {
+		if (removeDuplicatePaths) {
 			shapeListOut = removeDuplicateShapes(shapeListOut);
 		}
 	}
-	/** modifies the paths
-	 * 
-	 * @param shapeListOut
+	
+	/** 
+	 * Some paths have redundant move (M) commands that can be removed
+	 * <p>
+	 * E.g. M x1 y1 L x2 y2 M x2 y2 L x3 y3 will be converted to 
+	 *      M x1 y1 L x2 y2 L x3 y3  
 	 */
+	@Deprecated
 	public void removeRedundantMoveCommands() {
-		if (this.removeRedundantMoveCommands) {
+		if (removeRedundantMoveCommands) {
 			for (SVGPath path : pathListIn) {
 				removeRedundantMoveCommands(path, MOVE_EPS);
 			}
 		}
 	}
-	/** runs components having set true/false flags if required
-	 * 
-	 * Not currently used ... change it
+	
+	/** 
+	 * Runs convertPathsToShapes(List<SVGPath> pathList) and splitPolylinesToLines(List<SVGShape> shapeList); use after setting true/false flags if required
 	 */
+	@Deprecated
 	public void runAnalyses(List<SVGPath> pathList) {
-		this.pathListIn = pathList;
-		this.removeDuplicatePaths();
-		this.removeRedundantMoveCommands();
-		this.splitAtMoveCommands();
-		List<SVGShape> shapeList = this.convertPathsToShapes(pathListIn);
-		this.splitPolylinesToLines(shapeList);
+		pathListIn = pathList;
+		splitAtMoveCommands();
+		removeRedundantMoveCommands();
+		List<SVGShape> shapeList = convertPathsToShapes(pathListIn);
+		splitPolylinesToLines(shapeList);
+		removeDuplicatePaths();
 	}
 	
 	public void setPathList(List<SVGPath> pathListIn) {
 		this.pathListIn = pathListIn;
 	}
 
-	/** some paths have redundant M commands which can be removed.
-	 * 
-	 *  e.g. M x1 y1 L x2 y2 M x2 y2 L x3 y3 can be converted to 
-	 *       M x1 y1 L x2 y2 L x3 y3  
-	 *  
-	 * modifies the path
-	 * 
-	 * @param path
-	 * @param eps
-	 */
-	private void removeRedundantMoveCommands(SVGPath path, double eps) {
-		if (removeRedundantMoveCommands) {
-			String d = path.getDString();
-			if (d != null) {
-				PathPrimitiveList newPrimitives = new PathPrimitiveList();
-				PathPrimitiveList primitives = SVGPathPrimitive.parseDString(d);
-				int primitiveCount = primitives.size();
-				SVGPathPrimitive lastPrimitive = null;
-				for (int i = 0; i < primitives.size(); i++) {
-					SVGPathPrimitive currentPrimitive = primitives.get(i);
-					boolean skip = false;
-					if (currentPrimitive instanceof MovePrimitive) {
-						if (i == primitives.size() -1) { // final primitive
-							skip = true;
-						} else if (lastPrimitive != null) {
-							// move is to end of last primitive
-							Real2 lastLastCoord = lastPrimitive.getLastCoord();
-							Real2 currentFirstCoord = currentPrimitive.getFirstCoord();
-							skip = (lastLastCoord != null) && lastLastCoord.isEqualTo(currentFirstCoord, eps);
-						}
-						if (!skip && lastPrimitive != null) {
-							SVGPathPrimitive nextPrimitive = primitives.get(i+1);
-							Real2 currentLastCoord = currentPrimitive.getLastCoord();
-							Real2 nextFirstCoord = nextPrimitive.getFirstCoord();
-							skip = (nextFirstCoord != null) && currentLastCoord.isEqualTo(nextFirstCoord, eps);
-						}
+	private static SVGPath removeRedundantMoveCommands(SVGPath path, double eps) {
+		String d = path.getDString();
+		if (d != null) {
+			PathPrimitiveList newPrimitives = new PathPrimitiveList();
+			PathPrimitiveList primitives = SVGPathPrimitive.parseDString(d);
+			int primitiveCount = primitives.size();
+			SVGPathPrimitive lastPrimitive = null;
+			for (int i = 0; i < primitives.size(); i++) {
+				SVGPathPrimitive currentPrimitive = primitives.get(i);
+				boolean skip = false;
+				if (currentPrimitive instanceof MovePrimitive) {
+					if (i == primitives.size() -1) { // final primitive
+						skip = true;
+					} else if (lastPrimitive != null) {
+						// move is to end of last primitive
+						Real2 lastLastCoord = lastPrimitive.getLastCoord();
+						Real2 currentFirstCoord = currentPrimitive.getFirstCoord();
+						skip = (lastLastCoord != null) && lastLastCoord.isEqualTo(currentFirstCoord, eps);
 					}
-					if (!skip) {
-						newPrimitives.add(currentPrimitive);
-					} else {
-						LOG.trace("skipped "+lastPrimitive+ "== "+currentPrimitive);
+					if (!skip && lastPrimitive != null) {
+						SVGPathPrimitive nextPrimitive = primitives.get(i+1);
+						Real2 currentLastCoord = currentPrimitive.getLastCoord();
+						Real2 nextFirstCoord = nextPrimitive.getFirstCoord();
+						skip = (nextFirstCoord != null) && currentLastCoord.isEqualTo(nextFirstCoord, eps);
 					}
-					lastPrimitive = currentPrimitive;
 				}
-				createNewPathIfModified(path, d, newPrimitives, primitiveCount);
+				if (!skip) {
+					newPrimitives.add(currentPrimitive);
+				} else {
+					LOG.trace("skipped "+lastPrimitive+ "== "+currentPrimitive);
+				}
+				lastPrimitive = currentPrimitive;
 			}
+			return createNewPathIfModified(path, d, newPrimitives, primitiveCount);
 		}
+		return path;
 	}
 
-	private void createNewPathIfModified(SVGPath path, String d,
+	private static SVGPath createNewPathIfModified(SVGPath path, String d,
 			PathPrimitiveList newPrimitives, int primitiveCount) {
 		int newPrimitiveCount = newPrimitives.size();
 		if (newPrimitiveCount != primitiveCount) {
 			LOG.trace("Deleted "+(primitiveCount - newPrimitiveCount)+" redundant moves");
 			String newD = SVGPath.constructDString(newPrimitives);
 			SVGPath newPath = new SVGPath(newD);
-			XMLUtil.copyAttributesFromTo(path,  newPath);
+			XMLUtil.copyAttributesFromTo(path, newPath);
 			newPath.setDString(newD);
-			path.getParent().replaceChild(path,  newPath);
+			path.getParent().replaceChild(path, newPath);
 			LOG.trace(">>>"+d+"\n>>>"+newD);
+			return newPath;
 		}
+		return path;
 	}
 	
+	@Deprecated
 	public void splitAtMoveCommands() {
-		if (this.splitAtMoveCommands ) {
-			 for (SVGPath path : pathListIn) {
-				 splitAtMoveCommandsX();
-			 }
+		if (splitAtMoveCommands) {
+			splitAtMoveCommands(pathListIn);
 		}
 	}
 
-	private List<SVGPath> splitAtMoveCommandsX() {
-		 splitPathList = new ArrayList<SVGPath>();
+	private static List<SVGPath> splitAtMoveCommands(List<SVGPath> paths) {
+		ArrayList<SVGPath> newPaths = new ArrayList<SVGPath>();
+		for (SVGPath path : paths) {
+			List<SVGPath> result = splitAtMoveCommandsX(path);
+			newPaths.addAll(result);
+		}
+		return newPaths;
+	}
+
+	private static List<SVGPath> splitAtMoveCommandsX(SVGPath svgPath) {
+		 ArrayList<SVGPath> splitPathList = new ArrayList<SVGPath>();
 		 String d = svgPath.getDString();
 		 List<String> newDStringList = splitAtMoveCommandsAndCreateNewDStrings(d);
 		 if (newDStringList.size() == 1) {
@@ -402,16 +457,16 @@ public class Path2ShapeConverter {
 		 return splitPathList;
 	}
 	
-	private List<String> splitAtMoveCommandsAndCreateNewDStrings(String d) {
+	private static List<String> splitAtMoveCommandsAndCreateNewDStrings(String d) {
 		List<String> strings = new ArrayList<String>();
 		int current = -1;
 		while (true) {
-			int i = d.indexOf(SVGPathPrimitive.ABS_MOVE, current+1);
+			int i = d.indexOf(SVGPathPrimitive.ABS_MOVE, current + 1);
 			if (i == -1 && current >= 0) {
 				strings.add(d.substring(current));
 				break;
 			}
-			if (i > current+1) {
+			if (i > current + 1) {
 				strings.add(d.substring(current, i));
 			}
 			current = i;
@@ -454,13 +509,14 @@ public class Path2ShapeConverter {
 		LOG.trace("split: "+linesToAdd.size());
 	}
 
-	/** with help from
-	http://stackoverflow.com/questions/4958161/determine-the-centre-center-of-a-circle-using-multiple-points
-		 * @param p1
-		 * @param p2
-		 * @param p3
-		 * @return
-		 */
+	/** 
+	* Written with help from {@linktourl http://stackoverflow.com/questions/4958161/determine-the-centre-center-of-a-circle-using-multiple-points}
+	* 
+	* @param p1
+	* @param p2
+	* @param p3
+	* @return circle
+	*/
 	public static SVGCircle findCircleFrom3Points(Real2 p1, Real2 p2, Real2 p3, Double eps) {
 		SVGCircle circle = null;
 		if (p1 != null && p2 != null && p3 != null) {
@@ -556,33 +612,50 @@ public class Path2ShapeConverter {
 		}
 	}
 	
+	/** 
+	 * Many paths are drawn twice; if two or more paths are equal, remove the later one(s) if removeDuplicatePaths is set
+	 */
 	public void setRemoveDuplicatePaths(boolean removeDuplicatePaths) {
 		this.removeDuplicatePaths = removeDuplicatePaths;
 	}
+	
+	/** 
+	 * Some paths have redundant move (M) commands that can be removed
+	 * <p>
+	 * E.g. M x1 y1 L x2 y2 M x2 y2 L x3 y3 will be converted to 
+	 *      M x1 y1 L x2 y2 L x3 y3  
+	 */
 	public void setRemoveRedundantMoveCommands(boolean removeRedundantMoveCommands) {
 		this.removeRedundantMoveCommands = removeRedundantMoveCommands;
 	}
+	
 	public void setMinLinesInPolyline(Integer minLinesInPolyline) {
 		this.minLinesInPolyline = minLinesInPolyline;
 	}
+	
 	public void setSplitAtMoveCommands(boolean splitAtMoveCommands) {
 		this.splitAtMoveCommands = splitAtMoveCommands;
 	}
+	
 	public boolean isRemoveDuplicatePaths() {
 		return removeDuplicatePaths;
 	}
+	
 	public boolean isRemoveRedundantMoveCommands() {
 		return removeRedundantMoveCommands;
 	}
 	public Integer getMinLinesInPolyline() {
 		return minLinesInPolyline;
 	}
+	
 	public boolean isSplitAtMoveCommands() {
 		return splitAtMoveCommands;
 	}
+	
 	public Integer getDecimalPlaces() {
 		return decimalPlaces;
 	}
+	
 	public void setDecimalPlaces(Integer decimalPlaces) {
 		this.decimalPlaces = decimalPlaces;
 	}
