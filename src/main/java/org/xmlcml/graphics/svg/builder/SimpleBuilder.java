@@ -65,7 +65,7 @@ public class SimpleBuilder {
 	private static final double HATCH_DETECTION_DEFAULT_MAXIMUM_LINE_LENGTH = 4;
 	private static final double HATCH_DETECTION_DEFAULT_MAXIMUM_SPACING = 4;
 	private static final double POLYGON_ABSTRACTION_DEFAULT_RELATIVE_AREA_THRESHOLD = 0.92;
-	private static final double POLYGON_ABSTRACTION_DEFAULT_RELATIVE_DISTANCE_FROM_LINE_THRESHOLD = 0.08;
+	private static final double POLYGON_ABSTRACTION_DEFAULT_RELATIVE_DISTANCE_FROM_LINE_THRESHOLD = 0.06;
 	private static final double HATCH_DETECTION_DEFAULT_LINE_OVERLAP_EPSILON = 1e-8;
 	private static final double DEFAULT_POINT_EQUIVALENCE_EPSILON = 1e-8;
 
