@@ -87,32 +87,31 @@ public class Path2ShapeConverterTest {
 		Assert.assertTrue("4 "+svgElements.get(4).getClass().getSimpleName(), svgElements.get(4) instanceof SVGPath);
 	}
 	
-	/**
-<svg xmlns="http://www.w3.org/2000/svg">
- <g>
-  <path stroke="black" fill="#000000" stroke-width="0.0" 
-  d="M172.14 512.58 
-  L172.14 504.3   // A
-  C172.14 504.18 172.26 504.06 172.38 504.06 
-  C172.5 504.06 172.62 504.18 172.62 504.3 
-  L172.62 512.58  // D
-  C172.62 512.76 172.5 512.88 172.38 512.88 
-  C172.26 512.88 172.14 512.76 172.14 512.58 "
-  svgx:z="1737"/>
- </g>
-</svg>	 */
+	/*
+	<svg xmlns="http://www.w3.org/2000/svg">
+	 <g>
+	  <path stroke="black" fill="#000000" stroke-width="0.0" 
+	  d="M172.14 512.58 
+	  L172.14 504.3   // A
+	  C172.14 504.18 172.26 504.06 172.38 504.06 
+	  C172.5 504.06 172.62 504.18 172.62 504.3 
+	  L172.62 512.58  // D
+	  C172.62 512.76 172.5 512.88 172.38 512.88 
+	  C172.26 512.88 172.14 512.76 172.14 512.58 "
+	  svgx:z="1737"/>
+	 </g>
+	</svg>
 	
-/**
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg">
- <path stroke="black" fill="#000000" stroke-width="0.0" 
- d="M172.14 512.58 
- L172.14 504.3 
- L172.62 504.3 
- L172.62 512.58 
- L172.14 512.58 "/>
-</svg>
-*/
+	<?xml version="1.0" encoding="UTF-8"?>
+	<svg xmlns="http://www.w3.org/2000/svg">
+	 <path stroke="black" fill="#000000" stroke-width="0.0" 
+	 d="M172.14 512.58 
+	 L172.14 504.3 
+	 L172.62 504.3 
+	 L172.62 512.58 
+	 L172.14 512.58 "/>
+	</svg>
+	*/
 	@Test
 	public void testReplaceTwoQuadrantCapsByButt() {
 		SVGElement svgElement = createAndProcessElement(new File(Fixtures.PATHS_DIR, "roundedline.svg"));
@@ -144,8 +143,8 @@ public class Path2ShapeConverterTest {
 		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.PATHS_DIR, "circle.svg"))
 				.getChildElements().get(0);
 		Assert.assertEquals("sig",  "MCCCCZ", svgPath.getSignature());
-		Path2ShapeConverter p2sConverter = new Path2ShapeConverter(svgPath);
-		SVGShape circle = p2sConverter.convertPathToShape();
+		Path2ShapeConverter p2sConverter = new Path2ShapeConverter();
+		SVGShape circle = p2sConverter.convertPathToShape(svgPath);
 		Assert.assertNotNull("circle", circle);
 		Assert.assertTrue("circle", circle instanceof SVGCircle);
 		SVGCircle svgCircle = (SVGCircle) circle;
@@ -157,8 +156,7 @@ public class Path2ShapeConverterTest {
 	private List<SVGShape> createShapeList(File file) {
 		SVGElement svgElement = SVGElement.readAndCreateSVG(file);
 		Path2ShapeConverter converter = new Path2ShapeConverter();
-		converter.convertPathsToShapes(svgElement);
-		List<SVGShape> shapeList = converter.getShapeListOut();
+		List<SVGShape> shapeList = converter.convertPathsToShapes(svgElement);
 		return shapeList;
 	}
 	

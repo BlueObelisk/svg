@@ -197,7 +197,7 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		if (prim instanceof CubicPrimitive) {
 			Angle angle = prim.getAngle();
 			if (angle.getRightAngle(angleEps) != 0) {
-				quadrant = new Arc((CubicPrimitive)prim);
+				quadrant = new Arc((CubicPrimitive) prim);
 			}
 		}
 		return quadrant;
