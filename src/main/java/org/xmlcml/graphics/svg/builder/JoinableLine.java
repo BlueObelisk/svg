@@ -17,7 +17,7 @@ public class JoinableLine extends JoinableWithBackbone {
 	private SVGLine svgLine;
 	private JoinManager joinManager;
 
-	private static final double DEFAULT_RELATIVE_DISTANCE_TO_INTERSECTION = 1.5;
+	private static final double DEFAULT_RELATIVE_DISTANCE_TO_INTERSECTION = 0.5;
 	
 	private double relativeDistance = DEFAULT_RELATIVE_DISTANCE_TO_INTERSECTION;
 

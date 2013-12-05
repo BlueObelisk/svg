@@ -249,16 +249,16 @@ public class SVGPath extends SVGShape {
 	public SVGSymbol createSymbol(double maxWidth) {
 		createCoordArray();
 		SVGSymbol symbol = null;
-		Real2Range r2r = this.getBoundingBox();
+		Real2Range r2r = getBoundingBox();
 		if (Math.abs(r2r.getXRange().getRange()) < maxWidth && Math.abs(r2r.getYRange().getRange()) < maxWidth) {
 			symbol = new SVGSymbol();
-			SVGPath path = (SVGPath)this.copy();
+			SVGPath path = (SVGPath) copy();
 			Real2 orig = path.getOrigin();
 			path.normalizeOrigin();
 			SVGLine line = path.createHorizontalOrVerticalLine(EPS);
 			symbol.appendChild(path);
 			symbol.setId(path.getId()+".s");
-			List<SVGElement> defsNodes = SVGUtil.getQuerySVGElements(this,"/svg:svg/svg:defs");
+			List<SVGElement> defsNodes = SVGUtil.getQuerySVGElements(this, "/svg:svg/svg:defs");
 			defsNodes.get(0).appendChild(symbol);
 		}
 		return symbol;
@@ -266,7 +266,7 @@ public class SVGPath extends SVGShape {
 
 	private SVGLine createHorizontalOrVerticalLine(double eps) {
 		SVGLine  line = null;
-		Real2Array coords = this.getCoords();
+		Real2Array coords = getCoords();
 		if (coords.size() == 2) {
 			line = new SVGLine(coords.get(0), coords.get(1));
 			if (!line.isHorizontal(eps) && !line.isVertical(eps)) {
@@ -285,9 +285,9 @@ public class SVGPath extends SVGShape {
 	public SVGCircle createCircle(double epsilon) {
 		createCoordArray();
 		SVGCircle circle = null;
-		String signature = this.getSignature();
+		String signature = getSignature();
 		if (signature.equals("MCCCCZ") || signature.equals("MCCCC") && isClosed) {
-			PathPrimitiveList primList = this.ensurePrimitives();
+			PathPrimitiveList primList = ensurePrimitives();
 			Angle angleEps = new Angle(0.05, Units.RADIANS);
 			Real2Array centreArray = new Real2Array();
 			RealArray radiusArray = new RealArray();
@@ -338,7 +338,7 @@ public class SVGPath extends SVGShape {
 	public PathPrimitiveList ensurePrimitives() {
 		isClosed = false;
 		if (primitiveList == null) {
-			primitiveList = this.createPathPrimitives();
+			primitiveList = createPathPrimitives();
 		}
 		if (primitiveList.size() > 1) {
 			SVGPathPrimitive primitive0 = primitiveList.get(0);

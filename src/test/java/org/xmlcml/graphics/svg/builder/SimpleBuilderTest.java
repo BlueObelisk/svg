@@ -12,14 +12,9 @@ import org.xmlcml.graphics.svg.*;
 import java.io.File;
 import java.util.List;
 
-/** test reading molecules
- * 
- * Reads SVG and uses heuristics to create chemistry.
- * 
+/**
  * @author pm286
- *
  */
-//@Ignore
 public class SimpleBuilderTest {
 
 	private final static Logger LOG = Logger.getLogger(SimpleBuilderTest.class);
@@ -43,6 +38,227 @@ public class SimpleBuilderTest {
 	File SMALL_TEST_2 = new File(Fixtures.MOLECULES_DIR, "smalltest2.svg");
 	File SMALL_TEST_3 = new File(Fixtures.MOLECULES_DIR, "smalltest3.svg");
 	File SMALL_TEST_4 = new File(Fixtures.MOLECULES_DIR, "smalltest4.svg");
+	File SMALL_TEST_5 = new File(Fixtures.MOLECULES_DIR, "smalltest5.svg");
+
+	@Test
+	public void test2_10() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_10_SVG));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("derived lines", 44, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("texts", 19, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("higher lines", 20, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("hatches", 2, simpleBuilder.getHigherPrimitives().getHatchList().size());
+		Assert.assertEquals("polygons", 0, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("tram lines", 7, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("joinables", 48, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("raw junctions", 56, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("merged junctions", 24, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	@Test
+	public void test2_11() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_11_SVG));
+		simpleBuilder.createHigherPrimitives();
+		//, 6, 8, 6);    // fails
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("derived lines", 6, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("texts", 6, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("higher lines", 4, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("hatches", 0, simpleBuilder.getHigherPrimitives().getHatchList().size());
+		Assert.assertEquals("polygons", 0, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("tram lines", 1, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("joinables", 11, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("raw junctions", 8, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("merged junctions", 6, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	@Test
+	public void test2_13() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_13_SVG));
+		simpleBuilder.createHigherPrimitives();
+		//, 13, 17, 10);
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("derived lines", 13, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("texts", 6, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("higher lines", 7, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("hatches", 0, simpleBuilder.getHigherPrimitives().getHatchList().size());
+		Assert.assertEquals("polygons", 0, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("tram lines", 3, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("joinables", 16, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("raw junctions", 17, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("merged junctions", 10, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	@Test
+	public void test2_15() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_15_SVG));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("derived lines", 40, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("texts", 24, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("higher lines", 21, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("hatches", 1, simpleBuilder.getHigherPrimitives().getHatchList().size());
+		Assert.assertEquals("polygons", 2, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("tram lines", 7, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("joinables", 55, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("raw junctions", 59, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("merged junctions", 24, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	@Test
+	public void test2_16() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_16_SVG));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("derived lines", 20, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("texts", 7, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("higher lines", 10, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("hatches", 0, simpleBuilder.getHigherPrimitives().getHatchList().size());
+		Assert.assertEquals("polygons", 0, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("tram lines", 5, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("joinables", 22, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("raw junctions", 24, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("merged junctions", 14, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	//TODO 2_18
+	
+	@Test
+	public void test2_23() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_23_SVG));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+		//, 24, 37, 21);
+		Assert.assertEquals("derived lines", 24, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("texts", 19, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("higher lines", 16, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("hatches", 0, simpleBuilder.getHigherPrimitives().getHatchList().size());
+		Assert.assertEquals("polygons", 0, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("tram lines", 4, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("joinables", 39, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("raw junctions", 37, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("merged junctions", 21, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	//TODO 2_25
+	
+	@Test
+	public void test5_11() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_11_SVG));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("derived lines", 46, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("texts", 0, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("higher lines", 28, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("hatches", 3, simpleBuilder.getHigherPrimitives().getHatchList().size());
+		Assert.assertEquals("polygons", 4, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("tram lines", 4, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("joinables", 39, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("raw junctions", 68, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("merged junctions", 23, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	@Test
+	public void test5_12() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_12_SVG));
+		simpleBuilder.createHigherPrimitives();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("derived lines", 45, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("texts", 0, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("higher lines", 27, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("hatches", 2, simpleBuilder.getHigherPrimitives().getHatchList().size());
+		Assert.assertEquals("polygons", 4, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("tram lines", 6, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("joinables", 39, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("raw junctions", 67, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("merged junctions", 23, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	@Test
+	public void test5_13() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_13_SVG));
+		simpleBuilder.createHigherPrimitives();
+		//first 37, 48, 26; second 39, 51, 27
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("derived lines", 86, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("texts", 0, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("higher lines", 52, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("hatches", 5, simpleBuilder.getHigherPrimitives().getHatchList().size());
+		Assert.assertEquals("polygons", 8, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("tram lines", 11, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("joinables", 76, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("raw junctions", 130, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("merged junctions", 42, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+	}
+	
+	@Test
+	public void testJunctionMerging5_13() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_13_SVG));
+		simpleBuilder.createHigherPrimitives();
+		//simpleBuilder.createMergedJunctions();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("lines", 42, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());//FIXME me should be 46, lines were missed in the PDF to SVG conversion stage; 59 with text
+		Assert.assertEquals("lines", 86, simpleBuilder.getDerivedPrimitives().getLineList().size());//74
+		Assert.assertEquals("lines", 11, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+	}
+	
+	@Test
+	public void testWithElementPNG5_13() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_13_SVG));
+		simpleBuilder.createHigherPrimitives();
+		//simpleBuilder.createRawAndDerivedLines();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("lines", 86, simpleBuilder.getDerivedPrimitives().getLineList().size());//FIXME should be 88; missing lines in SVG
+	}
+	
+	@Test
+	public void testTramLines5_13() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_13_SVG));
+		simpleBuilder.createHigherPrimitives();
+		//simpleBuilder.createTramLineList();
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("tramLines", 11, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		//Assert.assertEquals("paths", 1, simpleBuilder.getRawPrimitives().getLineList().size());
+		Assert.assertEquals("paths", 52, simpleBuilder.getHigherPrimitives().getLineList().size());//FIXME should be 54, lines were missed in the PDF to SVG conversion stage
+	}
+	
+	@Test
+	@Ignore//FIXME
+	public void testJunctionMerging2_25() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_25_SVG));
+		simpleBuilder.createHigherPrimitives();
+		//no hatches; should be 25, 32, 20; l of Cl not circular enough, =O too near other bonds
+		Assert.assertEquals("lines", 22, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+		Assert.assertEquals("lines", 15, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("lines", 5, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+	}
+	
+	@Test
+	public void testJunctionMerging5_11() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_11_SVG));
+		simpleBuilder.createHigherPrimitives();
+		//simpleBuilder.createRawJunctionList();
+		//hatches and arrow; should be 36, 49, 26
+		//simpleBuilder.createRawAndDerivedLines();
+		Assert.assertEquals("lines", 46, simpleBuilder.getDerivedPrimitives().getLineList().size());//Should be 39 (38)
+		//simpleBuilder.createMergedJunctions();
+		//Assert.assertEquals("lines", 38, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("lines", 4, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		drawFromSimpleBuilder(simpleBuilder);
+		Assert.assertEquals("lines", 23, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());//FIXME should be 26 as not picking up text; 29 with hatches and wedges
+	}
+	
+	/*@Test
+	public void testJunctionMergingReduced5_11() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(new File("src/test/resources/org/xmlcml/graphics/svg/molecules/image.g.5.11reduced2.svg")));
+		simpleBuilder.createRawJunctionList();
+		drawFromSimpleBuilder(simpleBuilder);
+		simpleBuilder.createMergedJunctions();//hatches and arrow; should be 36, 49, 26
+		Assert.assertEquals("lines", 1, simpleBuilder.createMergedJunctions().size());//FIXME should be 26 as not picking up text; 29 with hatches and wedges
+		Assert.assertEquals("lines", 8, simpleBuilder.getHigherPrimitives().getSingleLineList().size());//Should be 39
+		Assert.assertEquals("lines", 0, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+	}*/
 	
 	@Test
 	public void testAllLists() {
@@ -154,15 +370,7 @@ public class SimpleBuilderTest {
 		//simpleBuilder.createRawAndDerivedLines();
 		drawFromSimpleBuilder(simpleBuilder);
 		Assert.assertEquals("lines", 45, simpleBuilder.getDerivedPrimitives().getLineList().size());
-	}
-	@Test
-	public void testWithElementPNG5_13() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_13_SVG));
-		simpleBuilder.createHigherPrimitives();
-		//simpleBuilder.createRawAndDerivedLines();
-		drawFromSimpleBuilder(simpleBuilder);
-		Assert.assertEquals("lines", 86, simpleBuilder.getDerivedPrimitives().getLineList().size());//FIXME should be 88; missing lines in SVG
-	}		
+	}	
 	@Test
 	public void testWithElementPNG5_14() {
 		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_14_SVG));
@@ -269,28 +477,6 @@ public class SimpleBuilderTest {
 	}
 	
 	@Test
-	public void testTramLines5_12() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_12_SVG));
-		simpleBuilder.createHigherPrimitives();
-		//simpleBuilder.createTramLineList();
-		drawFromSimpleBuilder(simpleBuilder);
-		Assert.assertEquals("tramLines", 6, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-		//Assert.assertEquals("paths", 1, simpleBuilder.getRawPrimitives().getLineList().size());
-		Assert.assertEquals("paths", 27, simpleBuilder.getHigherPrimitives().getLineList().size());
-	}
-	
-	@Test
-	public void testTramLines5_13() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_13_SVG));
-		simpleBuilder.createHigherPrimitives();
-		//simpleBuilder.createTramLineList();
-		drawFromSimpleBuilder(simpleBuilder);
-		Assert.assertEquals("tramLines", 11, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-		//Assert.assertEquals("paths", 1, simpleBuilder.getRawPrimitives().getLineList().size());
-		Assert.assertEquals("paths", 52, simpleBuilder.getHigherPrimitives().getLineList().size());//FIXME should be 54, lines were missed in the PDF to SVG conversion stage
-	}
-	
-	@Test
 	public void testTramLines5_14() {
 		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_14_SVG));
 		simpleBuilder.createHigherPrimitives();
@@ -323,106 +509,7 @@ public class SimpleBuilderTest {
 		Assert.assertEquals("explicitLines", 1, simpleBuilder.getRawPrimitives().getLineList().size());
 
 	}
-	
-	@Test
-	public void testJunctionMerging2_11() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_11_SVG));
-		simpleBuilder.createHigherPrimitives();
-		//, 6, 8, 6);    // fails
-		Assert.assertEquals("lines", 6, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
-		Assert.assertEquals("lines", 4, simpleBuilder.getHigherPrimitives().getLineList().size());
-		Assert.assertEquals("lines", 1, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-	}
-	
-	@Test
-	public void testJunctionMerging2_13() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_13_SVG));
-		simpleBuilder.createHigherPrimitives();
-		//, 13, 17, 10);
-		Assert.assertEquals("lines", 10, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
-		Assert.assertEquals("lines", 7, simpleBuilder.getHigherPrimitives().getLineList().size());
-		Assert.assertEquals("lines", 3, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-	}
-	
-	@Test
-	@Ignore//FIXME
-	public void testJunctionMerging2_18() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_18_SVG));
-		simpleBuilder.createHigherPrimitives();
-		//, 21, 23, 14);
-		Assert.assertEquals("lines", 15, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
-		Assert.assertEquals("lines", 12, simpleBuilder.getHigherPrimitives().getLineList().size());
-		Assert.assertEquals("lines", 5, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-	}
-	
-	@Test
-	public void testJunctionMerging2_23() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_23_SVG));
-		simpleBuilder.createHigherPrimitives();
-		//, 24, 37, 21);
-		Assert.assertEquals("lines", 21, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
-		Assert.assertEquals("lines", 16, simpleBuilder.getHigherPrimitives().getLineList().size());
-		Assert.assertEquals("lines", 4, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-	}
-	
-	@Test
-	@Ignore//FIXME
-	public void testJunctionMerging2_25() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_25_SVG));
-		simpleBuilder.createHigherPrimitives();
-		//no hatches; should be 25, 32, 20; l of Cl not circular enough, =O too near other bonds
-		Assert.assertEquals("lines", 22, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
-		Assert.assertEquals("lines", 15, simpleBuilder.getHigherPrimitives().getLineList().size());
-		Assert.assertEquals("lines", 5, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-	}
-	
-	@Test
-	public void testJunctionMerging5_11() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_11_SVG));
-		simpleBuilder.createHigherPrimitives();
-		//simpleBuilder.createRawJunctionList();
-		//hatches and arrow; should be 36, 49, 26
-		//simpleBuilder.createRawAndDerivedLines();
-		Assert.assertEquals("lines", 46, simpleBuilder.getDerivedPrimitives().getLineList().size());//Should be 39 (38)
-		//simpleBuilder.createMergedJunctions();
-		//Assert.assertEquals("lines", 38, simpleBuilder.getHigherPrimitives().getLineList().size());
-		Assert.assertEquals("lines", 4, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-		drawFromSimpleBuilder(simpleBuilder);
-		Assert.assertEquals("lines", 23, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());//FIXME should be 26 as not picking up text; 29 with hatches and wedges
-	}
-	
-	/*@Test
-	public void testJunctionMergingReduced5_11() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(new File("src/test/resources/org/xmlcml/graphics/svg/molecules/image.g.5.11reduced2.svg")));
-		simpleBuilder.createRawJunctionList();
-		drawFromSimpleBuilder(simpleBuilder);
-		simpleBuilder.createMergedJunctions();//hatches and arrow; should be 36, 49, 26
-		Assert.assertEquals("lines", 1, simpleBuilder.createMergedJunctions().size());//FIXME should be 26 as not picking up text; 29 with hatches and wedges
-		Assert.assertEquals("lines", 8, simpleBuilder.getHigherPrimitives().getSingleLineList().size());//Should be 39
-		Assert.assertEquals("lines", 0, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-	}*/
-	
-	@Test
-	public void testJunctionMerging5_12() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_12_SVG));
-		simpleBuilder.createHigherPrimitives();
-		Assert.assertEquals("lines", 23, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());//FIXME should be 29 as not picking up text
-		Assert.assertEquals("lines", 27, simpleBuilder.getHigherPrimitives().getLineList().size());
-		Assert.assertEquals("lines", 6, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-	}
-	
-	@Test
-	public void testJunctionMerging5_13() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_5_13_SVG));
-		simpleBuilder.createHigherPrimitives();
-		//first 37, 48, 26; second 39, 51, 27
-		//simpleBuilder.createMergedJunctions();
-		drawFromSimpleBuilder(simpleBuilder);
-		Assert.assertEquals("lines", 42, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());//FIXME me should be 46, lines were missed in the PDF to SVG conversion stage; 59 with text
-		Assert.assertEquals("lines", 86, simpleBuilder.getDerivedPrimitives().getLineList().size());//74
-		Assert.assertEquals("lines", 11, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-	}
-	
+		
 	@Test
 	public void testJunctionWithTram() {
 		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_11_SVG));
@@ -502,35 +589,19 @@ public class SimpleBuilderTest {
 	}
 	
 	@Test
-	public void test210() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_10_SVG));
+	public void testSmall5() {
+		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(SMALL_TEST_5));
 		simpleBuilder.createHigherPrimitives();
 		drawFromSimpleBuilder(simpleBuilder);
-		Assert.assertEquals("lines", 44, simpleBuilder.getDerivedPrimitives().getLineList().size());
-		Assert.assertEquals("lines", 20, simpleBuilder.getHigherPrimitives().getLineList().size());
-		Assert.assertEquals("tramLines", 7, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-		Assert.assertEquals("texts", 19, simpleBuilder.getDerivedPrimitives().getTextList().size());
-		Assert.assertEquals("polylines", 0, simpleBuilder.getRawPrimitives().getPolylineList().size());
-		Assert.assertEquals("polygons", 0, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
-		Assert.assertEquals("joinables", 48, simpleBuilder.getHigherPrimitives().getJoinableList().size());
-		Assert.assertEquals("junctions", 56, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
-		Assert.assertEquals("junctions", 24, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
-	}
-	
-	@Test
-	public void test215() {
-		SimpleBuilder simpleBuilder = new SimpleBuilder(SVGElement.readAndCreateSVG(IMAGE_2_15_SVG));
-		simpleBuilder.createHigherPrimitives();
-		drawFromSimpleBuilder(simpleBuilder);
-		Assert.assertEquals("lines", 40, simpleBuilder.getDerivedPrimitives().getLineList().size());
-		Assert.assertEquals("lines", 21, simpleBuilder.getHigherPrimitives().getLineList().size());
-		Assert.assertEquals("tramLines", 7, simpleBuilder.getHigherPrimitives().getTramLineList().size());
-		Assert.assertEquals("texts", 24, simpleBuilder.getDerivedPrimitives().getTextList().size());
-		Assert.assertEquals("polylines", 2, simpleBuilder.getRawPrimitives().getPolylineList().size());
-		Assert.assertEquals("polygons", 2, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
-		Assert.assertEquals("joinables", 55, simpleBuilder.getHigherPrimitives().getJoinableList().size());
-		Assert.assertEquals("junctions", 59, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
-		Assert.assertEquals("junctions", 24, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
+		Assert.assertEquals("derived lines", 5, simpleBuilder.getDerivedPrimitives().getLineList().size());
+		Assert.assertEquals("texts", 0, simpleBuilder.getDerivedPrimitives().getTextList().size());
+		Assert.assertEquals("higher lines", 5, simpleBuilder.getHigherPrimitives().getLineList().size());
+		Assert.assertEquals("hatches", 0, simpleBuilder.getHigherPrimitives().getHatchList().size());
+		Assert.assertEquals("polygons", 1, simpleBuilder.getDerivedPrimitives().getPolygonList().size());
+		Assert.assertEquals("tram lines", 0, simpleBuilder.getHigherPrimitives().getTramLineList().size());
+		Assert.assertEquals("joinables", 6, simpleBuilder.getHigherPrimitives().getJoinableList().size());
+		Assert.assertEquals("raw junctions", 9, simpleBuilder.getHigherPrimitives().getRawJunctionList().size());
+		Assert.assertEquals("merged junctions", 2, simpleBuilder.getHigherPrimitives().getMergedJunctionList().size());
 	}
 
 	private void drawFromSimpleBuilder(SimpleBuilder simpleBuilder) {
