@@ -50,15 +50,15 @@ public class Path2ShapeConverter {
 	private static final Angle ANGLE_EPS = new Angle(0.01);
 
 
-	private Integer decimalPlaces = DEFAULT_DECIMAL_PLACES;
-	private Integer minLinesInPolyline = DEFAULT_LINES_IN_POLYLINE;
+	private int decimalPlaces = DEFAULT_DECIMAL_PLACES;
+	private int minLinesInPolyline = DEFAULT_LINES_IN_POLYLINE;
 	private boolean removeDuplicatePaths = true;
 	private boolean removeRedundantMoveCommands = true;
 	private boolean splitAtMoveCommands = true;
 	private double maxPathWidth = DEFAULT_MAX_PATH_WIDTH;
 	private Angle maxAngle = DEFAULT_MAX_ANGLE;
-	private Double minRectThickness = DEFAULT_MIN_RECT_THICKNESS;
-	
+	private double maxRectThickness = DEFAULT_MIN_RECT_THICKNESS;
+
 	/** input and output */
 	private List<SVGPath> pathListIn;
 	private List<SVGPath> splitPathList;
@@ -137,7 +137,7 @@ public class Path2ShapeConverter {
 		if (splitAtMoveCommands) {
 			pathList = splitAtMoveCommands(pathList);
 		}
-		for (SVGElement path : pathList) {
+		for (SVGPath path : pathList) {
 			SVGShape shape = convertPathToShape(path);
 			shape.setId(shape.getClass().getSimpleName().toLowerCase().substring(SVG.length())+"."+id);
 			shapeListOut.add(shape);
@@ -162,8 +162,43 @@ public class Path2ShapeConverter {
 	 * @param path
 	 * @return a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
 	 */
-	public SVGShape convertPathToShape(SVGElement path) {
-		SVGShape shape = convertPathToShape(path);
+	public SVGShape convertPathToShape(SVGPath path) {
+		if (path == null) {
+			return null;
+		}
+		SVGShape shape = null;
+		shape = createRectOrAxialLine(path, RECT_EPS);
+		if (shape == null) {
+			shape = path.createRoundedBox(ROUNDED_BOX_EPS);
+		}
+		if (shape == null) {
+			shape = path.createCircle(CIRCLE_EPS);
+		}
+		if (shape == null) {
+			SVGPolyline polyline = (SVGPolyline) path.createPolyline();
+			// not a polyline, return unchanged path
+			if (polyline == null) {
+				shape = new SVGPath(path);
+			} else {
+				// SVG is a polyline, try the variants
+				//Is it a line?
+				shape = polyline.createSingleLine();
+				if (shape == null) {
+					// or a polygon?
+					shape = createPolygonRectOrLine(shape, polyline);
+					LOG.trace("polygon "+shape);
+				}
+				// no, reset to polyline
+				if (shape == null || shape instanceof SVGPolygon) {
+					shape = createNarrowLine((SVGPolygon) shape);
+					if (shape == null) {
+						shape = polyline;
+					} 
+				}
+			}
+		}
+		copyAttributes(path, shape);
+		shape.format(decimalPlaces);
 		return shape;
 	}
 
@@ -178,7 +213,8 @@ public class Path2ShapeConverter {
 		svgPath = path;
 	}
 	
-	/** Set the number of decimal places TODO
+	/** 
+	 * The number of decimal places for coordinates in output
 	 * 
 	 * @param places
 	 */
@@ -206,7 +242,7 @@ public class Path2ShapeConverter {
 		}
 		return path;
 	}
-
+	
 	/** 
 	 * Creates best guess at higher SVGElement
 	 * <p>
@@ -217,43 +253,7 @@ public class Path2ShapeConverter {
 	 */
 	@Deprecated
 	public SVGShape convertPathToShape() {
-		if (svgPath == null) {
-			return null;
-		}
-		SVGShape shape = null;
-		shape = createRectOrAxialLine(RECT_EPS);
-		if (shape == null) {
-			shape = svgPath.createRoundedBox(ROUNDED_BOX_EPS);
-		}
-		if (shape == null) {
-			shape = svgPath.createCircle(CIRCLE_EPS);
-		}
-		if (shape == null) {
-			SVGPolyline polyline = (SVGPolyline) svgPath.createPolyline();
-			// not a polyline, return unchanged path
-			if (polyline == null) {
-				shape = new SVGPath(svgPath);
-			} else {
-				// SVG is a polyline, try the variants
-				//Is it a line?
-				shape = polyline.createSingleLine();
-				if (shape == null) {
-					// or a polygon?
-					shape = createPolygonRectOrLine(shape, polyline);
-					LOG.trace("polygon "+shape);
-				}
-				// no, reset to polyline
-				if (shape == null || shape instanceof SVGPolygon) {
-					shape = createNarrowLine((SVGPolygon) shape);
-					if (shape == null) {
-						shape = polyline;
-					} 
-				}
-			}
-		}
-		copyAttributes(svgPath, shape);
-		shape.format(decimalPlaces);
-		return shape;
+		return convertPathToShape(svgPath);
 	}
 
 	private SVGShape createNarrowLine(SVGPolygon polygon) {
@@ -284,12 +284,12 @@ public class Path2ShapeConverter {
 		return shape;
 	}
 
-	private SVGShape createRectOrAxialLine(double eps) {
+	private SVGShape createRectOrAxialLine(SVGPath path, double eps) {
 		SVGShape shape;
-		SVGRect rect = svgPath.createRectangle(eps);
+		SVGRect rect = path.createRectangle(eps);
 		SVGLine line = null;
 		if (rect == null) {
-			line = createLineFromMLLLorMLCCLCC(svgPath);
+			line = createLineFromMLLLorMLCCLCC(path);
 		} else {
 			line = createLineFromRect(rect); 
 		}
@@ -297,12 +297,6 @@ public class Path2ShapeConverter {
 		return shape;
 	}
 
-	/**
-	 * Replaces paths with their converted equivalents in their parent nodes
-	 * 
-	 * @param shapeList SVG equivalents of pathList
-	 * @param pathList the original paths
-	 */
 	private static void replacePathsByShapes(List<SVGShape> shapeList, List<SVGPath> pathList) {
 		if (shapeList.size() != pathList.size()){
 			throw new RuntimeException("converted paths ("+shapeList.size()+") != old paths ("+pathList.size()+")");
@@ -420,6 +414,14 @@ public class Path2ShapeConverter {
 		return path;
 	}
 	
+	/**
+	 * Split paths into constituent paths if there are move commands other than at the start
+	 * <p>
+	 * @deprecated
+	 * 
+	 * @param paths
+	 * @return list of paths with move commands only at the start
+	 */
 	@Deprecated
 	public void splitAtMoveCommands() {
 		if (splitAtMoveCommands) {
@@ -474,7 +476,8 @@ public class Path2ShapeConverter {
 		return strings;
 	}
 	
-	/** iterates over allShapes and extracts all splitLines.
+	/** 
+	 * Splits any polylines in shapeList into lines according to minLinesInPolyline ({@link setMinLinesInPolyline} and {@link getMinLinesInPolyline})
 	 * 
 	 * @param shapeList
 	 * @return
@@ -510,11 +513,12 @@ public class Path2ShapeConverter {
 	}
 
 	/** 
-	* Written with help from {@linktourl http://stackoverflow.com/questions/4958161/determine-the-centre-center-of-a-circle-using-multiple-points}
+	* Written with help from http://stackoverflow.com/questions/4958161/determine-the-centre-center-of-a-circle-using-multiple-points
 	* 
 	* @param p1
 	* @param p2
 	* @param p3
+	* @param eps TODO
 	* @return circle
 	*/
 	public static SVGCircle findCircleFrom3Points(Real2 p1, Real2 p2, Real2 p3, Double eps) {
@@ -535,11 +539,17 @@ public class Path2ShapeConverter {
 		return circle;
 	}
 
-
+	/** 
+	* Written with help from http://stackoverflow.com/questions/4958161/determine-the-centre-center-of-a-circle-using-multiple-points
+	* 
+	* @param r2a the points
+	* @param eps TODO
+	* @return circle
+	*/
 	public static SVGCircle findCircleFromPoints(Real2Array r2a, double eps) {
 		SVGCircle circle = null;
 		if (r2a == null || r2a.size() < 3) {
-			//
+			
 		} else if (r2a.size() == 3) {
 			circle = findCircleFrom3Points(r2a.get(0), r2a.get(1), r2a.get(2), eps);
 		} else {
@@ -557,7 +567,7 @@ public class Path2ShapeConverter {
 			Real2Range bbox =r2a.getRange2();
 			// check if scatter in both directions
 			if (bbox.getXRange().getRange() > eps && bbox.getYRange().getRange() > eps) {
-				// don't lnow the distribution and can't afford to find all triplets
+				//Don't know the distribution and can't afford to find all triplets
 				// so find the extreme points
 				Real2 minXPoint = r2a.getPointWithMinimumX();
 				Real2 maxXPoint = r2a.getPointWithMaximumX();
@@ -568,7 +578,12 @@ public class Path2ShapeConverter {
 		return circle;
 	}
 
-
+	/**
+	 * Many paths are drawn twice; if two or more paths are equal, remove the later one(s) if removeDuplicatePaths is set
+	 * 
+	 * @param shapeList
+	 * @return
+	 */
 	public static List<SVGShape> removeDuplicateShapes(List<SVGShape> shapeList) {
 		if (shapeList != null) {
 			Set<String> dStringSet = new HashSet<String>();
@@ -593,7 +608,12 @@ public class Path2ShapeConverter {
 		return shapeList;
 	}
 
-
+	/**
+	 * Copies fill, opacity, stroke and stroke width attributes
+	 * 
+	 * @param path
+	 * @param result
+	 */
 	public static void copyAttributes(SVGPath path, SVGElement result) {
 		for (String attName : new String[]{
 				StyleBundle.FILL, 
@@ -613,7 +633,7 @@ public class Path2ShapeConverter {
 	}
 	
 	/** 
-	 * Many paths are drawn twice; if two or more paths are equal, remove the later one(s) if removeDuplicatePaths is set
+	 * @param removeDuplicatePaths whether if two or more paths are equal, the later one(s) should be removed
 	 */
 	public void setRemoveDuplicatePaths(boolean removeDuplicatePaths) {
 		this.removeDuplicatePaths = removeDuplicatePaths;
@@ -622,58 +642,99 @@ public class Path2ShapeConverter {
 	/** 
 	 * Some paths have redundant move (M) commands that can be removed
 	 * <p>
-	 * E.g. M x1 y1 L x2 y2 M x2 y2 L x3 y3 will be converted to 
-	 *      M x1 y1 L x2 y2 L x3 y3  
+	 * E.g. M x1 y1 L x2 y2 M x2 y2 L x3 y3 will be converted to M x1 y1 L x2 y2 L x3 y3
+	 *      
+	 * @param whether this should be done
 	 */
 	public void setRemoveRedundantMoveCommands(boolean removeRedundantMoveCommands) {
 		this.removeRedundantMoveCommands = removeRedundantMoveCommands;
 	}
 	
+	/**
+	 * @param the minimum number of lines for polylines to be split into lines with {@link splitPolylinesToLines}
+	 */
 	public void setMinLinesInPolyline(Integer minLinesInPolyline) {
 		this.minLinesInPolyline = minLinesInPolyline;
 	}
-	
+
+	/**
+	 * @param whether to split paths into constituent paths if there are move commands other than at the start
+	 */
 	public void setSplitAtMoveCommands(boolean splitAtMoveCommands) {
 		this.splitAtMoveCommands = splitAtMoveCommands;
 	}
 	
+	/** 
+	 * @return whether if two or more paths are equal, the later one(s) will be removed
+	 */
 	public boolean isRemoveDuplicatePaths() {
 		return removeDuplicatePaths;
 	}
 	
+	/** 
+	 * Some paths have redundant move (M) commands that can be removed
+	 * <p>
+	 * E.g. M x1 y1 L x2 y2 M x2 y2 L x3 y3 will be converted to M x1 y1 L x2 y2 L x3 y3
+	 *      
+	 * @return whether this will be done
+	 */
 	public boolean isRemoveRedundantMoveCommands() {
 		return removeRedundantMoveCommands;
 	}
+	
+	/**
+	 * @return the minimum number of lines for polylines to be split into lines with {@link splitPolylinesToLines}
+	 */
 	public Integer getMinLinesInPolyline() {
 		return minLinesInPolyline;
 	}
 	
+	/**
+	 * @return whether to split paths into constituent paths if there are move commands other than at the start
+	 */
 	public boolean isSplitAtMoveCommands() {
 		return splitAtMoveCommands;
 	}
 	
+	/** 
+	 * @return the number of decimal places for coordinates in output
+	 */
 	public Integer getDecimalPlaces() {
 		return decimalPlaces;
 	}
 	
-	public void setDecimalPlaces(Integer decimalPlaces) {
-		this.decimalPlaces = decimalPlaces;
-	}
-
-	/** converts paths in svgElement and replaces originals.
+	/**
+	 * Converts paths to shapes where appropriate in an SVG element
 	 * 
-	 * @param gChunk
+	 * @param svgElement
 	 */
-	public void convertPathsToShapes(SVGElement svgElement) {
+	public List<SVGShape> convertPathsToShapes(SVGElement svgElement) {
 		List<SVGPath> pathList = SVGPath.extractPaths(svgElement);
 		List<SVGShape> shapeList = convertPathsToShapes(pathList);
 		Path2ShapeConverter.replacePathsByShapes(shapeList, pathList);
+		return shapeList;
 	}
 
+	/**
+	 * Get the results of processing
+	 * <p>
+	 * @deprecated
+	 * 
+	 * @return list of shapes
+	 */
+	@Deprecated
 	public List<SVGShape> getShapeListOut() {
 		return shapeListOut;
 	}
 
+	/**
+	 * Create line from path consisting of 3 or 4 lines creating the outline of a line
+	 * <p>
+	 * @deprecated
+	 * 
+	 * @return
+	 */
+	@Deprecated
 	public SVGLine createNarrowLine() {
 		maxPathWidth = 1.0;
 		if (svgPath == null) return null;
@@ -706,6 +767,14 @@ public class Path2ShapeConverter {
 		return line;
 	}
 	
+	/**
+	 * TODO
+	 * <p>
+	 * @deprecated
+	 * 
+	 * @return TODO
+	 */
+	@Deprecated
 	public SVGPath createNarrowQuadrant() {
 		SVGPath newPath = null;
 		String signature = svgPath.getSignature();
@@ -717,10 +786,18 @@ public class Path2ShapeConverter {
 		return newPath;
 	}
 
+	/**
+	 * Converts circles represented as polygons (closed paths) into SVG circles
+	 * <p>
+	 * TODO
+	 * 
+	 * @param polygon
+	 * @return circle
+	 */
 	public SVGCircle convertToCircle(SVGPolygon polygon) {
 		Real2Range bbox = polygon.getBoundingBox();
 		SVGCircle circle = null;
-		double eps = 10. * RECT_EPS; // why not?
+		double eps = 10 * RECT_EPS;//Why not?
 		if (Math.abs(bbox.getXRange().getRange() - bbox.getYRange().getRange()) < eps) {
 			Real2 centre = bbox.getCentroid();
 			RealArray radArray = new RealArray();
@@ -735,6 +812,14 @@ public class Path2ShapeConverter {
 		return circle;
 	}
 	
+	/**
+	 * Converts narrow rectangles into lines
+	 * <p>
+	 * Converts to line running along the longer of the width and the height, so long as it is below minRectThickness ({@link setMinRectThickness} and {@link getMinRectThickness})
+	 *  
+	 * @param rect
+	 * @return line
+	 */
 	public SVGLine createLineFromRect(SVGRect rect) {
 		SVGLine line1 = null;
 		SVGLine line2 = null;
@@ -742,15 +827,28 @@ public class Path2ShapeConverter {
 			Real2 origin = rect.getXY();
 			double width = rect.getWidth();
 			double height = rect.getHeight();
-			if (width < minRectThickness) {
+			if (width < maxRectThickness) {
 				line1 = new SVGLine(origin.plus(new Real2(width / 2, 0.0)), origin.plus(new Real2(width / 2, height)));
 			} 
-			if (height < minRectThickness) {
+			if (height < maxRectThickness) {
 				line2 = new SVGLine(origin.plus(new Real2(0.0, height / 2)), origin.plus(new Real2(width, height / 2)));
 			}
 		}
 		return (line1 == null ? line2 : (line2 == null ? line1 : (line1.getLength() > line2.getLength() ? line1 : line2)));
 	}
-	
+
+	/**
+	 * @return maximum thickness for lines created from rectangles
+	 */
+	public double getMaxRectThickness() {
+		return maxRectThickness;
+	}
+
+	/**
+	 * @param maxRectThickness maximum thickness for lines created from rectangles
+	 */
+	public void setMaxRectThickness(double maxRectThickness) {
+		this.maxRectThickness = maxRectThickness;
+	}
 
 }

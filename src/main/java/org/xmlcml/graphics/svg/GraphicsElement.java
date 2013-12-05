@@ -209,7 +209,7 @@ public class GraphicsElement extends Element implements SVGConstants {
     }
 
     public void applyStyles() {
-    	this.addAttribute(new Attribute(StyleBundle.STYLE, styleBundle.toString()));
+    	addAttribute(new Attribute(StyleBundle.STYLE, styleBundle.toString()));
     }
     
 	public boolean isUseStyleAttribute() {
