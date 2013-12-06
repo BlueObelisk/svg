@@ -1,6 +1,7 @@
 package org.xmlcml.graphics.svg.path;
 
 import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -152,6 +153,7 @@ public class Path2ShapeConverterTest {
 		Assert.assertEquals("circle", 
 				"<circle xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"#ff0000\" stroke-width=\"0.840\" cx=\"310.517\" cy=\"149.088\" r=\"1.379\" />", circle.toXML());
 	}
+	
 	// ============================================================================
 	private List<SVGShape> createShapeList(File file) {
 		SVGElement svgElement = SVGElement.readAndCreateSVG(file);
@@ -167,6 +169,65 @@ public class Path2ShapeConverterTest {
 		return svgElement;
 	}
 
+	@Test
+	public void	testRect() {
+		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "rect.svg"));
+		List<SVGG> groups = SVGG.extractSelfAndDescendantGs(output);
+		Assert.assertTrue("first", groups.get(6).getChild(1) instanceof SVGRect);
+		Assert.assertTrue("second", groups.get(6).getChild(3) instanceof SVGRect);
+		Assert.assertTrue("third", groups.get(6).getChild(5) instanceof SVGRect);
+	}
 	
+	@Test
+	public void testCircles() {
+		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "circle.svg"));
+		Assert.assertTrue("first", output.getChild(1) instanceof SVGCircle);
+	}
+
+	@Test
+	public void	testPolylines() {
+		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "polyline.svg"));
+		List<SVGG> groups = SVGG.extractSelfAndDescendantGs(output);
+		Assert.assertTrue("first", groups.get(6).getChild(1) instanceof SVGPolyline);
+		Assert.assertTrue("second", groups.get(6).getChild(3) instanceof SVGPolyline);
+		Assert.assertTrue("third", groups.get(6).getChild(5) instanceof SVGPolyline);
+	}
+
+	@Test
+	@Ignore
+	public void	testPolygons() {
+		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "polygon.svg"));
+		List<SVGG> groups = SVGG.extractSelfAndDescendantGs(output);
+		Assert.assertTrue("first", groups.get(6).getChild(1) instanceof SVGPolygon);
+	}
+
+	@Test
+	public void	testLines() {
+		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "line.svg"));
+		List<SVGG> groups = SVGG.extractSelfAndDescendantGs(output);
+		Assert.assertTrue("1", groups.get(6).getChild(1) instanceof SVGLine);
+		Assert.assertTrue("2", groups.get(6).getChild(3) instanceof SVGLine);
+		Assert.assertTrue("3", groups.get(6).getChild(5) instanceof SVGLine);
+		Assert.assertTrue("4", groups.get(6).getChild(7) instanceof SVGLine);
+		Assert.assertTrue("5", groups.get(6).getChild(9) instanceof SVGLine);
+		Assert.assertTrue("6", groups.get(6).getChild(11) instanceof SVGLine);
+		Assert.assertTrue("7", groups.get(6).getChild(13) instanceof SVGLine);
+		Assert.assertTrue("8", groups.get(6).getChild(15) instanceof SVGLine);
+		Assert.assertTrue("9", groups.get(6).getChild(17) instanceof SVGLine);
+		Assert.assertTrue("10", groups.get(6).getChild(19) instanceof SVGLine);
+		Assert.assertTrue("11", groups.get(6).getChild(21) instanceof SVGLine);
+		Assert.assertTrue("12", groups.get(6).getChild(23) instanceof SVGLine);
+		Assert.assertTrue("13", groups.get(6).getChild(25) instanceof SVGLine);
+		Assert.assertTrue("14", groups.get(6).getChild(27) instanceof SVGLine);
+		Assert.assertTrue("15", groups.get(6).getChild(29) instanceof SVGLine);
+		Assert.assertTrue("16", groups.get(6).getChild(31) instanceof SVGLine);
+		Assert.assertTrue("17", groups.get(6).getChild(33) instanceof SVGLine);
+		Assert.assertTrue("18", groups.get(6).getChild(35) instanceof SVGLine);
+		Assert.assertTrue("19", groups.get(6).getChild(37) instanceof SVGLine);
+		Assert.assertTrue("20", groups.get(6).getChild(39) instanceof SVGLine);
+		Assert.assertTrue("21", groups.get(6).getChild(41) instanceof SVGLine);
+		Assert.assertTrue("22", groups.get(6).getChild(43) instanceof SVGLine);
+		Assert.assertTrue("23", groups.get(6).getChild(45) instanceof SVGLine);
+	}
 
 }
