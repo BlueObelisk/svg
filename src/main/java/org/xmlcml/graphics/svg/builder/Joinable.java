@@ -79,8 +79,8 @@ public interface Joinable {
     JoinPoint getIntersectionPoint(JoinableLine line);
     JoinPoint getIntersectionPoint(JoinableText text);
     JoinPoint getIntersectionPoint(TramLine tramLine);
-    JoinPoint getIntersectionPoint(JoinablePolygon polygon);
-	JoinPoint getIntersectionPoint(HatchedPolygon polygon);
+    JoinPoint getIntersectionPoint(JoinableTriangle polygon);
+	JoinPoint getIntersectionPoint(HatchedTriangle polygon);
 
 	double getPriority();
 

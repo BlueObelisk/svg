@@ -101,7 +101,7 @@ public class JoinManager {
 		} else if (element instanceof SVGText) {
 			joinable = new JoinableText((SVGText) element);
  		} else if (element instanceof SVGPolygon && ((SVGPolygon) element).getLineList().size() == 3) {
-			joinable = new JoinablePolygon((SVGPolygon) element);
+			joinable = new JoinableTriangle((SVGPolygon) element);
  		} else {
  			LOG.debug("Unknown joinable: "+element);
  		}

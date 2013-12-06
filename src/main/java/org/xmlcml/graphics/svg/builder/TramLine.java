@@ -11,15 +11,16 @@ import org.xmlcml.graphics.svg.SVGLine;
 import java.util.ArrayList;
 import java.util.List;
 
-/** two or more parallel lines with overlap.
- * 
- * <p>Used for double bonds, grid lines, etc.</p>
+/** 
+ * Two or more parallel lines with overlap.
+ * <p>
+ * Used for double bonds, grid lines, etc.
+ * <p>
  * TODO should this really be for grid lines? What with HatchedPolygon now existing...
- * 
- * originally extended SVGG so it could be used in place of SVGLines when needed but no longer does
- * 
+ * <p>
+ * Originally extended SVGG so it could be used in place of SVGLines when needed but no longer does
+ * <p>
  * @author pm286
- *
  */
 public class TramLine extends JoinableWithBackbone {
 
@@ -46,7 +47,7 @@ public class TramLine extends JoinableWithBackbone {
 	}
 
 	private void createJoinerAndAddJoinPoints() {
-		Angle EPS = new Angle(0.1, Units.RADIANS); // we already know they are aligned
+		Angle eps = new Angle(0.1, Units.RADIANS); // we already know they are aligned
 		joinManager = new JoinManager();
 		SVGLine line0 = lineList.get(0);
 		SVGLine line1 = lineList.get(1);
@@ -56,7 +57,7 @@ public class TramLine extends JoinableWithBackbone {
 		Real2 point11 = line1.getXY(1);
 		Real2 join0 = null;
 		Real2 join1 = null;
-		if (line0.isAntiParallelTo(line1, EPS)) {
+		if (line0.isAntiParallelTo(line1, eps)) {
 			join0 = point00.getMidPoint(point11);
 			join1 = point01.getMidPoint(point10);
 		} else {
@@ -124,11 +125,11 @@ public class TramLine extends JoinableWithBackbone {
 		return joinManager.getCommonPoint(tramLine);
 	}
 
-	public JoinPoint getIntersectionPoint(JoinablePolygon polygon) {
+	public JoinPoint getIntersectionPoint(JoinableTriangle polygon) {
 		return joinManager.getCommonPoint(polygon);
 	}
 
-	public JoinPoint getIntersectionPoint(HatchedPolygon polygon) {
+	public JoinPoint getIntersectionPoint(HatchedTriangle polygon) {
 		return joinManager.getCommonPoint(polygon);
 	}
 

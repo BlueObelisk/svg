@@ -122,10 +122,19 @@ public class SimpleBuilder {
 	}
 
 	private void removeHiddenLines() {
-		Iterator<SVGLine> i = derivedPrimitives.getLineList().iterator();
-		while (i.hasNext()) {
-			SVGLine l = i.next();
-			for (SVGPolygon p : derivedPrimitives.getPolygonList()) {
+		for (SVGPolygon p : derivedPrimitives.getPolygonList()) {
+			Iterator<SVGLine> i = derivedPrimitives.getLineList().iterator();
+			while (i.hasNext()) {
+				SVGLine l = i.next();
+				if (p.includes(l)) {
+					i.remove();
+				}
+			}
+		}
+		for (SVGRect p : derivedPrimitives.getRectList()) {
+			Iterator<SVGLine> i = derivedPrimitives.getLineList().iterator();
+			while (i.hasNext()) {
+				SVGLine l = i.next();
 				if (p.includes(l)) {
 					i.remove();
 				}
@@ -166,7 +175,7 @@ public class SimpleBuilder {
 	}
 
 	private void combineHatchLines() {
-		List<HatchedPolygon> hatchList = new ArrayList<HatchedPolygon>();
+		List<HatchedTriangle> hatchList = new ArrayList<HatchedTriangle>();
 		higherPrimitives.setHatchList(hatchList);
 		List<SVGLine> smallLines = new ArrayList<SVGLine>();
 		for (SVGLine l : derivedPrimitives.getLineList()) {
@@ -190,7 +199,7 @@ public class SimpleBuilder {
 	}
 
 	private void makeHatchedPolygons(UnionFind<SVGLine> disjointSets) {
-		List<HatchedPolygon> hatchList = higherPrimitives.getHatchList();
+		List<HatchedTriangle> hatchList = higherPrimitives.getHatchList();
 		for (Set<SVGLine> set : disjointSets.snapshot()) {
 			ArrayList<SVGLine> lines1 = new ArrayList<SVGLine>(set);
 			ArrayList<SVGLine> lines2 = new ArrayList<SVGLine>(set);
@@ -216,7 +225,7 @@ public class SimpleBuilder {
 				} catch (IndexOutOfBoundsException e) {
 					
 				}
-				hatchList.add(new HatchedPolygon(lines1));
+				hatchList.add(new HatchedTriangle(lines1));
 				higherPrimitives.getLineList().removeAll(lines1);
 			}
 		}

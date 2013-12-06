@@ -17,7 +17,7 @@ public class HigherPrimitives {
 	private List<Junction> mergedJunctionList;
 	private List<Joinable> joinableList;
 	private List<Junction> rawJunctionList;
-	private List<HatchedPolygon> hatchList;
+	private List<HatchedTriangle> hatchList;
 
 	private void ensureLineList() {
 		if (lineList == null) {
@@ -36,7 +36,7 @@ public class HigherPrimitives {
 		return tramLineList;
 	}
 
-	public List<HatchedPolygon> getHatchList() {
+	public List<HatchedTriangle> getHatchList() {
 		return hatchList;
 	}
 
@@ -75,7 +75,7 @@ public class HigherPrimitives {
 		this.tramLineList = tramLineList;
 	}
 
-	public void setHatchList(List<HatchedPolygon> hatchList) {
+	public void setHatchList(List<HatchedTriangle> hatchList) {
 		this.hatchList = hatchList;
 	}
 	

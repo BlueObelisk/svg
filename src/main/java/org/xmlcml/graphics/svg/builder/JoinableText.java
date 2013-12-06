@@ -66,11 +66,11 @@ public class JoinableText implements Joinable {
 		return joinManager.getCommonPoint(tramLine);
 	}
 
-	public JoinPoint getIntersectionPoint(JoinablePolygon polygon) {
+	public JoinPoint getIntersectionPoint(JoinableTriangle polygon) {
 		return joinManager.getCommonPoint(polygon);
 	}
 
-	public JoinPoint getIntersectionPoint(HatchedPolygon polygon) {
+	public JoinPoint getIntersectionPoint(HatchedTriangle polygon) {
 		return joinManager.getCommonPoint(polygon);
 	}
 
