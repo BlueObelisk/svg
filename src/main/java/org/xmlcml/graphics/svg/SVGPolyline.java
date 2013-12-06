@@ -72,19 +72,22 @@ public class SVGPolyline extends SVGPoly {
         this.setReal2Array(real2Array);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPolyline(SVGElement element) {
         super(element);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPolyline(Element element) {
         super((SVGElement) element);
 	}
 	
-	/** constructor.
+	/** 
+	 * Constructor.
 	 * 
 	 * @param x1
 	 * @param x2
@@ -96,7 +99,7 @@ public class SVGPolyline extends SVGPoly {
 	}
 	
     /**
-     * copy node .
+     * Copy node.
      *
      * @return Node
      */

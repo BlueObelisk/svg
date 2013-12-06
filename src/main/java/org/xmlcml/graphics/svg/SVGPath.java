@@ -227,7 +227,7 @@ public class SVGPath extends SVGShape {
 			} else {
 				Real2 r2 = primitive.getFirstCoord();
 				allCoords.add(r2);
-				firstCoords.add(primitive.getFirstCoord());
+				firstCoords.add(r2);
 			}
 		}
 	}
@@ -311,26 +311,26 @@ public class SVGPath extends SVGShape {
 			}
 		} else if (isClosed && allCoords.size() >= 8) {
 			// no longer useful I think
-//			LOG.debug("CIRCLE: "+signature);
-//			Real2Range r2r = this.getBoundingBox();
-//			// is it square?
-//			if (Real.isEqual(r2r.getXRange().getRange(),  r2r.getYRange().getRange(), 2*epsilon)) {
-//				Real2 centre = r2r.getCentroid();
-//				Double sum = 0.0;
-//				double[] spokeLengths = new double[firstCoords.size()];
-//				for (int i = 0; i < firstCoords.size(); i++) {
-//					Double spokeLength = centre.getDistance(firstCoords.get(i));
-//					spokeLengths[i] = spokeLength;
-//					sum += spokeLength;
-//				}
-//				Double rad = sum / firstCoords.size();
-//				for (int i = 0; i < spokeLengths.length; i++) {
-//					if (Math.abs(spokeLengths[i] - rad) > epsilon) {
-//						return null;
-//					}
-//				}
-//				circle = new SVGCircle(centre, rad);
-//			}
+			/*LOG.debug("CIRCLE: "+signature);
+			Real2Range r2r = this.getBoundingBox();
+			//Is it square?
+			if (Real.isEqual(r2r.getXRange().getRange(),  r2r.getYRange().getRange(), 2*epsilon)) {
+				Real2 centre = r2r.getCentroid();
+				Double sum = 0.0;
+				double[] spokeLengths = new double[firstCoords.size()];
+				for (int i = 0; i < firstCoords.size(); i++) {
+					Double spokeLength = centre.getDistance(firstCoords.get(i));
+					spokeLengths[i] = spokeLength;
+					sum += spokeLength;
+				}
+				Double rad = sum / firstCoords.size();
+				for (int i = 0; i < spokeLengths.length; i++) {
+					if (Math.abs(spokeLengths[i] - rad) > epsilon) {
+						return null;
+					}
+				}
+				circle = new SVGCircle(centre, rad);
+			}*/
 		}
 		return circle;
 	}
@@ -425,7 +425,7 @@ public class SVGPath extends SVGShape {
 	}
 
 	private PathPrimitiveList createPathPrimitives() {
-		return SVGPathPrimitive.parseDString(this.getDString());
+		return SVGPathPrimitive.parseDString(getDString());
 	}
 
 	/** get bounding box
@@ -649,8 +649,8 @@ public class SVGPath extends SVGShape {
 		return null;
 	}
 
-
-	/** makes a new list composed of the paths in the list
+	/** 
+	 * Makes a new list composed of the paths in the list
 	 * 
 	 * @param elements
 	 * @return
@@ -706,13 +706,13 @@ public class SVGPath extends SVGShape {
 		return path;
 	}
 
-	/** creates a line from path with signature "MLLLL" or MLLLLZ".
+	/** 
+	 * Creates a line from path with signature "MLLLL", MLLLLZ".
 	 * 
 	 * <p>uses primitiveList.createLineFromMLLLL().</p>
 	 * @param angleEps
 	 * @param maxWidth
 	 * @return null if line has wrong signature or is too wide or not antiParallel.
-	 * 
 	 */
 	public SVGLine createLineFromMLLLL(Angle angleEps, Double maxWidth) {
 		SVGLine line = null;

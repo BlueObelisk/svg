@@ -62,7 +62,9 @@ public abstract class SVGPathPrimitive {
 				double[] dd = readDoubles(tokenList, 2, itok);
 				itok += 2;
 				Real2 r2 = new Real2(dd[0], dd[1]);
-				r2 = r2.plus(lastXY);
+				if (lastXY != null) {
+					r2 = r2.plus(lastXY);
+				}
 				SVGPathPrimitive pp = new MovePrimitive(r2);
 				primitiveList.add(pp);
 				lastXY = r2;
