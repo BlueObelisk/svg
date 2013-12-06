@@ -14,11 +14,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class JoinablePolygon extends JoinableWithBackbone {
+public class JoinableTriangle extends JoinableWithBackbone {
 	
-	private final static Logger LOG = Logger.getLogger(JoinablePolygon.class);
+	private final static Logger LOG = Logger.getLogger(JoinableTriangle.class);
 
-	private static final double POLYGON_PRORITY = 3.0;
+	private static final double TRIANGLE_PRORITY = 3.0;
 
 	private SVGPolygon svgPolygon;
 	private JoinManager joinManager;
@@ -27,7 +27,7 @@ public class JoinablePolygon extends JoinableWithBackbone {
 	
 	private double relativeDistance = DEFAULT_RELATIVE_DISTANCE_TO_INTERSECTION;
 
-	public JoinablePolygon(SVGPolygon svgPolygon) {
+	public JoinableTriangle(SVGPolygon svgPolygon) {
 		if (svgPolygon.getLineList().size() != 3) {
 			throw new IllegalArgumentException();
 		}
@@ -36,7 +36,7 @@ public class JoinablePolygon extends JoinableWithBackbone {
 	}
 
 	public double getPriority() {
-		return POLYGON_PRORITY;
+		return TRIANGLE_PRORITY;
 	}
 	
 	public void createJoinerAndAddPoints() {
@@ -79,11 +79,11 @@ public class JoinablePolygon extends JoinableWithBackbone {
 		return joinManager.getCommonPoint(tramLine);
 	}
 
-	public JoinPoint getIntersectionPoint(JoinablePolygon polygon) {
+	public JoinPoint getIntersectionPoint(JoinableTriangle polygon) {
 		return joinManager.getCommonPoint(polygon);
 	}
 
-	public JoinPoint getIntersectionPoint(HatchedPolygon polygon) {
+	public JoinPoint getIntersectionPoint(HatchedTriangle polygon) {
 		return joinManager.getCommonPoint(polygon);
 	}
 
