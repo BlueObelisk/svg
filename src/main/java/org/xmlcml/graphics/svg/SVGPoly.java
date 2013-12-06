@@ -108,10 +108,10 @@ public abstract class SVGPoly extends SVGShape {
 			System.err.println("null real2Array in polyline: ");
 		} else {
 			String points = r2a.getStringArray();
-			this.addAttribute(new Attribute(POINTS, points));
+			addAttribute(new Attribute(POINTS, points));
 			// copy unless same object
-			if (this.real2Array != r2a) {
-				this.real2Array = new Real2Array(r2a);
+			if (real2Array != r2a) {
+				real2Array = new Real2Array(r2a);
 			}
 		}
 	}
@@ -395,7 +395,7 @@ public abstract class SVGPoly extends SVGShape {
 	public SVGRect createRect(double epsilon) {
 		SVGRect rect = null;
 		if (this != null && isBox(epsilon)) {
-			Real2Range r2r = this.getBoundingBox();
+			Real2Range r2r = getBoundingBox();
 			rect = new SVGRect(r2r.getCorners()[0], r2r.getCorners()[1]);
 			rect.setFill("none");
 		}
@@ -429,6 +429,7 @@ public abstract class SVGPoly extends SVGShape {
 			isBox = false;
 			createLineList();
 			if (lineList == null) {
+				
 			} else if (lineList.size() == 4 || (lineList.size() == 3 && isClosed)) {
 				SVGLine line0 = lineList.get(0);
 				SVGLine line2 = lineList.get(2);

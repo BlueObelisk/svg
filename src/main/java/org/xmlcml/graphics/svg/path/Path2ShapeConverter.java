@@ -122,7 +122,8 @@ public class Path2ShapeConverter {
 		return shapeListOut;
 	}
 
-	/** Main routine for list of paths
+	/** 
+	 * Main routine for list of paths
 	 * 
 	 * @param pathList
 	 * @return a list of shapes; each a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
@@ -157,7 +158,8 @@ public class Path2ShapeConverter {
 		return newPaths;
 	}
 
-	/** Main routine for a single path
+	/** 
+	 * Main routine for a single path
 	 * 
 	 * @param path
 	 * @return a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
@@ -258,10 +260,14 @@ public class Path2ShapeConverter {
 
 	private SVGShape createNarrowLine(SVGPolygon polygon) {
 		SVGLine line = null;
-		if (polygon != null && (polygon.size() == 4 || polygon.size() == 3)) {
+		if (polygon != null && polygon.size() == 4) {
 			SVGLine line0 = polygon.getLineList().get(0);
+			SVGLine line1 = polygon.getLineList().get(1);
 			SVGLine line2 = polygon.getLineList().get(2);
-			line = createNarrowLine(line0, line2);
+			SVGLine line3 = polygon.getLineList().get(3);
+			SVGLine newLine1 = createNarrowLine(line0, line2);
+			SVGLine newLine2 = createNarrowLine(line1, line3);
+			line = (newLine1 == null ? newLine2 : (newLine2 == null ? newLine1 : (newLine1.getLength() > newLine2.getLength() ? newLine1 : newLine2)));
 		}
 		return line;
 	}
