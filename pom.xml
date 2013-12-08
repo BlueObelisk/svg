@@ -1,166 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>uk.ac.cam.ch.wwmm</groupId>
-        <artifactId>wwmm-parent</artifactId>
-        <version>5-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<groupId>uk.ac.cam.ch.wwmm</groupId>
+		<artifactId>wwmm-parent</artifactId>
+		<version>5-SNAPSHOT</version>
+	</parent>
 
-    <groupId>org.xml-cml</groupId>
-    <artifactId>svg-dev</artifactId>
-    <version>0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    <name>SVG</name>
-    <description>A Java library for processing SVG</description>
+	<groupId>org.xml-cml</groupId>
+	<artifactId>svg-dev</artifactId>
+	<version>0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>SVG</name>
+	<description>A Java library for processing SVG</description>
 
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <scm>
-        <url>https://bitbucket.org/petermr/svg-dev/src</url>
-        <connection>scm:hg:http://bitbucket.org/petermr/svg-dev</connection>
-        <developerConnection>scm:hg:https://bitbucket.org/petermr/svg-dev</developerConnection>
-    </scm>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://bitbucket.org/petermr/svg-dev/src</url>
+		<connection>scm:hg:http://bitbucket.org/petermr/svg-dev</connection>
+		<developerConnection>scm:hg:https://bitbucket.org/petermr/svg-dev</developerConnection>
+	</scm>
 
-    <developers>
-        <developer>
-            <id>pm286</id>
-            <name>Peter Murray-Rust</name>
-        </developer>
-    </developers>
+	<developers>
+		<developer>
+			<id>pm286</id>
+			<name>Peter Murray-Rust</name>
+		</developer>
+	</developers>
 
-    <inceptionYear>2007</inceptionYear>
-    <ciManagement>
-        <system>hudson</system>
-        <url>https://hudson.ch.cam.ac.uk/job/svg-dev/</url>
-    </ciManagement>
+	<inceptionYear>2007</inceptionYear>
+	<ciManagement>
+		<system>hudson</system>
+		<url>https://hudson.ch.cam.ac.uk/job/svg-dev/</url>
+	</ciManagement>
 
-    <organization>
-        <name>Peter Murray-Rust</name>
-        <url>http://blogs.ch.cam.ac.uk/pmr</url>
-    </organization>
-    <build>
-        <plugins>
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-surefire-plugin</artifactId>
-			<version>2.16</version>
-			<configuration>
-				<parallel>classes</parallel>
-				<useUnlimitedThreads>true</useUnlimitedThreads>
-			</configuration>
-		</plugin>
-        </plugins>
-    </build>
+	<organization>
+		<name>Peter Murray-Rust</name>
+		<url>http://blogs.ch.cam.ac.uk/pmr</url>
+	</organization>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<parallel>classes</parallel>
+					<useUnlimitedThreads>true</useUnlimitedThreads>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
-    <!-- remove <repositories> for release to maven central -->
-    <repositories>
-        <repository>
-            <id>ucc-repo</id>
-            <name>UCC Maven Repository</name>
-            <url>https://maven.ch.cam.ac.uk/m2repo</url>
-        </repository>
-    </repositories>
-    
-    <dependencies>
-        <dependency>
-            <groupId>org.xml-cml</groupId>
-            <artifactId>euclid-dev</artifactId>
-            <version>1.1-SNAPSHOT</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- 
-        <dependency>
-            <groupId>org.xml-cml</groupId>
-            <artifactId>euclid-testutil</artifactId>
-            <version>1.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        -->
-        <dependency>
-            <version>1.1-SNAPSHOT</version>
-            <groupId>org.xml-cml</groupId>
-            <artifactId>jumbo-testutil</artifactId>
-            <scope>test</scope>
-        </dependency>
-        
-    </dependencies>
-    
-    <reporting>
-        <plugins>
-        <!-- 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>index</report>
-                            <report>summary</report>
-                            <report>dependencies</report>
-                            <report>project-team</report>
-                            <report>license</report>
-                            <report>cim</report>
-                            <report>scm</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            -->
-            <!-- 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            -->
-            <!-- 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <targetJdk>1.5</targetJdk>
-                    <linkXRef>true</linkXRef>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <configLocation>src/test/resources/checkstyle.xml</configLocation>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>apt-maven-plugin</artifactId>
-            </plugin>
-            -->
+	<!-- remove <repositories> for release to maven central -->
+	<repositories>
+		<repository>
+			<id>ucc-repo</id>
+			<name>UCC Maven Repository</name>
+			<url>https://maven.ch.cam.ac.uk/m2repo</url>
+		</repository>
+	</repositories>
 
-        </plugins>
-    </reporting>
+	<dependencies>
+		<dependency>
+			<groupId>org.xml-cml</groupId>
+			<artifactId>euclid-dev</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<version>1.1-SNAPSHOT</version>
+			<groupId>org.xml-cml</groupId>
+			<artifactId>jumbo-testutil</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+
 </project>
