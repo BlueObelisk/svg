@@ -18,7 +18,8 @@ import java.util.Set;
 /** 
  * Converts SVGPaths to SVGShape(s).
  * <p>
- * Uses a variety of heuristics to split and combine primitives.
+ * Uses a variety of heuristics to split and combine primitives. See the SVG wiki for more details.
+ * <p>
  * Customisable through setters.
  * 
  * @author pm286
@@ -49,7 +50,6 @@ public class Path2ShapeConverter {
 	private static final String SVG = "svg";
 	private static final Angle ANGLE_EPS = new Angle(0.01);
 
-
 	private int decimalPlaces = DEFAULT_DECIMAL_PLACES;
 	private int minLinesInPolyline = DEFAULT_LINES_IN_POLYLINE;
 	private boolean removeDuplicatePaths = true;
@@ -58,15 +58,14 @@ public class Path2ShapeConverter {
 	private double maxPathWidth = DEFAULT_MAX_PATH_WIDTH;
 	private Angle maxAngle = DEFAULT_MAX_ANGLE;
 	private double maxRectThickness = DEFAULT_MIN_RECT_THICKNESS;
+	private Angle maxAngleForParallel = DEFAULT_MAX_ANGLE_FOR_PARALLEL;
+	private double maxWidthForParallel = DEFAULT_MAX_WIDTH_FOR_PARALLEL;
 
-	/** input and output */
+	//Input and output
 	private List<SVGPath> pathListIn;
 	private List<SVGPath> splitPathList;
 	private SVGPath svgPath;
 	private List<SVGShape> shapeListOut;
-
-	private Angle maxAngleForParallel = DEFAULT_MAX_ANGLE_FOR_PARALLEL;
-	private double maxWidthForParallel = DEFAULT_MAX_WIDTH_FOR_PARALLEL;
 
 	public Path2ShapeConverter() {
 		
