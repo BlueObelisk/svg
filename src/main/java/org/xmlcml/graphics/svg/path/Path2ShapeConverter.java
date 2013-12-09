@@ -11,12 +11,11 @@ import org.xmlcml.xml.XMLUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 /** 
- * Converts SVGPaths to SVGShape(s).
+ * Converts SVGPaths to SVGShapes.
  * <p>
  * Uses a variety of heuristics to split and combine primitives. See the SVG wiki for more details.
  * <p>
