@@ -128,41 +128,11 @@ public class SVGImageTest {
 	}
 
 	@Test
-	public void testPNGReadRasterCanny() throws IOException {
-		transformPixels(Fixtures.TEST_PNG, "target/canny1.png", CANNY);
-	}
-
-	@Test
-	public void testPNGReadRasterCanny1() throws IOException {
-		transformPixels(Fixtures.CHEM_BMP, "target/chem1.png", CANNY);
-	}
-
-	@Test
 	@Ignore // some unknown problem on hudson reading file
 	public void test1MiniCanny1() throws IOException {
 		transformPixels(Fixtures.TEST1MINI_BMP, "target/test1Mini.png", CANNY);
 	}
 
-	@Test
-	public void testPNGReadRasterMonochromeCanny() {
-		try {
-			transformPixels(Fixtures.MONOCHROME1_PNG, "target/monocanny1.png", CANNY);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	@Test
-	public void testPNGReadRasterMonochromeCanny1() throws IOException {
-		transformPixels(Fixtures.PLOTS1_BMP, "target/monoplots1.png", Fixtures.MONOCHROME);
-		transformPixels(new File("target/monoplots1.png"), "target/monocanny1.png", CANNY);
-	}
-
-	@Test
-	public void testPNGReadRasterJPGCanny1() throws IOException {
-		transformPixels(Fixtures.PLOTS1_BMP, "target/plots1canny.png", CANNY);
-	}
 	
 	@Test
 	public void testAddCC0() throws IOException {
