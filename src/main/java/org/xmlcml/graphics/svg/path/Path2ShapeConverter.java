@@ -626,7 +626,8 @@ public class Path2ShapeConverter {
 		}
 		return line;
 	}
-	
+
+	//TODO doesn't work
 	public SVGPath createNarrowQuadrant() {
 		SVGPath newPath = null;
 		String signature = svgPath.getSignature();
