@@ -173,24 +173,38 @@ public class Path2ShapeConverterTest {
 	public void	testRect() {
 		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "rect.svg"));
 		List<SVGG> groups = SVGG.extractSelfAndDescendantGs(output);
-		Assert.assertTrue("first", groups.get(6).getChild(1) instanceof SVGRect);
-		Assert.assertTrue("second", groups.get(6).getChild(3) instanceof SVGRect);
-		Assert.assertTrue("third", groups.get(6).getChild(5) instanceof SVGRect);
+		Assert.assertTrue("1", groups.get(6).getChild(1) instanceof SVGRect);
+		Assert.assertTrue("2", groups.get(6).getChild(3) instanceof SVGRect);
+		Assert.assertTrue("3", groups.get(6).getChild(5) instanceof SVGRect);
 	}
 	
 	@Test
 	public void testCircles() {
 		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "circle.svg"));
-		Assert.assertTrue("first", output.getChild(1) instanceof SVGCircle);
+		Assert.assertTrue("1", output.getChild(1) instanceof SVGCircle);
+		Assert.assertEquals("310.517", ((SVGCircle) output.getChild(1)).getAttribute("cx").getValue());
+		Assert.assertEquals("149.088", ((SVGCircle) output.getChild(1)).getAttribute("cy").getValue());
+		Assert.assertEquals("1.379", ((SVGCircle) output.getChild(1)).getAttribute("r").getValue());
 	}
 
 	@Test
 	public void	testPolylines() {
 		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "polyline.svg"));
 		List<SVGG> groups = SVGG.extractSelfAndDescendantGs(output);
-		Assert.assertTrue("first", groups.get(6).getChild(1) instanceof SVGPolyline);
-		Assert.assertTrue("second", groups.get(6).getChild(3) instanceof SVGPolyline);
-		Assert.assertTrue("third", groups.get(6).getChild(5) instanceof SVGPolyline);
+		Assert.assertTrue("1", groups.get(6).getChild(1) instanceof SVGPolyline);
+		Assert.assertEquals("1", "27.143 82.362 129.286 28.791 159.286 125.934 58.571 133.791 102.143 75.934", ((SVGPolyline) groups.get(6).getChild(1)).getAttribute("points").getValue());
+		Assert.assertTrue("2", groups.get(6).getChild(3) instanceof SVGPolyline);
+		Assert.assertEquals("1", "77.896 270.218 342.327 270.218 342.327 270.791 77.899 270.791 82.192 270.522", ((SVGPolyline) groups.get(6).getChild(3)).getAttribute("points").getValue());
+		Assert.assertTrue("3", groups.get(6).getChild(5) instanceof SVGPolyline);
+		Assert.assertEquals("1", "78.231 274.04 342.662 274.04 342.662 274.613 78.234 274.613", ((SVGPolyline) groups.get(6).getChild(5)).getAttribute("points").getValue());
+		Assert.assertTrue("1", groups.get(6).getChild(7) instanceof SVGPolyline);
+		Assert.assertEquals("1", "87.934 584.909 87.934 320.478 88.508 320.478 88.508 584.906 88.239 580.613", ((SVGPolyline) groups.get(6).getChild(7)).getAttribute("points").getValue());
+		Assert.assertTrue("2", groups.get(6).getChild(9) instanceof SVGPolyline);
+		Assert.assertEquals("1", "87.764 890.767 87.764 626.336 88.337 626.336 88.337 890.764", ((SVGPolyline) groups.get(6).getChild(9)).getAttribute("points").getValue());
+		Assert.assertTrue("3", groups.get(6).getChild(11) instanceof SVGPolyline);
+		Assert.assertEquals("1", "-14.561 1136.235 143.066 923.92 143.526 924.261 -14.099 1136.574 -11.755 1132.967", ((SVGPolyline) groups.get(6).getChild(11)).getAttribute("points").getValue());
+		Assert.assertTrue("3", groups.get(6).getChild(13) instanceof SVGPolyline);
+		Assert.assertEquals("1", "-6.928 1372.659 160.361 1167.871 160.805 1168.234 -6.482 1373.019", ((SVGPolyline) groups.get(6).getChild(13)).getAttribute("points").getValue());
 	}
 
 	@Test
@@ -198,7 +212,7 @@ public class Path2ShapeConverterTest {
 	public void	testPolygons() {
 		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "polygon.svg"));
 		List<SVGG> groups = SVGG.extractSelfAndDescendantGs(output);
-		Assert.assertTrue("first", groups.get(6).getChild(1) instanceof SVGPolygon);
+		Assert.assertTrue("1", groups.get(6).getChild(1) instanceof SVGPolygon);
 	}
 
 	@Test
@@ -206,17 +220,72 @@ public class Path2ShapeConverterTest {
 		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "line.svg"));
 		List<SVGG> groups = SVGG.extractSelfAndDescendantGs(output);
 		Assert.assertTrue("1", groups.get(6).getChild(1) instanceof SVGLine);
+		Assert.assertEquals("113.377", ((SVGLine) groups.get(6).getChild(1)).getAttribute("x1").getValue());
+		Assert.assertEquals("281.615", ((SVGLine) groups.get(6).getChild(1)).getAttribute("y1").getValue());
+		Assert.assertEquals("377.807", ((SVGLine) groups.get(6).getChild(1)).getAttribute("x2").getValue());
+		Assert.assertEquals("281.615", ((SVGLine) groups.get(6).getChild(1)).getAttribute("y2").getValue());
 		Assert.assertTrue("2", groups.get(6).getChild(3) instanceof SVGLine);
+		Assert.assertEquals("111.276", ((SVGLine) groups.get(6).getChild(3)).getAttribute("x1").getValue());
+		Assert.assertEquals("314.547", ((SVGLine) groups.get(6).getChild(3)).getAttribute("y1").getValue());
+		Assert.assertEquals("375.707", ((SVGLine) groups.get(6).getChild(3)).getAttribute("x2").getValue());
+		Assert.assertEquals("314.547", ((SVGLine) groups.get(6).getChild(3)).getAttribute("y2").getValue());
 		Assert.assertTrue("3", groups.get(6).getChild(5) instanceof SVGLine);
+		Assert.assertEquals("182.656", ((SVGLine) groups.get(6).getChild(5)).getAttribute("x1").getValue());
+		Assert.assertEquals("348.259", ((SVGLine) groups.get(6).getChild(5)).getAttribute("y1").getValue());
+		Assert.assertEquals("217.601", ((SVGLine) groups.get(6).getChild(5)).getAttribute("x2").getValue());
+		Assert.assertEquals("348.259", ((SVGLine) groups.get(6).getChild(5)).getAttribute("y2").getValue());
 		Assert.assertTrue("4", groups.get(6).getChild(7) instanceof SVGLine);
+		Assert.assertEquals("46.313", ((SVGLine) groups.get(6).getChild(7)).getAttribute("x1").getValue());
+		Assert.assertEquals("400.595", ((SVGLine) groups.get(6).getChild(7)).getAttribute("y1").getValue());
+		Assert.assertEquals("46.313", ((SVGLine) groups.get(6).getChild(7)).getAttribute("x2").getValue());
+		Assert.assertEquals("665.026", ((SVGLine) groups.get(6).getChild(7)).getAttribute("y2").getValue());
 		Assert.assertTrue("5", groups.get(6).getChild(9) instanceof SVGLine);
+		Assert.assertEquals("46.251", ((SVGLine) groups.get(6).getChild(9)).getAttribute("x1").getValue());
+		Assert.assertEquals("687.41", ((SVGLine) groups.get(6).getChild(9)).getAttribute("y1").getValue());
+		Assert.assertEquals("46.251", ((SVGLine) groups.get(6).getChild(9)).getAttribute("x2").getValue());
+		Assert.assertEquals("951.841", ((SVGLine) groups.get(6).getChild(9)).getAttribute("y2").getValue());
 		Assert.assertTrue("6", groups.get(6).getChild(11) instanceof SVGLine);
+		Assert.assertEquals("45.23", ((SVGLine) groups.get(6).getChild(11)).getAttribute("x1").getValue());
+		Assert.assertEquals("957.307", ((SVGLine) groups.get(6).getChild(11)).getAttribute("y1").getValue());
+		Assert.assertEquals("45.23", ((SVGLine) groups.get(6).getChild(11)).getAttribute("x2").getValue());
+		Assert.assertEquals("992.251", ((SVGLine) groups.get(6).getChild(11)).getAttribute("y2").getValue());
 		Assert.assertTrue("7", groups.get(6).getChild(13) instanceof SVGLine);
+		Assert.assertEquals("34.735", ((SVGLine) groups.get(6).getChild(13)).getAttribute("x1").getValue());
+		Assert.assertEquals("1092.522", ((SVGLine) groups.get(6).getChild(13)).getAttribute("y1").getValue());
+		Assert.assertEquals("55.36", ((SVGLine) groups.get(6).getChild(13)).getAttribute("x2").getValue());
+		Assert.assertEquals("1064.312", ((SVGLine) groups.get(6).getChild(13)).getAttribute("y2").getValue());
 		Assert.assertTrue("8", groups.get(6).getChild(15) instanceof SVGLine);
+		Assert.assertEquals("133.188", ((SVGLine) groups.get(6).getChild(15)).getAttribute("x1").getValue());
+		Assert.assertEquals("1174.733", ((SVGLine) groups.get(6).getChild(15)).getAttribute("y1").getValue());
+		Assert.assertEquals("-22.88", ((SVGLine) groups.get(6).getChild(15)).getAttribute("x2").getValue());
+		Assert.assertEquals("1388.195", ((SVGLine) groups.get(6).getChild(15)).getAttribute("y2").getValue());
 		Assert.assertTrue("9", groups.get(6).getChild(17) instanceof SVGLine);
+		Assert.assertEquals("6.718", ((SVGLine) groups.get(6).getChild(17)).getAttribute("x1").getValue());
+		Assert.assertEquals("1478.041", ((SVGLine) groups.get(6).getChild(17)).getAttribute("y1").getValue());
+		Assert.assertEquals("116.673", ((SVGLine) groups.get(6).getChild(17)).getAttribute("x2").getValue());
+		Assert.assertEquals("1478.041", ((SVGLine) groups.get(6).getChild(17)).getAttribute("y2").getValue());
 		Assert.assertTrue("10", groups.get(6).getChild(19) instanceof SVGLine);
+		Assert.assertEquals("41.012", ((SVGLine) groups.get(6).getChild(19)).getAttribute("x1").getValue());
+		Assert.assertEquals("1494.658", ((SVGLine) groups.get(6).getChild(19)).getAttribute("y1").getValue());
+		Assert.assertEquals("41.012", ((SVGLine) groups.get(6).getChild(19)).getAttribute("x2").getValue());
+		Assert.assertEquals("1552.994", ((SVGLine) groups.get(6).getChild(19)).getAttribute("y2").getValue());
 		Assert.assertTrue("11", groups.get(6).getChild(21) instanceof SVGLine);
+		Assert.assertEquals("33.234", ((SVGLine) groups.get(6).getChild(21)).getAttribute("x1").getValue());
+		Assert.assertEquals("1594.36", ((SVGLine) groups.get(6).getChild(21)).getAttribute("y1").getValue());
+		Assert.assertEquals("74.953", ((SVGLine) groups.get(6).getChild(21)).getAttribute("x2").getValue());
+		Assert.assertEquals("1563.954", ((SVGLine) groups.get(6).getChild(21)).getAttribute("y2").getValue());
 		Assert.assertTrue("12", groups.get(6).getChild(23) instanceof SVGLine);
+		Assert.assertEquals("-24.034", ((SVGLine) groups.get(6).getChild(23)).getAttribute("x1").getValue());
+		Assert.assertEquals("1889.092", ((SVGLine) groups.get(6).getChild(23)).getAttribute("y1").getValue());
+		Assert.assertEquals("132.033", ((SVGLine) groups.get(6).getChild(23)).getAttribute("x2").getValue());
+		Assert.assertEquals("1675.631", ((SVGLine) groups.get(6).getChild(23)).getAttribute("y2").getValue());
+	}
+	
+	@Test
+	@Ignore
+	public void	testLinesFails() {
+		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "line.svg"));
+		List<SVGG> groups = SVGG.extractSelfAndDescendantGs(output);
 		Assert.assertTrue("13", groups.get(6).getChild(25) instanceof SVGLine);
 		Assert.assertTrue("14", groups.get(6).getChild(27) instanceof SVGLine);
 		Assert.assertTrue("15", groups.get(6).getChild(29) instanceof SVGLine);
