@@ -41,7 +41,8 @@ public class Path2ShapeConverter {
 	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.12, Units.RADIANS);
 	private static final double DEFAULT_MAX_WIDTH_FOR_PARALLEL = 2.0;
 	public static final Angle DEFAULT_MAX_ANGLE = new Angle(0.15, Units.RADIANS);
-	private static final Double DEFAULT_MIN_RECT_THICKNESS = 0.99;
+	public static final Double DEFAULT_MAX_WIDTH = 2.0;
+	private static final Double DEFAULT_MAX_LINE_FROM_RECT_THICKNESS = 0.99;
 	private static final double DEFAULT_MAX_PATH_WIDTH = 1.0;
 	private static final int DEFAULT_LINES_IN_POLYLINE = 8;
 	private static final int DEFAULT_DECIMAL_PLACES = 3;
@@ -55,8 +56,9 @@ public class Path2ShapeConverter {
 	private boolean removeRedundantMoveCommands = true;
 	private boolean splitAtMoveCommands = true;
 	private double maxPathWidth = DEFAULT_MAX_PATH_WIDTH;
+	private double maxWidth = DEFAULT_MAX_WIDTH;
 	private Angle maxAngle = DEFAULT_MAX_ANGLE;
-	private double maxRectThickness = DEFAULT_MIN_RECT_THICKNESS;
+	private double maxRectThickness = DEFAULT_MAX_LINE_FROM_RECT_THICKNESS;
 	private Angle maxAngleForParallel = DEFAULT_MAX_ANGLE_FOR_PARALLEL;
 	private double maxWidthForParallel = DEFAULT_MAX_WIDTH_FOR_PARALLEL;
 
@@ -202,7 +204,8 @@ public class Path2ShapeConverter {
 		return shape;
 	}
 
-	/** Set the path to use
+	/** 
+	 * Set the path to use
 	 * <p>
 	 * @deprecated Use {@link convertPathToShape(path)}
 	 * 
@@ -571,8 +574,7 @@ public class Path2ShapeConverter {
 			Real2Range bbox =r2a.getRange2();
 			// check if scatter in both directions
 			if (bbox.getXRange().getRange() > eps && bbox.getYRange().getRange() > eps) {
-				//Don't know the distribution and can't afford to find all triplets
-				// so find the extreme points
+				//Don't know the distribution and can't afford to find all triplets, so find the extreme points
 				Real2 minXPoint = r2a.getPointWithMinimumX();
 				Real2 maxXPoint = r2a.getPointWithMaximumX();
 				Real2 minYPoint = r2a.getPointWithMinimumY();

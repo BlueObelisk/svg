@@ -102,7 +102,7 @@ public class SVGTextTest {
 		LOG.trace(bb);
 		Real2Range bbexpect = new Real2Range(new Real2(3.0, 335.28), new Real2(3.0, 335.28));
 		Assert.assertNotNull(bb);
-//		Assert.assertTrue("bb", bbexpect.isEqualTo(bb, 0.01));
+		//Assert.assertTrue("bb", bbexpect.isEqualTo(bb, 0.01));
 	}
 
 	@Test
@@ -155,16 +155,16 @@ public class SVGTextTest {
 		for (int i = 0; i < elementList.size(); i++) {
 			SVGText text = (SVGText) elementList.get(i);
 			lengths[i] = text.getEstimatedHorizontalLength(fontWidthFactor);
-//			LOG.trace("        "+Util.format(lengths[i], 1)+",");
+			//LOG.trace("        "+Util.format(lengths[i], 1)+",");
 		}
-//		for (int i = 1; i < elementList.size(); i++) {
-//			SVGText text0 = (SVGText) elementList.get(i-1);
-//			SVGText text = (SVGText) elementList.get(i);
-////			LOG.trace("-----------------------");
-//			length[i-1] = text0.getEstimatedHorizontalLength(fontWidthFactor);
-//			double dist = text.getX()-text0.getX();
-////			LOG.trace(String.valueOf(Util.format(text0.getY(), 2)) +" "+Util.format(text.getY(), 2)+"["+text0.getValue()+"] "+Util.format(dist, 1)+" "+length[i-1]+" "+dist/length[i-1]);
-//		}
+		/*for (int i = 1; i < elementList.size(); i++) {
+			SVGText text0 = (SVGText) elementList.get(i-1);
+			SVGText text = (SVGText) elementList.get(i);
+			//LOG.trace("-----------------------");
+			length[i-1] = text0.getEstimatedHorizontalLength(fontWidthFactor);
+			double dist = text.getX()-text0.getX();
+			//LOG.trace(String.valueOf(Util.format(text0.getY(), 2)) +" "+Util.format(text.getY(), 2)+"["+text0.getValue()+"] "+Util.format(dist, 1)+" "+length[i-1]+" "+dist/length[i-1]);
+		}*/
 		
 		double[] expectedLength = new double[]{
 		        13.1,
@@ -367,16 +367,16 @@ public class SVGTextTest {
 	public void testConcatenate2() {
 		double fontWidthFactor = 1.0;
 		double fontHeightFactor = 1.0;
-/**
-<g class="peak">
-  <line style="stroke-width:0.131;stroke-linecap:round;" x1="89.22" y1="121.98" x2="89.22" y2="125.88" /> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"306.72\">17</text> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"300.54\">8</text> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"297.54\">.</text> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"295.74\">616</text> 
-  <line style="stroke-width:0.131;stroke-linecap:round;" x1="89.22" y1="277.86" x2="89.22" y2="304.14" /> 
-  </g>
-  */
+		/*
+		<g class="peak">
+		  <line style="stroke-width:0.131;stroke-linecap:round;" x1="89.22" y1="121.98" x2="89.22" y2="125.88" /> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"306.72\">17</text> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"300.54\">8</text> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"297.54\">.</text> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"295.74\">616</text> 
+		  <line style="stroke-width:0.131;stroke-linecap:round;" x1="89.22" y1="277.86" x2="89.22" y2="304.14" /> 
+		</g>
+		*/
 		SVGText text0 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" " +
 				"improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"306.72\">17</text>"));
@@ -399,24 +399,23 @@ public class SVGTextTest {
 		SVGElement text03 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 286.03, "178.616", text01, text3);
 	}
 	
-	
 	@Test
 	@Ignore
 	public void testConcatenate3() {
 		double fontWidthFactor = 1.0;
 		double fontHeightFactor = 1.0;
-/**
-<g>
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"24.36\" y=\"303.36\">7</text> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"28.68\" y=\"303.36\">5</text> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"32.94\" y=\"303.36\"> M</text> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"41.47\" y=\"303.36\">H</text> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"46.99\" y=\"303.36\">z,</text> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"55.11\" y=\"303.36\">CD</text> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"66.08\" y=\"303.36\">Cl</text> 
-  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7091;stroke:none;fill:black;\" improper=\"true\" x=\"73.26\" y=\"301.68\">3</text> 
-  </g>
-  */
+		/*
+		<g>
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"24.36\" y=\"303.36\">7</text> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"28.68\" y=\"303.36\">5</text> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"32.94\" y=\"303.36\"> M</text> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"41.47\" y=\"303.36\">H</text> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"46.99\" y=\"303.36\">z,</text> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"55.11\" y=\"303.36\">CD</text> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" improper=\"true\" x=\"66.08\" y=\"303.36\">Cl</text> 
+		  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7091;stroke:none;fill:black;\" improper=\"true\" x=\"73.26\" y=\"301.68\">3</text> 
+		</g>
+		*/
 		SVGText text0 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
 				" <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"24.36\" y=\"303.36\">7</text> "));
@@ -494,4 +493,5 @@ public class SVGTextTest {
 		transform2 = transform2.concatenate(new Transform2(new Vector2(text.getXY().multiplyBy(-1.0))));
 		text.setTransform(transform2);
 	}
+	
 }
