@@ -7,7 +7,7 @@
     <parent>
         <groupId>uk.ac.cam.ch.wwmm</groupId>
         <artifactId>wwmm-parent</artifactId>
-        <version>4</version>
+        <version>5-SNAPSHOT</version>
     </parent>
 
     <groupId>org.xml-cml</groupId>
@@ -47,10 +47,19 @@
         <name>Peter Murray-Rust</name>
         <url>http://blogs.ch.cam.ac.uk/pmr</url>
     </organization>
-    <build>
-        <plugins>
-        </plugins>
-    </build>
+    
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<parallel>classes</parallel>
+					<useUnlimitedThreads>true</useUnlimitedThreads>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
     <!-- remove <repositories> for release to maven central -->
     <repositories>
@@ -74,6 +83,7 @@
             <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
+        
         <!-- 
         <dependency>
             <groupId>org.xml-cml</groupId>
@@ -82,17 +92,20 @@
             <scope>test</scope>
         </dependency>
         -->
+        
         <dependency>
             <version>1.1-SNAPSHOT</version>
             <groupId>org.xml-cml</groupId>
             <artifactId>jumbo-testutil</artifactId>
             <scope>test</scope>
         </dependency>
+        
         <dependency>
         	<groupId>com.google.guava</groupId>
         	<artifactId>guava</artifactId>
         	<version>15.0</version>
         </dependency>
+        
         <dependency>
         	<groupId>com.google.code.findbugs</groupId>
         	<artifactId>jsr305</artifactId>
@@ -102,7 +115,8 @@
     
     <reporting>
         <plugins>
-        <!-- 
+        
+        	<!-- 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
