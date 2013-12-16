@@ -210,6 +210,15 @@ public class SVGImage extends SVGShape {
 		if (imageType == null) {
 			throw new RuntimeException("Cannot convert mimeType: "+mimeType);
 		}
+		setXYWidthHeight(bufferedImage);
+		
+		String base64 = convertBufferedImageToBase64(bufferedImage, imageType);
+		String attValue = createHrefAttributeValue(mimeType, base64);
+		addXlinkHref(attValue);
+		return attValue;
+	}
+
+	public void setXYWidthHeight(BufferedImage bufferedImage) {
 		double x = bufferedImage.getMinX();
 		double y = bufferedImage.getMinY();
 		double height = bufferedImage.getHeight();
@@ -218,11 +227,6 @@ public class SVGImage extends SVGShape {
 		this.setY(y);
 		this.setWidth(width);
 		this.setHeight(height);
-		
-		String base64 = convertBufferedImageToBase64(bufferedImage, imageType);
-		String attValue = createHrefAttributeValue(mimeType, base64);
-		addXlinkHref(attValue);
-		return attValue;
 	}
 
 	private static String createHrefAttributeValue(String mimeType, String base64) {
