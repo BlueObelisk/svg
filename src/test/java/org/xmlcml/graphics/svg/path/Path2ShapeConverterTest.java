@@ -83,7 +83,7 @@ public class Path2ShapeConverterTest {
 		Assert.assertEquals("converted", 23, svgElements.size());
 		Assert.assertTrue("0 "+svgElements.get(0).getClass().getSimpleName(), svgElements.get(0) instanceof SVGPolygon);
 		Assert.assertTrue("1 "+svgElements.get(1).getClass().getSimpleName(), svgElements.get(1) instanceof SVGPolygon);
-//		Assert.assertTrue("2 "+svgElements.get(2).getClass().getSimpleName(), svgElements.get(2) instanceof SVGCircle);
+		//Assert.assertTrue("2 "+svgElements.get(2).getClass().getSimpleName(), svgElements.get(2) instanceof SVGCircle);
 		Assert.assertTrue("3 "+svgElements.get(3).getClass().getSimpleName(), svgElements.get(3) instanceof SVGRect);
 		Assert.assertTrue("4 "+svgElements.get(4).getClass().getSimpleName(), svgElements.get(4) instanceof SVGPath);
 	}
@@ -134,13 +134,13 @@ public class Path2ShapeConverterTest {
 	
 	@Test
 	public void testCircle() {
-//		 <path fill="none" stroke="#ff0000" stroke-width="0.840" 
-//		d="M311.86 149.088 
-//		C311.86 149.833 311.256 150.431 310.517 150.431 
-//		C309.772 150.431 309.175 149.833 309.175 149.088 
-//		C309.175 148.35 309.772 147.745 310.517 147.745 
-//		C311.256 147.745 311.86 148.35 311.86 149.088 
-//		Z"/>
+		/*<path fill="none" stroke="#ff0000" stroke-width="0.840" 
+		d="M311.86 149.088 
+		C311.86 149.833 311.256 150.431 310.517 150.431 
+		C309.772 150.431 309.175 149.833 309.175 149.088 
+		C309.175 148.35 309.772 147.745 310.517 147.745 
+		C311.256 147.745 311.86 148.35 311.86 149.088 
+		Z"/>*/
 		SVGPath svgPath = (SVGPath) SVGElement.readAndCreateSVG(new File(Fixtures.PATHS_DIR, "circle.svg"))
 				.getChildElements().get(0);
 		Assert.assertEquals("sig",  "MCCCCZ", svgPath.getSignature());
