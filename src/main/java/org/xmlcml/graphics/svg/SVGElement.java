@@ -335,7 +335,7 @@ public class SVGElement extends GraphicsElement {
 					throw new RuntimeException("Unbalanced or missing brackets in transform");
 				}
 				String kw = s.substring(0, lb);
-				String values = s.substring(lb+1, rb);
+				String values = s.substring(lb + 1, rb);
 				// remove unwanted spaces
 				values = values.replaceAll("  *", " ");
 				s = s.substring(rb+1).trim();
@@ -546,7 +546,7 @@ public class SVGElement extends GraphicsElement {
 				throw new RuntimeException("Bad transform: "+ts);
 			}
 			ts = ts.substring((MATRIX+"(").length());
-			ts = ts.substring(0, ts.length()-1);
+			ts = ts.substring(0, ts.length() - 1);
 			ts = ts.replace(S_COMMA, S_SPACE);
 			RealArray realArray = new RealArray(ts);
 			t = createTransformFrom1D(realArray.getArray());
@@ -583,9 +583,9 @@ public class SVGElement extends GraphicsElement {
 		}
 	}
 	
-
 	/**
 	 */
+	@Deprecated
 	public void draw() {
 //		FileOutputStream fos = new FileOutputStream(outfile);
 //		SVGElement g = MoleculeTool.getOrCreateTool(molecule).
@@ -858,7 +858,8 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	/** traverse all children recursively
-	 * often  copied to subclasses to improve readability
+	 * often copied to subclasses to improve readability
+	 * 
 	 * @return null by default
 	 */
 	public Real2Range getBoundingBox() {
@@ -874,7 +875,7 @@ public class SVGElement extends GraphicsElement {
 	 */
 	public java.awt.Dimension getDimension() {
 		Real2 real2 = getReal2Dimension();
-		return new Dimension((int)real2.getX(), (int)real2.getY());
+		return new Dimension((int) real2.getX(), (int) real2.getY());
 	}
 
 	/** return unrooted x-y range of element.
@@ -900,7 +901,7 @@ public class SVGElement extends GraphicsElement {
 			boundingBox = new Real2Range();
 		}
 		for (int i = 0; i < childNodes.size(); i++) {
-			SVGElement child = (SVGElement)childNodes.get(i);
+			SVGElement child = (SVGElement) childNodes.get(i);
 			Real2Range childBoundingBox = child.getBoundingBox();
 			if (childBoundingBox != null) {
 				if (!childBoundingBox.isValid()) {
@@ -1011,7 +1012,7 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	public SVGRect drawBox(String stroke, String fill, double strokeWidth, double opacity) {
-		return SVGElement.drawBox(this.getBoundingBox(), this, stroke, fill, strokeWidth, opacity);
+		return SVGElement.drawBox(getBoundingBox(), this, stroke, fill, strokeWidth, opacity);
 	}
 
 	public static void applyTransformsWithinElementsAndFormat(SVGElement svgElement) {
@@ -1035,21 +1036,21 @@ public class SVGElement extends GraphicsElement {
 	}
 	
 	public void setTitle(String title) {
-		this.addAttribute(new Attribute(TITLE, title));
+		addAttribute(new Attribute(TITLE, title));
 	}
 	
 	public String getTitle() {
-		return this.getAttributeValue(TITLE);
+		return getAttributeValue(TITLE);
 	}
 	
 	public void setId(String id) {
 		if (id != null) {
-			this.addAttribute(new Attribute(ID, id));
+			addAttribute(new Attribute(ID, id));
 		}
 	}
 	
 	public String getId() {
-		return this.getAttributeValue(ID);
+		return getAttributeValue(ID);
 	}
 
 	/** removes all transformation attributes
@@ -1058,7 +1059,7 @@ public class SVGElement extends GraphicsElement {
 	 * also dangerous as the ancestor may govern other descendants
 	 */
 	public void removeAncestorTransformations() {
-		Nodes ancestorAttributes = this.query("ancestor::*/@transform");
+		Nodes ancestorAttributes = query("ancestor::*/@transform");
 		for (int i = 0; i < ancestorAttributes.size(); i++) {
 			ancestorAttributes.get(i).detach();
 		}

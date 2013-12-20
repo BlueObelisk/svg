@@ -71,7 +71,7 @@ public class SVGUtil {
 			if (!(element instanceof SVGElement)) {
 				throw new RuntimeException("Element was not SVGElement: "+element.toXML());
 			}
-			svgElements.add((SVGElement)element);
+			svgElements.add((SVGElement) element);
 		}
 		return svgElements;
 	}
