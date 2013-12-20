@@ -16,7 +16,6 @@
 
 package org.xmlcml.graphics.svg;
 
-
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
@@ -26,9 +25,6 @@ import org.xmlcml.euclid.Real2Range;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-
-
 
 /** grouping element
  * 
