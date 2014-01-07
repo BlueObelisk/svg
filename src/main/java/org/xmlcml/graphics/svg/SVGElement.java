@@ -29,10 +29,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/** base class for lightweight generic SVG element.
- * no checking - i.e. can take any name or attributes
+/** 
+ * Base class for lightweight generic SVG element.
+ * <p>
+ * No checking - i.e. can take any name or attributes.
+ * 
  * @author pm286
- *
  */
 public class SVGElement extends GraphicsElement {
 	private static Logger LOG = Logger.getLogger(SVGElement.class);
@@ -65,10 +67,11 @@ public class SVGElement extends GraphicsElement {
 
 	protected Real2Range boundingBox = null;
 	protected boolean boundingBoxCached = false;
-//	private AffineTransform savedAffineTransform;
+	//private AffineTransform savedAffineTransform;
 	
 	
-	/** constructor.
+	/** 
+	 * Constructor.
 	 * 
 	 * @param name
 	 */
@@ -86,7 +89,8 @@ public class SVGElement extends GraphicsElement {
         this.userElement = element.userElement;
 	}
 	
-	/** copy constructor from non-subclassed elements
+	/** 
+	 * Copy constructor from non-subclassed elements
 	 */
 	public static SVGElement readAndCreateSVG(Element element) {
 		SVGElement newElement = null;
@@ -141,24 +145,26 @@ public class SVGElement extends GraphicsElement {
         return newElement;
 	}
 	
-	/** converts an SVG file to SVGElement
+	/** 
+	 * Converts an SVG file to SVGElement
 	 * 
 	 * @param file
 	 * @return
 	 */
 	public static SVGElement readAndCreateSVG(File file) {
 		Element element = XMLUtil.parseQuietlyToDocument(file).getRootElement();
-		return (element == null) ? null : readAndCreateSVG(element);
+		return (element == null ? null : readAndCreateSVG(element));
 	}
 	
-	/** converts an SVG file to SVGElement
+	/** 
+	 * Converts an SVG file to SVGElement
 	 * 
 	 * @param file
 	 * @return
 	 */
 	public static SVGElement readAndCreateSVG(InputStream is) {
 		Element element = XMLUtil.parseQuietlyToDocument(is).getRootElement();
-		return (element == null) ? null : readAndCreateSVG(element);
+		return (element == null ? null : readAndCreateSVG(element));
 	}
 	
 	protected static void createSubclassedChildren(Element oldElement, SVGElement newElement) {
