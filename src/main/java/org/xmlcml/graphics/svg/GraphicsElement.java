@@ -30,10 +30,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/** base class for lightweight generic SVG element.
- * no checking - i.e. can take any name or attributes
+/** 
+ * Base class for lightweight generic SVG element.
+ * <p>
+ * No checking - i.e. can take any name or attributes.
+ * 
  * @author pm286
- *
  */
 public class GraphicsElement extends Element implements SVGConstants {
 
@@ -72,12 +74,13 @@ public class GraphicsElement extends Element implements SVGConstants {
 	protected boolean useStyleAttribute = false;
 	private StyleBundle styleBundle;
 	
-// save when drawing to Graphics2D	
+	//save when drawing to Graphics2D	
 	private Color saveColor;
 	private Stroke saveStroke;
 	private AffineTransform savedAffineTransform;
 		
-	/** constructor.
+	/** 
+	 * Constructor.
 	 * 
 	 * @param name
 	 * @param namespace
@@ -88,7 +91,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 	
     /**
-     * main constructor.
+     * Main constructor.
      * 
      * @param name tagname
      */
@@ -102,7 +105,7 @@ public class GraphicsElement extends Element implements SVGConstants {
     }
     
     public void setDefaultStyle() {
-//		setOpacity(1.0);
+    	//setOpacity(1.0);
     }
     
     protected Transform2 ensureCumulativeTransform() {
@@ -113,8 +116,8 @@ public class GraphicsElement extends Element implements SVGConstants {
     }
     
     /**
-     * copy constructor. copies attributes, children and properties using the
-     * copyFoo() routines (q.v.)
+     * Copy constructor. Copies attributes, children and properties using the
+     * copyFoo() routines (q.v.).
      * 
      * @param element
      */
@@ -135,7 +138,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
     /**
-     * copies namespaces.
+     * Copies namespaces.
      * @param element to copy from
      */
     public void copyNamespaces(GraphicsElement element) {
@@ -148,7 +151,7 @@ public class GraphicsElement extends Element implements SVGConstants {
     }
 
     /**
-     * copies attributes. makes subclass if necessary.
+     * Copies attributes. Makes subclass if necessary.
      * 
      * @param element to copy from
      */
@@ -163,7 +166,8 @@ public class GraphicsElement extends Element implements SVGConstants {
     }
 
     
-    /** copies children of element make subclasses when required
+    /** 
+     * Copies children of element make subclasses when required.
      * 
      * @param element to copy from
      */
@@ -177,7 +181,7 @@ public class GraphicsElement extends Element implements SVGConstants {
     
     
     /**
-     * copy node.
+     * Copies node.
      * 
      * @return node
      */
@@ -186,7 +190,7 @@ public class GraphicsElement extends Element implements SVGConstants {
     }
 
     /**
-     * get namespace.
+     * Gets namespace.
      * 
      * @param prefix
      * @return namespace
@@ -380,7 +384,6 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 
 	/**
-	 * 
 	 * @param fontSize the font size to set
 	 */
 	public void setFontSize(Double fontSize) {
@@ -400,7 +403,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 		try {
 			d = new Double(String.valueOf(subStyle));
 		} catch (Exception e) {
-			// return null
+			//return null
 		}
 		return d;
 	}
@@ -410,7 +413,6 @@ public class GraphicsElement extends Element implements SVGConstants {
 	}
 	
 	/**
-	 * 
 	 * @param filename
 	 * @throws IOException
 	 */
@@ -441,6 +443,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 		SVGUtil.debug(svg, fos, 2);
 		fos.close();		
 	}
+	
 	/**
 	 * @param args
 	 * @throws IOException
