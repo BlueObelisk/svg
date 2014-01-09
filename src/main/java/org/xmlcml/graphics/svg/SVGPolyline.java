@@ -16,19 +16,20 @@
 
 package org.xmlcml.graphics.svg;
 
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.ParentNode;
-import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.xml.XMLUtil;
-
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import nu.xom.Element;
+import nu.xom.Node;
+import nu.xom.ParentNode;
+
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.xml.XMLUtil;
 
 /** draws a straight line.
  * 
@@ -71,19 +72,22 @@ public class SVGPolyline extends SVGPoly {
         this.setReal2Array(real2Array);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPolyline(SVGElement element) {
         super(element);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPolyline(Element element) {
         super((SVGElement) element);
 	}
 	
-	/** constructor.
+	/** 
+	 * Constructor.
 	 * 
 	 * @param x1
 	 * @param x2
@@ -95,7 +99,7 @@ public class SVGPolyline extends SVGPoly {
 	}
 	
     /**
-     * copy node .
+     * Copy node.
      *
      * @return Node
      */
@@ -311,9 +315,9 @@ public class SVGPolyline extends SVGPoly {
 //		pointList = null;
 	}
 	
-	public SVGPoly createPolygon(double eps) {
+	public SVGPolygon createPolygon(double eps) {
 		createLineList();
-		SVGPoly polygon = null;
+		SVGPolygon polygon = null;
 		if (real2Array == null) {
 			throw new RuntimeException("null real2Array");
 		}
