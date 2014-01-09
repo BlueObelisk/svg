@@ -5,24 +5,24 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGText;
 
-/** symbols on plots.
- * 
- * All classes have a graphic representation, e.g. an SVGPolyline/gon.
- * 
+/** 
+ * Symbols on plots.
+ * <p>
+ * All classes have a graphic representation, e.g. an SVGPolyline / SVGPolygon.
+ * <p>
  * The SVG output will use standard SVG, enhanced by annotated with class, e.g.
- * <g class="TRIANGLE"><polygon points="0 0 0 1 0.5 0.886"/></g>.
- * These classes will try to track abstraction of the  unicode.
- * 
- * Many symbols have unicode (near)equivalents. This class will develop according to 
- * what people use. This is sometimes switched  by colour (e.g. TRIANGLE / fill="black") is
- * a different unicode from white triangle.
- * 
+ * &lt;g class="TRIANGLE"&gt;&lt;polygon points="0 0 0 1 0.5 0.886"/&gt;&lt;/g&gt;.
+ * These classes will try to track abstraction of the Unicode.
+ * <p>
+ * Many symbols have Unicode equivalents / near-equivalents. This class will develop according to 
+ * what people use. This is sometimes switched by colour (e.g. TRIANGLE / fill="black" is
+ * a different Unicode from white triangle).
+ * <p>
  * Not sure yet whether rotation matters. ROT0 is the "normal" orientation.
- * 
+ * <p>
  * The graphic representation may be one or more single SVGElements.
  * 
  * @author pm286
- *
  */
 public abstract class AbstractSymbol extends SVGG {
 
