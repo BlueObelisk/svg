@@ -136,7 +136,7 @@ public class Path2ShapeConverter {
 			pathList = removeRedundantMoveCommands(pathList);
 		}
 		if (splitAtMoveCommands) {
-			pathList = splitAtMoveCommands(pathList);
+			//pathList = splitAtMoveCommands(pathList);
 		}
 		for (SVGPath path : pathList) {
 			SVGShape shape = convertPathToShape(path);
@@ -145,7 +145,7 @@ public class Path2ShapeConverter {
 			id++;
 		}
 		if (removeDuplicatePaths) {
-			shapeListOut = removeDuplicateShapes(shapeListOut);
+			//shapeListOut = removeDuplicateShapes(shapeListOut);
 		}
 		return shapeListOut;
 	}
