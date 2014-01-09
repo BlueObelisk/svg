@@ -37,14 +37,13 @@ import java.awt.geom.PathIterator;
 import java.util.ArrayList;
 import java.util.List;
 
-/** draws a straight line.
- * 
+/** 
  * @author pm286
- *
  */
 public class SVGPath extends SVGShape {
 
 	private static Logger LOG = Logger.getLogger(SVGPath.class);
+	
 	static {
 		LOG.setLevel(Level.DEBUG);
 	}
@@ -207,7 +206,7 @@ public class SVGPath extends SVGShape {
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
-	/** extract polyline if path is M followed by L's
+	/** extract polyline if path is M followed by Ls
 	 * @return
 	 */
 	public void createCoordArray() {
@@ -228,7 +227,7 @@ public class SVGPath extends SVGShape {
 			} else {
 				Real2 r2 = primitive.getFirstCoord();
 				allCoords.add(r2);
-				firstCoords.add(primitive.getFirstCoord());
+				firstCoords.add(r2);
 			}
 		}
 	}
@@ -250,16 +249,16 @@ public class SVGPath extends SVGShape {
 	public SVGSymbol createSymbol(double maxWidth) {
 		createCoordArray();
 		SVGSymbol symbol = null;
-		Real2Range r2r = this.getBoundingBox();
+		Real2Range r2r = getBoundingBox();
 		if (Math.abs(r2r.getXRange().getRange()) < maxWidth && Math.abs(r2r.getYRange().getRange()) < maxWidth) {
 			symbol = new SVGSymbol();
-			SVGPath path = (SVGPath)this.copy();
+			SVGPath path = (SVGPath) copy();
 			Real2 orig = path.getOrigin();
 			path.normalizeOrigin();
 			SVGLine line = path.createHorizontalOrVerticalLine(EPS);
 			symbol.appendChild(path);
 			symbol.setId(path.getId()+".s");
-			List<SVGElement> defsNodes = SVGUtil.getQuerySVGElements(this,"/svg:svg/svg:defs");
+			List<SVGElement> defsNodes = SVGUtil.getQuerySVGElements(this, "/svg:svg/svg:defs");
 			defsNodes.get(0).appendChild(symbol);
 		}
 		return symbol;
@@ -267,7 +266,7 @@ public class SVGPath extends SVGShape {
 
 	private SVGLine createHorizontalOrVerticalLine(double eps) {
 		SVGLine  line = null;
-		Real2Array coords = this.getCoords();
+		Real2Array coords = getCoords();
 		if (coords.size() == 2) {
 			line = new SVGLine(coords.get(0), coords.get(1));
 			if (!line.isHorizontal(eps) && !line.isVertical(eps)) {
@@ -286,9 +285,9 @@ public class SVGPath extends SVGShape {
 	public SVGCircle createCircle(double epsilon) {
 		createCoordArray();
 		SVGCircle circle = null;
-		String signature = this.getSignature();
+		String signature = getSignature();
 		if (signature.equals("MCCCCZ") || signature.equals("MCCCC") && isClosed) {
-			PathPrimitiveList primList = this.ensurePrimitives();
+			PathPrimitiveList primList = ensurePrimitives();
 			Angle angleEps = new Angle(0.05, Units.RADIANS);
 			Real2Array centreArray = new Real2Array();
 			RealArray radiusArray = new RealArray();
@@ -312,26 +311,26 @@ public class SVGPath extends SVGShape {
 			}
 		} else if (isClosed && allCoords.size() >= 8) {
 			// no longer useful I think
-//			LOG.debug("CIRCLE: "+signature);
-//			Real2Range r2r = this.getBoundingBox();
-//			// is it square?
-//			if (Real.isEqual(r2r.getXRange().getRange(),  r2r.getYRange().getRange(), 2*epsilon)) {
-//				Real2 centre = r2r.getCentroid();
-//				Double sum = 0.0;
-//				double[] spokeLengths = new double[firstCoords.size()];
-//				for (int i = 0; i < firstCoords.size(); i++) {
-//					Double spokeLength = centre.getDistance(firstCoords.get(i));
-//					spokeLengths[i] = spokeLength;
-//					sum += spokeLength;
-//				}
-//				Double rad = sum / firstCoords.size();
-//				for (int i = 0; i < spokeLengths.length; i++) {
-//					if (Math.abs(spokeLengths[i] - rad) > epsilon) {
-//						return null;
-//					}
-//				}
-//				circle = new SVGCircle(centre, rad);
-//			}
+			/*LOG.debug("CIRCLE: "+signature);
+			Real2Range r2r = this.getBoundingBox();
+			//Is it square?
+			if (Real.isEqual(r2r.getXRange().getRange(),  r2r.getYRange().getRange(), 2*epsilon)) {
+				Real2 centre = r2r.getCentroid();
+				Double sum = 0.0;
+				double[] spokeLengths = new double[firstCoords.size()];
+				for (int i = 0; i < firstCoords.size(); i++) {
+					Double spokeLength = centre.getDistance(firstCoords.get(i));
+					spokeLengths[i] = spokeLength;
+					sum += spokeLength;
+				}
+				Double rad = sum / firstCoords.size();
+				for (int i = 0; i < spokeLengths.length; i++) {
+					if (Math.abs(spokeLengths[i] - rad) > epsilon) {
+						return null;
+					}
+				}
+				circle = new SVGCircle(centre, rad);
+			}*/
 		}
 		return circle;
 	}
@@ -339,7 +338,7 @@ public class SVGPath extends SVGShape {
 	public PathPrimitiveList ensurePrimitives() {
 		isClosed = false;
 		if (primitiveList == null) {
-			primitiveList = this.createPathPrimitives();
+			primitiveList = createPathPrimitives();
 		}
 		if (primitiveList.size() > 1) {
 			SVGPathPrimitive primitive0 = primitiveList.get(0);
@@ -426,7 +425,7 @@ public class SVGPath extends SVGShape {
 	}
 
 	private PathPrimitiveList createPathPrimitives() {
-		return SVGPathPrimitive.parseDString(this.getDString());
+		return SVGPathPrimitive.parseDString(getDString());
 	}
 
 	/** get bounding box
@@ -650,8 +649,8 @@ public class SVGPath extends SVGShape {
 		return null;
 	}
 
-
-	/** makes a new list composed of the paths in the list
+	/** 
+	 * Makes a new list composed of the paths in the list
 	 * 
 	 * @param elements
 	 * @return
@@ -694,7 +693,7 @@ public class SVGPath extends SVGShape {
 	public SVGPath replaceAllUTurnsByButt(Angle angleEps) {
 		SVGPath path = null;
 		if (getSignature().contains(CC)) {
-			PathPrimitiveList primList = this.ensurePrimitives();
+			PathPrimitiveList primList = ensurePrimitives();
 			List<Integer> quadrantStartList = primList.getUTurnList(angleEps);
 			if (quadrantStartList.size() > 0) {
 				for (int quad = quadrantStartList.size() - 1; quad >= 0; quad--) {
@@ -707,17 +706,17 @@ public class SVGPath extends SVGShape {
 		return path;
 	}
 
-	/** creates a line from path with signature "MLLLL" or MLLLLZ".
+	/** 
+	 * Creates a line from path with signature "MLLLL", MLLLLZ".
 	 * 
 	 * <p>uses primitiveList.createLineFromMLLLL().</p>
 	 * @param angleEps
 	 * @param maxWidth
 	 * @return null if line has wrong signature or is too wide or not antiParallel.
-	 * 
 	 */
 	public SVGLine createLineFromMLLLL(Angle angleEps, Double maxWidth) {
 		SVGLine line = null;
-		String sig = this.getSignature();
+		String sig = getSignature();
 		if (MLLLL.equals(sig) || MLLLLZ.equals(sig)) {
 			ensurePrimitives();
 			line = primitiveList.createLineFromMLLLL(angleEps, maxWidth);

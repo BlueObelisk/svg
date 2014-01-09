@@ -26,7 +26,8 @@ import nu.xom.Node;
  */
 public class SVGClipPath extends SVGElement {
 
-	public final static String TAG ="clipPath";
+	public final static String TAG = "clipPath";
+	
 	/** constructor
 	 */
 	public SVGClipPath() {
@@ -35,6 +36,7 @@ public class SVGClipPath extends SVGElement {
 	}
 	
 	protected void init() {
+		
 	}
 	
 	/** constructor
@@ -58,14 +60,11 @@ public class SVGClipPath extends SVGElement {
         return new SVGClipPath(this);
     }
 
-	
-
 	/**
 	 * @return tag
 	 */
 	public String getTag() {
 		return TAG;
 	}
-
 	
 }
