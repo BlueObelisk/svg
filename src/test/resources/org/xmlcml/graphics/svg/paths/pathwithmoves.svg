@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.1 "
-   sodipodi:docname="messymolecules-page2.svg">
+   sodipodi:docname="pathwithmoves.svg">
   <metadata
      id="metadata4828">
     <rdf:RDF>
@@ -24,7 +24,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -41,11 +41,11 @@
      inkscape:window-height="480"
      id="namedview4826"
      showgrid="false"
-     inkscape:zoom="0.36375"
-     inkscape:cx="-24.436371"
-     inkscape:cy="512.08051"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:zoom="2.0576807"
+     inkscape:cx="144.03919"
+     inkscape:cy="350.80633"
+     inkscape:window-x="42"
+     inkscape:window-y="70"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg2" />
   <defs
@@ -2629,7 +2629,8 @@
      d="M 154.5,434.34 L 154.5,452.1 M 201.78,461.58 L 216.72,452.58 M 154.5,434.34 L 170.1,425.1 M 138,479.76 L 138,466.2"
      id="path2816"
      inkscape:connector-curvature="0"
-     style="fill:none;stroke:#000000;stroke-width:0.87800002" />
+     style="fill:none;stroke:#000000;stroke-width:0.87800002"
+     svgx:z="1" />
   <text
      stroke="none"
      fill="#000000"
