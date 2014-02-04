@@ -315,8 +315,10 @@ public class Path2ShapeConverterTest {
 	public void testPathWithMoves() {
 		SVGElement output = createAndProcessElement(new File(Fixtures.PATHS_DIR, "pathwithmoves.svg"));
 		List<SVGG> groups = SVGG.extractSelfAndDescendantGs(output);
-		//SVGPolyline path = SVGPolyline.extractSelfAndDescendantPolylines(output)
-		Assert.assertTrue(false);
+		Assert.assertEquals(output.getChild(433).toString(), "line: from((154.5,434.34)) to((154.5,452.1)) v((0.0,17.760000000000048))");
+		Assert.assertEquals(output.getChild(434).toString(), "line: from((201.78,461.58)) to((216.72,452.58)) v((14.939999999999998,-9.0))");
+		Assert.assertEquals(output.getChild(435).toString(), "line: from((154.5,434.34)) to((170.1,425.1)) v((15.599999999999994,-9.239999999999952))");
+		Assert.assertEquals(output.getChild(436).toString(), "line: from((138.0,479.76)) to((138.0,466.2)) v((0.0,-13.560000000000002))");
 	}
 
 }
