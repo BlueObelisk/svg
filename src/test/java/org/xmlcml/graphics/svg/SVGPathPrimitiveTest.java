@@ -18,7 +18,7 @@ public class SVGPathPrimitiveTest {
 
 	private static final Angle ANGLE_EPS = new Angle(0.0001, Units.RADIANS);
 	
-	static String D1="" +
+	static String D1 = 
 			"M110.7 262.44 " +
 			"L110.82 261.839 " +
 			"L111.0 260.459 " +
@@ -31,6 +31,45 @@ public class SVGPathPrimitiveTest {
 			"C111.9 262.98 111.6 263.22 111.24 263.16 " +
 			"C110.88 263.1 110.64 262.8 110.7 262.43 " +
 			"Z";
+	
+	static String D2 = 
+			"m1 1 M 2 2";
+	
+	static String D3 = 
+			"M1 1 M 2 2";
+	
+	static String D4 = 
+			"M1 1 M 2 2";
+	
+	static String D5 = 
+			"M1 1 m 1 1";
+	
+	static String D6 = 
+			"M1 1 L 2 2";
+	
+	static String D7 = 
+			"M1 1 l 1 1";
+	
+	@Test
+	public void testRelativeMoveCommandAtStart() {
+		 PathPrimitiveList primitiveList1 = createPrimitiveList(D2);
+		 PathPrimitiveList primitiveList2 = createPrimitiveList(D3);
+		 Assert.assertEquals(primitiveList1.toString(), primitiveList2.toString());
+	}
+	
+	@Test
+	public void testRelativeMoveCommandNotAtStart() {
+		 PathPrimitiveList primitiveList1 = createPrimitiveList(D4);
+		 PathPrimitiveList primitiveList2 = createPrimitiveList(D5);
+		 Assert.assertEquals(primitiveList1.toString(), primitiveList2.toString());
+	}
+	
+	@Test
+	public void testRelativeLineCommand() {
+		 PathPrimitiveList primitiveList1 = createPrimitiveList(D6);
+		 PathPrimitiveList primitiveList2 = createPrimitiveList(D7);
+		 Assert.assertEquals(primitiveList1.toString(), primitiveList2.toString());
+	}
 
 	@Test
 	public void testString() {
@@ -131,20 +170,19 @@ public class SVGPathPrimitiveTest {
 		 Assert.assertNull("z", primitiveList.get(11).getAngle());
 	}
 	
-	/**
-<svg xmlns="http://www.w3.org/2000/svg">
- <g>
-  <path stroke="black" fill="#000000" stroke-width="0.0" 
-  d="M172.14 512.58 
-  L172.14 504.3 
-  C172.14 504.18 172.26 504.06 172.38 504.06 
-  C172.5 504.06 172.62 504.18 172.62 504.3 
-  L172.62 512.58 
-  C172.62 512.76 172.5 512.88 172.38 512.88 
-  C172.26 512.88 172.14 512.76 172.14 512.58 "
-  svgx:z="1737"/>
- </g>
-</svg>	 */
+	/*<svg xmlns="http://www.w3.org/2000/svg">
+	 <g>
+	  <path stroke="black" fill="#000000" stroke-width="0.0" 
+	  d="M172.14 512.58 
+	  L172.14 504.3 
+	  C172.14 504.18 172.26 504.06 172.38 504.06 
+	  C172.5 504.06 172.62 504.18 172.62 504.3 
+	  L172.62 512.58 
+	  C172.62 512.76 172.5 512.88 172.38 512.88 
+	  C172.26 512.88 172.14 512.76 172.14 512.58 "
+	  svgx:z="1737"/>
+	 </g>
+	</svg>*/
 	@Test
 	public void checkAngleForClosedCurve() {
 		SVGPath ROUNDED_LINE_SVG = (SVGPath) SVGElement.readAndCreateSVG(Fixtures.ROUNDED_LINE_SVG_FILE)
@@ -210,8 +248,7 @@ public class SVGPathPrimitiveTest {
 		Assert.assertEquals("quads2", 5, (int) quadStartList.get(1));
 	}
 
-
-// ==================================================================
+	// ==================================================================
 	
 	private PathPrimitiveList createPrimitiveList(String d) {
 		SVGPath path = new SVGPath(d);
