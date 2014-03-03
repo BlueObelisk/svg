@@ -163,11 +163,39 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		return quadStartList;
 	}
 
+	/**
+	 * @param quad
+	 * @deprecated Use replaceUTurnsByButt(int, false).
+	 */
 	public void replaceUTurnsByButt(int quad) {
-		//maybe test radius later
-		CubicPrimitive cubic1 = (CubicPrimitive) primitiveList.get(quad + 1);
-		Real2 point1 = cubic1.getLastCoord();
-		LinePrimitive linePrimitive = new LinePrimitive(point1);
+		replaceUTurnsByButt(quad, false);
+	}
+
+	public void replaceUTurnsByButt(int quad, boolean extend) {
+		LinePrimitive linePrimitive;
+		if (extend) {
+			CubicPrimitive cubic1 = (CubicPrimitive) primitiveList.get(quad);
+			Real2 endPoint = cubic1.getLastCoord();
+			Real2Array line1Coords = primitiveList.get(quad - 1).getCoordArray();
+			Real2 newLine1End = getLine(quad - 1).getNearestPointOnLine(endPoint);
+			line1Coords.setElement(line1Coords.size() - 1, newLine1End);
+			//Real2Array coordsLine2 = primitiveList.get(quad + 2).getCoordArray();
+			Real2 newLine2Start;
+			if (getLine(quad + 2) == null) {
+				newLine2Start = getLine(1).getNearestPointOnLine(endPoint);
+				Real2Array moveCoords = primitiveList.get(0).getCoordArray();
+				moveCoords.setElement(0, getLine(1).getNearestPointOnLine(endPoint));
+			} else {
+				newLine2Start = getLine(quad + 2).getNearestPointOnLine(endPoint);
+			}
+			//coordsLine2.setElement(coordsLine2.size() - 1, newLine2Start);
+			linePrimitive = new LinePrimitive(newLine2Start);
+		} else {
+			//maybe test radius later
+			CubicPrimitive cubic2 = (CubicPrimitive) primitiveList.get(quad + 1);
+			Real2 point = cubic2.getLastCoord();
+			linePrimitive = new LinePrimitive(point);
+		}
 		primitiveList.remove(quad + 1);
 		primitiveList.remove(quad);
 		primitiveList.add(quad, linePrimitive);
@@ -185,7 +213,7 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		if (i > 0) {
 			SVGPathPrimitive primitive = get(i);
 			if (primitive instanceof LinePrimitive) {
-				Real2 point0 = this.get(i - 1).getLastCoord();
+				Real2 point0 = get(i - 1).getLastCoord();
 				Real2 point1 = primitive.getFirstCoord();
 				line = new SVGLine(point0, point1);
 			}
