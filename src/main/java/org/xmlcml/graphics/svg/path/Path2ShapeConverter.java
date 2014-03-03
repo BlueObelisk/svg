@@ -290,9 +290,9 @@ public class Path2ShapeConverter {
 	private SVGPath removeRoundedCapsFromPossibleLine(SVGPath path) {
 		String signature = path.getSignature();
 		if (MLCCLCC.equals(signature) || MLCCLCCZ.equals(signature)) {
-			SVGPath newPath = path.replaceAllUTurnsByButt(maxAngleForParallel);
+			SVGPath newPath = path.replaceAllUTurnsByButt(maxAngleForParallel, true);
 			if (newPath != null) {
-				path = newPath;			
+				path = newPath;
 			}
 		}
 		return path;
