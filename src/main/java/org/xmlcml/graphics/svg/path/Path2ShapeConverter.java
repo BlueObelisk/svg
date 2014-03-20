@@ -12,6 +12,8 @@ import org.xmlcml.xml.XMLUtil;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /** 
@@ -24,6 +26,8 @@ import java.util.Set;
  * @author pm286
  */
 public class Path2ShapeConverter {
+
+	private static final String Z_COORDINATE = "z";
 
 	private final static Logger LOG = Logger.getLogger(Path2ShapeConverter.class);
 	
@@ -54,6 +58,7 @@ public class Path2ShapeConverter {
 	private int minLinesInPolyline = DEFAULT_LINES_IN_POLYLINE;
 	private boolean removeDuplicatePaths = true;
 	private boolean removeRedundantMoveCommands = true;
+	private boolean removeRedundantLineCommands = true;
 	private boolean splitAtMoveCommands = true;
 	private double maxPathWidth = DEFAULT_MAX_PATH_WIDTH;
 	private double maxWidth = DEFAULT_MAX_WIDTH;
@@ -121,39 +126,83 @@ public class Path2ShapeConverter {
 		}
 		return shapeListOut;
 	}
-
+	
 	/** 
-	 * Main routine for list of paths
+	 * Main routine for list of paths. Doesn't observe splitAtMoveCommands.
 	 * 
 	 * @param pathList
 	 * @return a list of shapes; each a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
 	 */
-	public List<SVGShape> convertPathsToShapes(List<SVGPath> pathList) {
-		setPathList(pathList);
-		List<SVGShape> shapeListOut = new ArrayList<SVGShape>();
+	public List<List<SVGShape>> convertPathsToShapesAndSplitAtMoves(List<SVGPath> pathList) {
+		return convertPathsToShapes(pathList, true);
+	}
+	
+	public List<List<SVGShape>> convertPathsToShapes(List<SVGPath> inputPathList, boolean split) {
+		setPathList(inputPathList);
+		List<List<SVGShape>> shapeListList = new ArrayList<List<SVGShape>>();
 		int id = 0;
+		if (removeRedundantLineCommands) {
+			inputPathList = removeRedundantLineCommands(inputPathList);
+		}
 		if (removeRedundantMoveCommands) {
-			pathList = removeRedundantMoveCommands(pathList);
+			inputPathList = removeRedundantMoveCommands(inputPathList);
 		}
-		if (splitAtMoveCommands) {
-			//pathList = splitAtMoveCommands(pathList);
+		List<List<SVGPath>> pathListList;
+		if (splitAtMoveCommands && split) {
+			pathListList = splitAtMoveCommands(inputPathList);
+		} else {
+			pathListList = new ArrayList<List<SVGPath>>();
+			for (SVGPath path : inputPathList) {
+				List<SVGPath> singlePath = new ArrayList<SVGPath>();
+				singlePath.add(path);
+				pathListList.add(singlePath);
+			}
 		}
-		for (SVGPath path : pathList) {
-			SVGShape shape = convertPathToShape(path);
-			shape.setId(shape.getClass().getSimpleName().toLowerCase().substring(SVG.length())+"."+id);
-			shapeListOut.add(shape);
-			id++;
+		
+		for (List<SVGPath> pathList : pathListList) {
+			List<SVGShape> shapeList = new ArrayList<SVGShape>();
+			for (SVGPath path : pathList) {
+				SVGShape shape = convertPathToShape(path);
+				shape.setId(shape.getClass().getSimpleName().toLowerCase().substring(SVG.length())+"."+id);
+				shapeList.add(shape);
+				id++;
+			}
+			shapeListList.add(shapeList);
 		}
 		if (removeDuplicatePaths) {
 			//shapeListOut = removeDuplicateShapes(shapeListOut);
 		}
-		return shapeListOut;
+		return shapeListList;
+	}
+
+	/** 
+	 * Main routine for list of paths. Doesn't observe splitAtMoveCommands.
+	 * 
+	 * @param pathList
+	 * @return a list of shapes; each a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
+	 * @deprecated Use convertPathsToShapesAndSplitAtMoves().
+	 */
+	public List<SVGShape> convertPathsToShapes(List<SVGPath> pathList) {
+		List<List<SVGShape>> converted = convertPathsToShapes(pathList, false);
+		List<SVGShape> results = new ArrayList<SVGShape>();
+		for (List<SVGShape> fromPath : converted) {
+			results.addAll(fromPath);
+		}
+		return results;
 	}
 
 	private static List<SVGPath> removeRedundantMoveCommands(List<SVGPath> pathList) {
 		List<SVGPath> newPaths = new ArrayList<SVGPath>();
 		for (SVGPath path : pathList) {
 			newPaths.add(removeRedundantMoveCommands(path, MOVE_EPS));
+		}
+		return newPaths;
+	}
+
+	private static List<SVGPath> removeRedundantLineCommands(List<SVGPath> pathList) {
+		List<SVGPath> newPaths = new ArrayList<SVGPath>();
+		for (SVGPath path : pathList) {
+			newPaths.add(removeRedundantLineCommands(path, MOVE_EPS));
 		}
 		return newPaths;
 	}
@@ -194,7 +243,10 @@ public class Path2ShapeConverter {
 				if (shape == null || shape instanceof SVGPolygon) {
 					shape = createNarrowLine((SVGPolygon) shape);
 					if (shape == null) {
-						shape = polyline;
+						shape = createNarrowLine(polyline);
+						if (shape == null) {
+							shape = polyline;
+						}
 					} 
 				}
 			}
@@ -225,7 +277,7 @@ public class Path2ShapeConverter {
 		decimalPlaces = places;
 	}
 	
-	private SVGLine createLineFromMLLLorMLCCLCC(SVGPath path) {
+	private SVGLine createLineFromMLLLLOrMLCCLCC(SVGPath path) {
 		SVGLine line = null;
 		if (path != null) {
 			path = removeRoundedCapsFromPossibleLine(path);
@@ -238,9 +290,9 @@ public class Path2ShapeConverter {
 	private SVGPath removeRoundedCapsFromPossibleLine(SVGPath path) {
 		String signature = path.getSignature();
 		if (MLCCLCC.equals(signature) || MLCCLCCZ.equals(signature)) {
-			SVGPath newPath = path.replaceAllUTurnsByButt(maxAngleForParallel);
+			SVGPath newPath = path.replaceAllUTurnsByButt(maxAngleForParallel, true);
 			if (newPath != null) {
-				path = newPath;			
+				path = newPath;
 			}
 		}
 		return path;
@@ -259,7 +311,12 @@ public class Path2ShapeConverter {
 		return convertPathToShape(svgPath);
 	}
 
-	private SVGShape createNarrowLine(SVGPolygon polygon) {
+	/**
+	 * Converts a polygon into a narrow line
+	 * 
+	 * @return null on failure
+	 */
+	public SVGLine createNarrowLine(SVGPolygon polygon) {
 		SVGLine line = null;
 		if (polygon != null && polygon.size() == 4) {
 			SVGLine line0 = polygon.getLineList().get(0);
@@ -269,6 +326,21 @@ public class Path2ShapeConverter {
 			SVGLine newLine1 = createNarrowLine(line0, line2);
 			SVGLine newLine2 = createNarrowLine(line1, line3);
 			line = (newLine1 == null ? newLine2 : (newLine2 == null ? newLine1 : (newLine1.getLength() > newLine2.getLength() ? newLine1 : newLine2)));
+		}
+		return line;
+	}
+	
+	/**
+	 * Converts a polyline into a narrow line (assumes one end is open)
+	 * 
+	 * @return null on failure
+	 */
+	public SVGLine createNarrowLine(SVGPolyline polyline) {
+		SVGLine line = null;
+		if (polyline != null && polyline.size() == 3) {
+			SVGLine line0 = polyline.getLineList().get(0);
+			SVGLine line2 = polyline.getLineList().get(2);
+			line = createNarrowLine(line0, line2);
 		}
 		return line;
 	}
@@ -296,7 +368,7 @@ public class Path2ShapeConverter {
 		SVGRect rect = path.createRectangle(eps);
 		SVGLine line = null;
 		if (rect == null) {
-			line = createLineFromMLLLorMLCCLCC(path);
+			line = createLineFromMLLLLOrMLCCLCC(path);
 		} else {
 			line = createLineFromRect(rect); 
 		}
@@ -323,8 +395,31 @@ public class Path2ShapeConverter {
 			}
 		}
 	}
-
 	
+	private void replaceEachPathWithShapes(List<List<SVGShape>> shapeListList, List<SVGPath> pathList) {
+		if (shapeListList.size() != pathList.size()){
+			throw new RuntimeException("converted paths ("+shapeListList.size()+") != old paths ("+pathList.size()+")");
+		}
+		for (int i = 0; i < pathList.size(); i++) {
+			SVGPath path = pathList.get(i);
+			List<SVGShape> shapeList = shapeListList.get(i);
+			ParentNode parent = path.getParent();
+			LOG.trace("Parent " + parent);
+			if (parent != null) {
+				int position = parent.indexOf(path);
+				for (SVGShape shape : shapeList) {
+					LOG.trace("CONV " + shape.toXML());
+					if (shape instanceof SVGPath) {
+						// no need to replace as no conversion done
+					} else {
+						path.detach();
+						parent.insertChild(shape, position++);
+					}
+				}
+			}
+		}
+	}
+
 	/** 
 	 * Many paths are drawn twice; if two or more paths are equal, remove the later one(s) if removeDuplicatePaths is set
 	 */
@@ -378,7 +473,7 @@ public class Path2ShapeConverter {
 				SVGPathPrimitive currentPrimitive = primitives.get(i);
 				boolean skip = false;
 				if (currentPrimitive instanceof MovePrimitive) {
-					if (i == primitives.size() -1) { // final primitive
+					if (i == primitives.size() - 1) { // final primitive
 						skip = true;
 					} else if (lastPrimitive != null) {
 						// move is to end of last primitive
@@ -386,11 +481,40 @@ public class Path2ShapeConverter {
 						Real2 currentFirstCoord = currentPrimitive.getFirstCoord();
 						skip = (lastLastCoord != null) && lastLastCoord.isEqualTo(currentFirstCoord, eps);
 					}
-					if (!skip && lastPrimitive != null) {
-						SVGPathPrimitive nextPrimitive = primitives.get(i+1);
+					/*if (!skip && lastPrimitive != null) {
+						SVGPathPrimitive nextPrimitive = primitives.get(i + 1);
 						Real2 currentLastCoord = currentPrimitive.getLastCoord();
 						Real2 nextFirstCoord = nextPrimitive.getFirstCoord();
 						skip = (nextFirstCoord != null) && currentLastCoord.isEqualTo(nextFirstCoord, eps);
+					}*/
+				}
+				if (!skip) {
+					newPrimitives.add(currentPrimitive);
+				} else {
+					LOG.trace("skipped "+lastPrimitive+ "== "+currentPrimitive);
+				}
+				lastPrimitive = currentPrimitive;
+			}
+			return createNewPathIfModified(path, d, newPrimitives, primitiveCount);
+		}
+		return path;
+	}
+	
+	private static SVGPath removeRedundantLineCommands(SVGPath path, double eps) {
+		String d = path.getDString();
+		if (d != null) {
+			PathPrimitiveList newPrimitives = new PathPrimitiveList();
+			PathPrimitiveList primitives = SVGPathPrimitive.parseDString(d);
+			int primitiveCount = primitives.size();
+			SVGPathPrimitive lastPrimitive = null;
+			for (int i = 0; i < primitives.size(); i++) {
+				SVGPathPrimitive currentPrimitive = primitives.get(i);
+				boolean skip = false;
+				if (currentPrimitive instanceof LinePrimitive) {
+					if (lastPrimitive != null) {
+						Real2 lastLastCoord = lastPrimitive.getLastCoord();
+						Real2 currentFirstCoord = currentPrimitive.getFirstCoord();
+						skip = (lastLastCoord != null) && lastLastCoord.isEqualTo(currentFirstCoord, eps);
 					}
 				}
 				if (!skip) {
@@ -436,32 +560,36 @@ public class Path2ShapeConverter {
 		}
 	}
 
-	private static List<SVGPath> splitAtMoveCommands(List<SVGPath> paths) {
-		ArrayList<SVGPath> newPaths = new ArrayList<SVGPath>();
+	private static List<List<SVGPath>> splitAtMoveCommands(List<SVGPath> paths) {
+		List<List<SVGPath>> results = new ArrayList<List<SVGPath>>();
 		for (SVGPath path : paths) {
-			List<SVGPath> result = splitAtMoveCommandsX(path);
-			newPaths.addAll(result);
+			List<SVGPath> result = splitAtMoveCommands(path);
+			results.add(result);
 		}
-		return newPaths;
+		return results;
 	}
 
-	private static List<SVGPath> splitAtMoveCommandsX(SVGPath svgPath) {
+	private static List<SVGPath> splitAtMoveCommands(SVGPath svgPath) {
 		 ArrayList<SVGPath> splitPathList = new ArrayList<SVGPath>();
 		 String d = svgPath.getDString();
 		 List<String> newDStringList = splitAtMoveCommandsAndCreateNewDStrings(d);
 		 if (newDStringList.size() == 1) {
 			 splitPathList.add(svgPath);
 		 } else {
-			 ParentNode parent = svgPath.getParent();
-			 int index = parent.indexOf(svgPath);
+			 //ParentNode parent = svgPath.getParent();
+			 //int index = parent.indexOf(svgPath);
+			 double i = 0;
 			 for (String newDString : newDStringList) {
+				 i += 0.001;
 				 SVGPath newPath = new SVGPath();
 				 XMLUtil.copyAttributesFromTo(svgPath, newPath);
+				 double z = Double.parseDouble(SVGUtil.getSVGXAttribute(svgPath, Z_COORDINATE));
+				 SVGUtil.setSVGXAttribute(newPath, Z_COORDINATE, String.valueOf(z + i));
 				 newPath.setDString(newDString);
-				 parent.insertChild(newPath, ++index);
+				 //parent.insertChild(newPath, ++index);
 				 splitPathList.add(newPath);
 			 }
-			 svgPath.detach();
+			 //svgPath.detach();
 		 }
 		 return splitPathList;
 	}
@@ -632,9 +760,9 @@ public class Path2ShapeConverter {
 				result.addAttribute(new Attribute(attName, val));
 			}
 		}
-		String zvalue = SVGUtil.getSVGXAttribute(path, "z");
+		String zvalue = SVGUtil.getSVGXAttribute(path, Z_COORDINATE);
 		if (zvalue != null) {
-			SVGUtil.setSVGXAttribute(result, "z", zvalue);
+			SVGUtil.setSVGXAttribute(result, Z_COORDINATE, zvalue);
 		}
 	}
 	
@@ -654,6 +782,17 @@ public class Path2ShapeConverter {
 	 */
 	public void setRemoveRedundantMoveCommands(boolean removeRedundantMoveCommands) {
 		this.removeRedundantMoveCommands = removeRedundantMoveCommands;
+	}
+	
+	/** 
+	 * Some paths have redundant line (L) commands that can be removed
+	 * <p>
+	 * E.g. M x1 y1 L x2 y2 M x3 y3 L x3 y3 will be converted to M x1 y1 L x2 y2 M x3 y3
+	 *      
+	 * @param whether this should be done
+	 */
+	public void setRemoveRedundantLineCommands(boolean removeRedundantLineCommands) {
+		this.removeRedundantLineCommands = removeRedundantLineCommands;
 	}
 	
 	/**
@@ -688,6 +827,17 @@ public class Path2ShapeConverter {
 		return removeRedundantMoveCommands;
 	}
 	
+	/** 
+	 * Some paths have redundant line (L) commands that can be removed
+	 * <p>
+	 * E.g. M x1 y1 L x2 y2 M x3 y3 L x3 y3 will be converted to M x1 y1 L x2 y2 M x3 y3
+	 *      
+	 * @param whether this should be done
+	 */
+	public boolean isRemoveRedundantLineCommands() {
+		return removeRedundantLineCommands;
+	}
+	
 	/**
 	 * @return the minimum number of lines for polylines to be split into lines with {@link splitPolylinesToLines}
 	 */
@@ -716,9 +866,13 @@ public class Path2ShapeConverter {
 	 */
 	public List<SVGShape> convertPathsToShapes(SVGElement svgElement) {
 		List<SVGPath> pathList = SVGPath.extractPaths(svgElement);
-		List<SVGShape> shapeList = convertPathsToShapes(pathList);
-		Path2ShapeConverter.replacePathsByShapes(shapeList, pathList);
-		return shapeList;
+		List<List<SVGShape>> shapeListList = convertPathsToShapesAndSplitAtMoves(pathList);
+		replaceEachPathWithShapes(shapeListList, pathList);
+		List<SVGShape> shapeListOut = new ArrayList<SVGShape>();
+		for (List<SVGShape> shapeList : shapeListList) {
+			shapeListOut.addAll(shapeList);
+		}
+		return shapeListOut;
 	}
 
 	/**
@@ -737,7 +891,6 @@ public class Path2ShapeConverter {
 	 * Create line from path consisting of 3 or 4 lines creating the outline of a line
 	 * <p>
 	 * @deprecated
-	 * 
 	 * @return
 	 */
 	@Deprecated
