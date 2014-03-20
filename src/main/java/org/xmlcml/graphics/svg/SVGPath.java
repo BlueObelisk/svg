@@ -19,6 +19,7 @@ package org.xmlcml.graphics.svg;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.*;
@@ -71,25 +72,28 @@ public class SVGPath extends SVGShape {
 	private Real2Array firstCoords;
 	private String signature;
 
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPath() {
 		super(TAG);
 		init();
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPath(SVGPath element) {
         super(element);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPath(GeneralPath generalPath) {
         super(TAG);
         String d = SVGPath.constructDString(generalPath);
-        this.setDString(d);
+        setDString(d);
 	}
 	
 	public SVGPath(Shape shape) {
@@ -124,7 +128,7 @@ public class SVGPath extends SVGShape {
 	}
 	
 	/**
-     * copy node .
+     * Copies node.
      *
      * @return Node
      */
@@ -146,14 +150,16 @@ public class SVGPath extends SVGShape {
 		path.setFill("none");
 	}
 	
-	/** creates a list of primitives
-	 * at present Move, Line, Curve, Z
+	/** 
+	 * Creates a list of primitives
+	 * <p>
+	 * At present Move, Line, Curve, Z
 	 * @param d
 	 * @return
 	 */
 	public PathPrimitiveList parseDString() {
 		String d = getDString();
-		return d == null ? null : SVGPathPrimitive.parseDString(d);
+		return (d == null ? null : SVGPathPrimitive.parseDString(d));
 	}
 	
     private static String createD(Real2Array xy) {
@@ -206,7 +212,9 @@ public class SVGPath extends SVGShape {
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
-	/** extract polyline if path is M followed by Ls
+	/** 
+	 * Extract polyline if path is M followed by Ls
+	 * 
 	 * @return
 	 */
 	public void createCoordArray() {
@@ -221,7 +229,7 @@ public class SVGPath extends SVGShape {
 				Real2Array curveCoords = primitive.getCoordArray();
 				allCoords.add(curveCoords);
 				firstCoords.add(primitive.getFirstCoord());
-//				break;
+				//break;
 			} else if (primitive instanceof ClosePrimitive) {
 				isClosed = true;
 			} else {
@@ -352,40 +360,44 @@ public class SVGPath extends SVGShape {
 	}
 
 	/**
-	 * do two paths have identical coordinates?
+	 * Do two paths have identical coordinates?
+	 * 
 	 * @param svgPath 
 	 * @param path2
 	 * @param epsilon tolerance allowed
 	 * @return
 	 */
 	public boolean hasEqualCoordinates(SVGPath path2, double epsilon) {
-		Real2Array r2a = this.getCoords();
+		Real2Array r2a = getCoords();
 		Real2Array r2a2 = path2.getCoords();
 		return r2a.isEqualTo(r2a2, epsilon);
 	}
 	
 	public Real2Array getCoords() {
-//		if (coords == null) {
-			coords = new Real2Array();
-			String ss = this.getDString().trim()+S_SPACE;
-			PathPrimitiveList primitives = this.createPathPrimitives();
-			for (SVGPathPrimitive primitive : primitives) {
-				Real2 coord = primitive.getFirstCoord();
-				Real2Array coordArray = primitive.getCoordArray();
-				if (coord != null) {
-					coords.add(coord);
-				} else if (coordArray != null) {
-					coords.add(coordArray);
-				}
+		//if (coords == null) {
+		coords = new Real2Array();
+		String ss = getDString().trim()+S_SPACE;
+		PathPrimitiveList primitives = createPathPrimitives();
+		for (SVGPathPrimitive primitive : primitives) {
+			Real2 coord = primitive.getFirstCoord();
+			Real2Array coordArray = primitive.getCoordArray();
+			if (coord != null) {
+				coords.add(coord);
+			} else if (coordArray != null) {
+				coords.add(coordArray);
 			}
-//		}
+		}
+		//}
 		return coords;
 	}
 	
 	/**
-	 * scale of bounding boxes
-	 * scale = Math.sqrt(xrange2/this.xrange * yrange2/this.yrange) 
+	 * Scale of bounding boxes
+	 * <p>
+	 * scale = Math.sqrt(xrange2/this.xrange * yrange2/this.yrange)
+	 * <p> 
 	 * (Can be used to scale vector fonts or other scalable objects)
+	 * 
 	 * @param path2
 	 * @return null if problem (e.g. zero ranges). result may be zero
 	 */
@@ -428,8 +440,10 @@ public class SVGPath extends SVGShape {
 		return SVGPathPrimitive.parseDString(getDString());
 	}
 
-	/** get bounding box
-	 * use coordinates given and ignore effect of curves
+	/** 
+	 * Gets bounding box
+	 * <p>
+	 * Uses coordinates given and ignores effect of curves
 	 */
 	@Override
 	public Real2Range getBoundingBox() {
@@ -440,16 +454,22 @@ public class SVGPath extends SVGShape {
 		return boundingBox;
 	}
 	
-	/** property of graphic bounding box
-	 * can be overridden
+	/** 
+	 * Property of graphic bounding box
+	 * <p>
+	 * Can be overridden
+	 * 
 	 * @return default none
 	 */
 	protected String getBBFill() {
 		return "none";
 	}
 
-	/** property of graphic bounding box
-	 * can be overridden
+	/** 
+	 * Property of graphic bounding box
+	 * <p>
+	 * Can be overridden
+	 * 
 	 * @return default blue
 	 */
 	protected String getBBStroke() {
@@ -670,7 +690,8 @@ public class SVGPath extends SVGShape {
 		return getDString();
 	}
 
-	/** convenience method to extract list of svgPaths in element
+	/** 
+	 * Convenience method to extract list of svgPaths in element
 	 * 
 	 * @param svgElement
 	 * @return
@@ -683,21 +704,35 @@ public class SVGPath extends SVGShape {
 		return SVGPath.extractPaths(SVGUtil.getQuerySVGElements(svgElement, ALL_PATH_XPATH));
 	}
 
-	/** not finished
+	/** 
+	 * Not finished
+	 * 
+	 * @param svgPath
+	 * @param distEps
+	 * @param angleEps
+	 * @return
+	 * @deprecated Use replaceAllUTurnsByButt(Angle, false).
+	 */
+	public SVGPath replaceAllUTurnsByButt(Angle angleEps) {
+		return replaceAllUTurnsByButt(angleEps, false);
+	}
+
+	/** 
+	 * Not finished
 	 * 
 	 * @param svgPath
 	 * @param distEps
 	 * @param angleEps
 	 * @return
 	 */
-	public SVGPath replaceAllUTurnsByButt(Angle angleEps) {
+	public SVGPath replaceAllUTurnsByButt(Angle angleEps, boolean extend) {
 		SVGPath path = null;
 		if (getSignature().contains(CC)) {
 			PathPrimitiveList primList = ensurePrimitives();
 			List<Integer> quadrantStartList = primList.getUTurnList(angleEps);
 			if (quadrantStartList.size() > 0) {
 				for (int quad = quadrantStartList.size() - 1; quad >= 0; quad--) {
-					primList.replaceUTurnsByButt(quadrantStartList.get(quad)/*, maxCapRadius*/);
+					primList.replaceUTurnsByButt(quadrantStartList.get(quad), extend/*, maxCapRadius*/);
 				}
 				path = new SVGPath(primList, this);
 				SVGUtil.setSVGXAttribute(path, ROUNDED_CAPS, REMOVED);
@@ -707,9 +742,10 @@ public class SVGPath extends SVGShape {
 	}
 
 	/** 
-	 * Creates a line from path with signature "MLLLL", MLLLLZ".
+	 * Creates a line from path with signature "MLLLL", "MLLLLZ".
+	 * <p>
+	 * Uses primitiveList.createLineFromMLLLL().
 	 * 
-	 * <p>uses primitiveList.createLineFromMLLLL().</p>
 	 * @param angleEps
 	 * @param maxWidth
 	 * @return null if line has wrong signature or is too wide or not antiParallel.
@@ -724,5 +760,4 @@ public class SVGPath extends SVGShape {
 		return line;
 	}
 	
-
 }

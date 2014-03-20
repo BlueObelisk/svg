@@ -8,13 +8,14 @@ import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGPathPrimitive;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-/** container and managed for primitives from an SVGPath.
+/** 
+ * Container and manager for primitives from an SVGPath.
  * 
  * @author pm286
- *
  */
 public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 
@@ -53,7 +54,7 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		for (int i = 1; i < nprim; i++) {
 			primitiveList.get(i).setFirstPoint(primitiveList.get(i-1).getLastCoord());
 		}
-		if (primitiveList.get(nprim-1) instanceof ClosePrimitive) {
+		if (primitiveList.get(nprim - 1) instanceof ClosePrimitive) {
 			if (nprim > 1) {
 				primitiveList.get(0).setFirstPoint(primitiveList.get(nprim-2).getLastCoord());
 			}
@@ -99,12 +100,12 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 			uTurn = true;
 		}
 		// are existing lines antiparallel?
-		if (!uTurn && isAntiParallel(i-1,  i+2, angleEps)) {
+		if (!uTurn && isAntiParallel(i - 1,  i + 2, angleEps)) {
 			uTurn = true;
 		}
 		// is it the last one? (this is -2 from end)
 		if (!uTurn &&  i == this.size() - 2 &&
-				isAntiParallel(i-1,  1, angleEps)) {
+				isAntiParallel(i - 1,  1, angleEps)) {
 			uTurn = true;
 		}
 		return uTurn;
@@ -162,18 +163,47 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		return quadStartList;
 	}
 
+	/**
+	 * @param quad
+	 * @deprecated Use replaceUTurnsByButt(int, false).
+	 */
 	public void replaceUTurnsByButt(int quad) {
-		//maybe test radius later
-		CubicPrimitive cubic1 = (CubicPrimitive) primitiveList.get(quad + 1);
-		Real2 point1 = cubic1.getLastCoord();
-		LinePrimitive linePrimitive = new LinePrimitive(point1);
+		replaceUTurnsByButt(quad, false);
+	}
+
+	public void replaceUTurnsByButt(int quad, boolean extend) {
+		LinePrimitive linePrimitive;
+		if (extend) {
+			CubicPrimitive cubic1 = (CubicPrimitive) primitiveList.get(quad);
+			Real2 endPoint = cubic1.getLastCoord();
+			Real2Array line1Coords = primitiveList.get(quad - 1).getCoordArray();
+			Real2 newLine1End = getLine(quad - 1).getNearestPointOnLine(endPoint);
+			line1Coords.setElement(line1Coords.size() - 1, newLine1End);
+			//Real2Array coordsLine2 = primitiveList.get(quad + 2).getCoordArray();
+			Real2 newLine2Start;
+			if (getLine(quad + 2) == null) {
+				newLine2Start = getLine(1).getNearestPointOnLine(endPoint);
+				Real2Array moveCoords = primitiveList.get(0).getCoordArray();
+				moveCoords.setElement(0, getLine(1).getNearestPointOnLine(endPoint));
+			} else {
+				newLine2Start = getLine(quad + 2).getNearestPointOnLine(endPoint);
+			}
+			//coordsLine2.setElement(coordsLine2.size() - 1, newLine2Start);
+			linePrimitive = new LinePrimitive(newLine2Start);
+		} else {
+			//maybe test radius later
+			CubicPrimitive cubic2 = (CubicPrimitive) primitiveList.get(quad + 1);
+			Real2 point = cubic2.getLastCoord();
+			linePrimitive = new LinePrimitive(point);
+		}
 		primitiveList.remove(quad + 1);
 		primitiveList.remove(quad);
 		primitiveList.add(quad, linePrimitive);
 		setFirstPoints();
 	}
 
-	/** interpret primitive as line if possible.
+	/** 
+	 * Interprets primitive as line if possible.
 	 * 
 	 * @param i must be > 0
 	 * @return line else null if i == 0
@@ -183,7 +213,7 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		if (i > 0) {
 			SVGPathPrimitive primitive = get(i);
 			if (primitive instanceof LinePrimitive) {
-				Real2 point0 = this.get(i - 1).getLastCoord();
+				Real2 point0 = get(i - 1).getLastCoord();
 				Real2 point1 = primitive.getFirstCoord();
 				line = new SVGLine(point0, point1);
 			}
@@ -304,8 +334,8 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 	private SVGLine createLineFromMidPoints(int i, int j) {
 		SVGLine linei = getLine(i);
 		SVGLine linej = getLine(j);
-		return (linei == null || linej == null) ? null : 
-			new SVGLine(linei.getMidPoint(), linej.getMidPoint());
+		return (linei == null || linej == null ? null : 
+			new SVGLine(linei.getMidPoint(), linej.getMidPoint()));
 	}
 
 	private boolean isShort(int i, double maxWidth) {
@@ -317,6 +347,10 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		SVGLine linei = getLine(i);
 		SVGLine linej = getLine(j);
 		return (linei == null || linej == null ? false : linei.isAntiParallelTo(linej, angleEps));
+	}
+	
+	public String toString() {
+		return Arrays.toString(primitiveList.toArray());
 	}
 
 }
