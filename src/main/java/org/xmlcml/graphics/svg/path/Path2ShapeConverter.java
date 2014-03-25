@@ -42,7 +42,7 @@ public class Path2ShapeConverter {
 	private static final double RECT_EPS = 0.01;
 	private static final double ROUNDED_BOX_EPS = 0.4;
 	
-	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.12, Units.RADIANS);
+	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.15, Units.RADIANS);
 	private static final double DEFAULT_MAX_WIDTH_FOR_PARALLEL = 2.0;
 	public static final Angle DEFAULT_MAX_ANGLE = new Angle(0.15, Units.RADIANS);
 	public static final Double DEFAULT_MAX_WIDTH = 2.0;
@@ -596,6 +596,10 @@ public class Path2ShapeConverter {
 	
 	private static List<String> splitAtMoveCommandsAndCreateNewDStrings(String d) {
 		List<String> strings = new ArrayList<String>();
+		if (d.equals("")) {
+			strings.add("");
+			return strings;
+		}
 		int current = -1;
 		while (true) {
 			int i = d.indexOf(SVGPathPrimitive.ABS_MOVE, current + 1);
