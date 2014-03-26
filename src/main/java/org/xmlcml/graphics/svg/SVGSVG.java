@@ -16,15 +16,16 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.Graphics2D;
+import java.io.File;
+import java.io.FileOutputStream;
+
 import nu.xom.Attribute;
 import nu.xom.Node;
+
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.xml.XMLConstants;
-
-import java.awt.*;
-import java.io.File;
-import java.io.FileOutputStream;
 
 /** container for SVG
  * "svg"
@@ -104,7 +105,9 @@ public class SVGSVG extends SVGElement {
 		svgsvg.setWidth(width);
 		try {
 			LOG.trace("Writing SVG "+file.getAbsolutePath());
-			SVGUtil.debug(svgsvg, new FileOutputStream(file), 1);
+			FileOutputStream fos = new FileOutputStream(file);
+			SVGUtil.debug(svgsvg, fos, 1);
+			fos.close();
 		} catch (Exception e) {
 			throw new RuntimeException("cannot write svg to "+file, e);
 		}
