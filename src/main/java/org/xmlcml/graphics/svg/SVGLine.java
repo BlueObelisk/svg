@@ -20,6 +20,7 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.Nodes;
+
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.*;
 import org.xmlcml.xml.XMLConstants;
@@ -81,6 +82,10 @@ public class SVGLine extends SVGShape {
 		this();
 		setXY(x1, 0);
 		setXY(x2, 1);
+		updateEuclidLine(x1, x2);
+	}
+
+	private void updateEuclidLine(Real2 x1, Real2 x2) {
 		euclidLine = new Line2(x1, x2);
 	}
 	
@@ -133,6 +138,10 @@ public class SVGLine extends SVGShape {
 		} else {
 			this.addAttribute(new Attribute(X+(serial+1), String.valueOf(x12.getX())));
 			this.addAttribute(new Attribute(Y+(serial+1), String.valueOf(x12.getY())));
+			if (euclidLine != null) {
+				euclidLine.setXY(x12, serial);
+			}
+
 		}
 	}
 	
@@ -157,6 +166,9 @@ public class SVGLine extends SVGShape {
 		} else {
 			this.addAttribute(new Attribute(X+serial, String.valueOf(x12.getX())));
 			this.addAttribute(new Attribute(Y+serial, String.valueOf(x12.getY())));
+			if (euclidLine != null) {
+				euclidLine.setXY(x12, serial);
+			}
 		}
 	}
 	
@@ -534,6 +546,39 @@ public class SVGLine extends SVGShape {
 
 	public Real2 getIntersection(SVGLine line) {
 		return (line == null ? null : this.getEuclidLine().getIntersection(line.getEuclidLine()));
+	}
+
+	/** create set of concatenated lines.
+	 * 
+	 * @param points
+	 * @param close if true create line (n-1)->0
+	 * @return
+	 */
+	public static SVGG plotPointsAsTouchingLines(List<Real2> points, boolean close) {
+		SVGG g = new SVGG();
+		for (int i = 0; i < points.size() - 1; i++) {
+			SVGLine line = new SVGLine(points.get(i), points.get((i + 1)));
+			g.appendChild(line);
+		}
+		if (close) {
+			g.appendChild(new SVGLine(points.get(points.size() - 1), points.get(0)));
+		}
+		return g;
+	}
+
+	public static Real2Array extractPoints(List<SVGLine> lines, double eps) {
+		Real2Array points = new Real2Array();
+		Real2 lastPoint = null;
+		for (SVGLine line : lines) {
+			Real2 p0 = line.getXY(0);
+			if (lastPoint != null && !p0.isEqualTo(lastPoint, eps)) {
+				points.add(p0);
+			}
+			Real2 p1 = line.getXY(1);
+			points.add(p1);
+			lastPoint = p1;
+		}
+		return points;
 	}
 
 }
