@@ -1,6 +1,12 @@
 package org.xmlcml.graphics.svg;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
+
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.FilenameUtils;
 
 import nu.xom.Element;
 
@@ -78,6 +84,19 @@ public class Fixtures {
 	public static final File IMAGE_2_13_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg");
 	public static final File IMAGE_2_11_NO2_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.11.no2.svg");
 
+	public static void writeImageQuietly(BufferedImage image, File file) {
+		if (image == null) {
+			throw new RuntimeException("Cannot write null image: "+file);
+		}
+		try {
+			// DONT EDIT!
+			String type = FilenameUtils.getExtension(file.getName());
+			file.getParentFile().mkdirs();
+			ImageIO.write(image, type, new FileOutputStream(file));
+		} catch (Exception e) {
+			throw new RuntimeException("cannot write image "+file, e);
+		}
+	}
 
 
 }

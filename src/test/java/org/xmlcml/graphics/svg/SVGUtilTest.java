@@ -63,7 +63,7 @@ public class SVGUtilTest {
 		g2d.setColor(Color.RED);
 		g2d.setTransform(affineTransform);
 		g2d.drawString("ABC", 10, 20);
-		ImageIO.write(img, "png", new File("target/affine2.png"));
+		Fixtures.writeImageQuietly(img,  new File("target/affine2.png"));
 	}
 	
 	@Test
@@ -77,14 +77,14 @@ public class SVGUtilTest {
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = (Graphics2D) img.getGraphics();
 		svgG.draw(g2d);
-		ImageIO.write(img, "png", new File("target/rect0.png"));
+		Fixtures.writeImageQuietly(img, new File("target/rect0.png"));
 		Transform2 transform2 = new Transform2(new Vector2(20., -70.));
 //		Transform2 transform2 = new Transform2(new Angle(0.2));
 		svgG.setTransform(transform2);
 		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		g2d = (Graphics2D) img.getGraphics();
 		svgG.draw(g2d);
-		ImageIO.write(img, "png", new File("target/rect1.png"));
+		Fixtures.writeImageQuietly(img, new File("target/rect1.png"));
 	}
 
 	

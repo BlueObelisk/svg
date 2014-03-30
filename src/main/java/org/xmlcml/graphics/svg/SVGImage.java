@@ -240,12 +240,9 @@ public class SVGImage extends SVGShape {
 		LOG.trace("format "+format);
 		format = SVGImage.PNG;
 		try {
-//			boolean ok = ImageIO.write(bufferedImage, imageType, baos);
 			boolean ok = ImageIO.write(bufferedImage, format, baos);
 			if (!ok) {
 				throw new RuntimeException("ImageIO: Cannot convert bufferedImage to ByteArrayOutputStream for type: "+imageType+" / "+bufferedImage);
-//				throw new RuntimeException("ImageIO: Cannot convert bufferedImage to ByteArrayOutputStream for type: "+imageType+" / "+bufferedImage);
-//				return null;
 			}
 			baos.close();
 		} catch (IOException e) {
@@ -358,14 +355,6 @@ public class SVGImage extends SVGShape {
 			throw new RuntimeException("ImageIO unknown mimeType: "+mimeType);
 		}
 	}
-
-//	private static boolean writeByImageIO(BufferedImage bufferedImage,
-//			String mimeType, File file) throws IOException {
-//		boolean ok;
-//		String informalFormat = mimeType.startsWith("image/") ? mimeType.substring("image/".length()): mimeType;
-//		ok = ImageIO.write(bufferedImage, informalFormat, file);
-//		return ok;
-//	}
 
 	private static void writeByWriter(BufferedImage bufferedImage,
 			String mimeType, FileOutputStream fos) throws IOException {

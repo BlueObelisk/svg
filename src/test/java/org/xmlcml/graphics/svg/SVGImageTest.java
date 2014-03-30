@@ -138,7 +138,7 @@ public class SVGImageTest {
 		BufferedImage targetBufferedImage = readBufferedImage(Fixtures.PLOTS1_BMP);
 		WritableRaster cc0Raster = readRaster(Fixtures.CC0_SVG);
 		overpaint(targetBufferedImage, cc0Raster);
-		outputImage(targetBufferedImage, SVGImage.PNG, Fixtures.PLOTS_CC0_PNG);
+		Fixtures.writeImageQuietly(targetBufferedImage, Fixtures.PLOTS_CC0_PNG);
 	}
 
 	@Test
@@ -147,7 +147,7 @@ public class SVGImageTest {
 		try {
 			WritableRaster cc0Raster = readRaster(Fixtures.PUBDOM_PNG);
 			overpaint(targetBufferedImage, cc0Raster);
-			outputImage(targetBufferedImage, SVGImage.PNG, Fixtures.PLOTS_PUBDOM_PNG);
+			Fixtures.writeImageQuietly(targetBufferedImage, Fixtures.PLOTS_PUBDOM_PNG);
 		} catch (Exception e) {
 			LOG.error("Cannot read - maybe flaky call to ImageIO - have to ignore "+e);
 		}
@@ -159,7 +159,7 @@ public class SVGImageTest {
 		try {
 			WritableRaster cc0Raster = readRaster(Fixtures.PUBDOM_PNG);
 			overpaint(targetBufferedImage, cc0Raster);
-			outputImage(targetBufferedImage, SVGImage.PNG, Fixtures.MONOCHROME2PUBDOM_PNG);
+			Fixtures.writeImageQuietly(targetBufferedImage, Fixtures.MONOCHROME2PUBDOM_PNG);
 		} catch (Exception e) {
 			LOG.error("Cannot read - maybe flaky call to ImageIO - have to ignore "+e);
 		}
@@ -175,7 +175,7 @@ public class SVGImageTest {
 			BufferedImage targetBufferedImage = readBufferedImage(is);
 			WritableRaster cc0Raster = readRaster(Fixtures.CCBY_PNG);
 			overpaint(targetBufferedImage, cc0Raster);
-			outputImage(targetBufferedImage, SVGImage.PNG, Fixtures.FIGSHARE1138891_PNG);
+			Fixtures.writeImageQuietly(targetBufferedImage, Fixtures.FIGSHARE1138891_PNG);
 		} catch (IOException e) {
 			// couldn't connect
 		}
@@ -188,7 +188,7 @@ public class SVGImageTest {
 			BufferedImage targetBufferedImage = readBufferedImage(fis);
 			WritableRaster cc0Raster = readRaster(Fixtures.PUBDOM_PNG);
 			overpaint(targetBufferedImage, cc0Raster);
-			outputImage(targetBufferedImage, SVGImage.PNG, Fixtures.MONOCHROME2PUBDOM_STREAM_PNG);
+			Fixtures.writeImageQuietly(targetBufferedImage, Fixtures.MONOCHROME2PUBDOM_STREAM_PNG);
 		} catch (Exception e) {
 			LOG.error("Cannot read - maybe flaky call to ImageIO - have to ignore "+e);
 		}
@@ -199,7 +199,7 @@ public class SVGImageTest {
 		BufferedImage targetBufferedImage = readBufferedImage(Fixtures.MONOCHROME2_PNG);
 		WritableRaster cc0Raster = readRaster(Fixtures.PMRCC0_PNG_);
 		overpaint(targetBufferedImage, cc0Raster);
-		outputImage(targetBufferedImage, SVGImage.PNG, Fixtures.MONOCHROME2PMRCC0_PNG);
+		Fixtures.writeImageQuietly(targetBufferedImage, Fixtures.MONOCHROME2PMRCC0_PNG);
 	}
 
 	@Test
@@ -210,7 +210,7 @@ public class SVGImageTest {
 		WritableRaster cc0Raster = readRasterText("CC0 Peter Murray-Rust", 
 				Fixtures.PMRCC0_PNG_.toString(), height);
 		overpaint(targetBufferedImage, cc0Raster);
-		outputImage(targetBufferedImage, SVGImage.PNG, Fixtures.MONOCHROME2TEXT_PNG);
+		Fixtures.writeImageQuietly(targetBufferedImage, Fixtures.MONOCHROME2TEXT_PNG);
 	}
 
 	@Test
@@ -387,24 +387,7 @@ public class SVGImageTest {
 
 	private void outputImage(BufferedImage bufferedImage, String filename, String type) {
 		File file = new File(filename);
-		outputImage(bufferedImage, type, file);
-	}
-
-	private void outputImage(BufferedImage bufferedImage, String type, File file) {
-		try {
-			FileOutputStream fos = new FileOutputStream(file);
-			outputImage(bufferedImage, type, fos);
-			fos.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Cannot write "+type, e);
-		}
-	}
-
-	public void outputImage(BufferedImage bufferedImage, String type,
-			FileOutputStream fos) throws IOException {
-		if (!ImageIO.write(bufferedImage, type, fos)) {
-			throw new RuntimeException("Failed to find writer for "+type);
-		}
+		Fixtures.writeImageQuietly(bufferedImage, file);
 	}
 
 	private void transformPixels(File inputFile, String outputFile, String method) throws IOException {
@@ -467,15 +450,5 @@ public class SVGImageTest {
 		BufferedImage bufferedImage = new BufferedImage(cols, rows, BufferedImage.TYPE_BYTE_GRAY);
 		return bufferedImage;
 	}
-	
-	/*private BufferedImage makeCanny(InputStream is) throws IOException {
-		BufferedImage bufferedImage = ImageIO.read(is);
-		CannyEdgeDetector detector = new CannyEdgeDetector();
-		return detector.transformBufferedImage(bufferedImage, 0.1f, 0.5f);
-	}
-	
-	private BufferedImage makeCanny(File file) throws IOException {
-		return makeCanny(new FileInputStream(file));
-	}*/
 	
 }
