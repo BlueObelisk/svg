@@ -33,7 +33,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/** draws a straight line.
+/** 
+ * Represents a collection of straight lines.
  * 
  * @author pm286
  *
@@ -55,7 +56,6 @@ public abstract class SVGPoly extends SVGShape {
 	public final static List<String> SVG_ATTS = Arrays.asList(
             POINTS);
 	
-	
 	protected Real2Array real2Array;
 	protected List<SVGLine> lineList;
 	protected List<SVGMarker> markerList;
@@ -64,19 +64,22 @@ public abstract class SVGPoly extends SVGShape {
 	protected Boolean isBox;
 	protected Boolean isAligned = null;
 
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPoly(String name) {
 		super(name);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPoly(SVGElement element) {
         super(element);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPoly(Element element) {
         super((SVGElement) element);
@@ -91,8 +94,9 @@ public abstract class SVGPoly extends SVGShape {
 		line.setStroke("black");
 		line.setStrokeWidth(1.0);
 	}
+	
     /**
-     * copy node .
+     * Copies node.
      *
      * @return Node
      */
@@ -119,23 +123,23 @@ public abstract class SVGPoly extends SVGShape {
 	public Real2Array getReal2Array() {
 		if (real2Array == null) {
 			real2Array = Real2Array.createFromPairs(
-					this.getAttributeValue("points"), XMLConstants.S_COMMA+S_PIPE+S_SPACE);
+					getAttributeValue("points"), XMLConstants.S_COMMA+S_PIPE+S_SPACE);
 		}
 		return real2Array;
 	}
 	
 	
-//  <g style="stroke-width:0.2;">
-//  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="black" style="stroke-width:0.36;"/>
-//  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="white" style="stroke-width:0.12;"/>
-//</g>
+	/*<g style="stroke-width:0.2;">
+	  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="black" style="stroke-width:0.36;"/>
+	  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="white" style="stroke-width:0.12;"/>
+	</g>*/
 
 	protected abstract void drawElement(Graphics2D g2d);
 
 	public void applyAttributes(Graphics2D g2d) {
 		if (g2d != null) {
-			double width = this.getStrokeWidth();
-			Stroke s = new BasicStroke((float)width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+			double width = getStrokeWidth();
+			Stroke s = new BasicStroke((float) width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 			g2d.setStroke(s);
 			super.applyAttributes(g2d);
 		}
@@ -212,7 +216,8 @@ public abstract class SVGPoly extends SVGShape {
     }
  	
     /**
-     * inspects if all values along axis increase or decrease monotonically
+     * Inspects if all values along axis increase or decrease monotonically
+     * 
      * @param axis (null returns null)
      * @return {@link Monotonicity} null if not monotonic or only one value
      */
@@ -220,21 +225,22 @@ public abstract class SVGPoly extends SVGShape {
     	Monotonicity monotonicity = null;
     	if (axis != null) {
 	    	Real2Array real2Array = getReal2Array(); 
-	    	RealArray realArray = (axis.equals(Axis2.X)) ? real2Array.getXArray() : real2Array.getYArray();
+	    	RealArray realArray = (axis.equals(Axis2.X) ? real2Array.getXArray() : real2Array.getYArray());
 	    	monotonicity = realArray.getMonotonicity();
     	}
     	return monotonicity;
     }
     
     public void clearMonotonicities() {
-    	this.removeAttribute(this.getAttribute(MONOTONIC+Axis2.X));
-    	this.removeAttribute(this.getAttribute(MONOTONIC+Axis2.Y));
+    	removeAttribute(getAttribute(MONOTONIC+Axis2.X));
+    	removeAttribute(getAttribute(MONOTONIC+Axis2.Y));
     }
     
     public void addMonotonicityAttributes() {
-		this.addMonotonicity(Axis2.X);
-		this.addMonotonicity(Axis2.Y);
+		addMonotonicity(Axis2.X);
+		addMonotonicity(Axis2.Y);
     }
+    
 	/**
 	 * @param polyline
 	 * @param axis
@@ -242,29 +248,38 @@ public abstract class SVGPoly extends SVGShape {
 	private void addMonotonicity(Axis2 axis) {
 		Monotonicity mono = this.getMonotonicity(axis);
 		if (mono != null) {
-			this.addAttribute(new Attribute(MONOTONIC+axis, String.valueOf(mono)));
+			addAttribute(new Attribute(MONOTONIC+axis, String.valueOf(mono)));
 		}
 	}
 	
-	/** property of graphic bounding box
-	 * can be overridden
+	/** 
+	 * Property of graphic bounding box
+	 * <p>
+	 * Can be overridden
+	 * 
 	 * @return default none
 	 */
 	protected String getBBFill() {
 		return "none";
 	}
 
-	/** property of graphic bounding box
-	 * can be overridden
+	/** 
+	 * Property of graphic bounding box
+	 * <p>
+	 * Can be overridden
+	 * 
 	 * @return default red
 	 */
 	protected String getBBStroke() {
 		return "red";
 	}
 
-	/** property of graphic bounding box
-	 * can be overridden
-	 * @return default 0.5
+	/** 
+	 * Property of graphic bounding box
+	 * <p>
+	 * Can be overridden
+	 * 
+	 * @return default 0.3
 	 */
 	protected double getBBStrokeWidth() {
 		return 0.3;
@@ -300,7 +315,7 @@ public abstract class SVGPoly extends SVGShape {
 			if (pointsAtt != null) {
 				real2Array = Real2Array.createFromPairs(pointsAtt.getValue(), XMLConstants.S_SPACE);
 			}
-			String id = this.getId();
+			String id = getId();
 			lineList = new ArrayList<SVGLine>();
 			markerList = new ArrayList<SVGMarker>();
 			SVGMarker lastPoint = new SVGMarker(real2Array.get(0));
@@ -325,10 +340,11 @@ public abstract class SVGPoly extends SVGShape {
 		return lineList;
 	}
 	
-	/** iterates over all polys and extracts lines.
+	/** 
+	 * Iterates over all polys and extracts lines.
 	 * <p>
-	 * uses poly.createLineList()
-	 * </p>
+	 * Uses poly.createLineList().
+	 * 
 	 * @param polyList list of polys
 	 * @return
 	 */
@@ -340,14 +356,21 @@ public abstract class SVGPoly extends SVGShape {
 		}
 		return lineList;
 	}
-
-
+	
+	protected void copyNonSVGAttributesFrom(Element element) {
+		for (int i = 0; i < element.getAttributeCount(); i++) {
+			Attribute attribute = element.getAttribute(i);
+			if (!SVG_ATTS.contains(attribute.getLocalName())) {
+				addAttribute((Attribute) attribute.copy());
+			}
+		}
+	}
 	
 	protected void copyNonSVGAttributes(SVGPoly svgPoly, SVGLine line) {
 		for (int i = 0; i < svgPoly.getAttributeCount(); i++) {
 			Attribute attribute = svgPoly.getAttribute(i);
 			if (!SVG_ATTS.contains(attribute.getLocalName())) {
-				line.addAttribute((Attribute)attribute.copy());
+				line.addAttribute((Attribute) attribute.copy());
 			}
 		}
 	}
