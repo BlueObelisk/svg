@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.ParentNode;
@@ -31,10 +32,10 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.xml.XMLUtil;
 
-/** draws a straight line.
+/** 
+ * Represents a collection of straight lines (not implicitly closed).
  * 
  * @author pm286
- *
  */
 public class SVGPolyline extends SVGPoly {
 
@@ -50,14 +51,16 @@ public class SVGPolyline extends SVGPoly {
 	
 	public final static String TAG ="polyline";
 
-	/** constructor
+	/** 
+	 * Constructor.
 	 */
 	public SVGPolyline() {
 		super(TAG);
 		init();
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor.
 	 */
 	public SVGPolyline(SVGLine line) {
         this();
@@ -73,14 +76,14 @@ public class SVGPolyline extends SVGPoly {
 	}
 	
 	/** 
-	 * Constructor
+	 * Constructor.
 	 */
 	public SVGPolyline(SVGElement element) {
         super(element);
 	}
 	
 	/** 
-	 * Constructor
+	 * Constructor.
 	 */
 	public SVGPolyline(Element element) {
         super((SVGElement) element);
@@ -99,7 +102,7 @@ public class SVGPolyline extends SVGPoly {
 	}
 	
     /**
-     * Copy node.
+     * Copies node.
      *
      * @return Node
      */
@@ -107,7 +110,8 @@ public class SVGPolyline extends SVGPoly {
         return new SVGPolyline(this);
     }
 
-	/** pass polyline or convert line.
+	/** 
+	 * Passes polyline or converts line.
 	 * 
 	 * @param element
 	 * @return
@@ -123,7 +127,9 @@ public class SVGPolyline extends SVGPoly {
 		return polyline;
 	}
 
-	/** get tag.
+	/** 
+	 * Gets tag.
+	 * 
 	 * @return tag
 	 */
 	public String getTag() {
@@ -135,7 +141,8 @@ public class SVGPolyline extends SVGPoly {
 		super.drawPolylineOrGon(g2d, false);
 	}
 	
-	/** pass polyline or convert line.
+	/** 
+	 * Passes polyline or converts line.
 	 * 
 	 * @param element
 	 * @return
@@ -152,8 +159,10 @@ public class SVGPolyline extends SVGPoly {
 		return polyline;
 	}
 
-	/** creates a polyline IFF consists of a M(ove) followed by one or
-	 * more L(ines)
+	/** 
+	 * Creates a polyline IFF consists of a M(ove) followed by one or
+	 * more L(ines).
+	 * 
 	 * @param element
 	 * @return null if not transformable into a Polyline
 	 */
@@ -180,9 +189,13 @@ public class SVGPolyline extends SVGPoly {
 		return newList;
 	}
 
-	/** appends poly1 to poly0.
-	 * does not duplicate common element
-	 * copy semantics
+	/** 
+	 * Appends poly1 to poly0.
+	 * <p>
+	 * Does not duplicate common element.
+	 * <p>
+	 * Copy semantics.
+	 * 
 	 * @param poly0 not changed
 	 * @param poly1 not changed
 	 * @param eps
@@ -206,11 +219,11 @@ public class SVGPolyline extends SVGPoly {
 
 	public SVGLine createSingleLine() {
 		createLineList();
-		return lineList.size() == 1 ? lineList.get(0) : null;
+		return (lineList.size() == 1 ? lineList.get(0) : null);
 	}
 	
-	/** is polyline aligned with axes?
-	 * 
+	/** 
+	 * Is polyline aligned with axes?
 	 */
 	public Boolean isAlignedWithAxes(double epsilon) {
 		if (isAligned  == null) {
@@ -264,7 +277,8 @@ public class SVGPolyline extends SVGPoly {
 		markerList.add(marker);
 	}
 
-	/** split polyline at given position.
+	/** 
+	 * Split polyline at given position.
 	 * 
 	 * @param splitPosition
 	 * @return
@@ -299,8 +313,8 @@ public class SVGPolyline extends SVGPoly {
 		return newPolyline;
 	}
 	
-	/** alters direction of line MODIFIES THIS
-	 * 
+	/** 
+	 * Alters direction of line. MODIFIES THIS.
 	 */
 	public void reverse() {
 		Real2Array r2a = this.getReal2Array();
@@ -311,8 +325,8 @@ public class SVGPolyline extends SVGPoly {
 	@Override
 	public void setReal2Array(Real2Array r2a) {
 		super.setReal2Array(r2a);
-//		lineList = null;
-//		pointList = null;
+		//lineList = null;
+		//pointList = null;
 	}
 	
 	public SVGPolygon createPolygon(double eps) {
@@ -326,9 +340,11 @@ public class SVGPolyline extends SVGPoly {
 				Real2Array real2Array1 = new Real2Array(real2Array);
 				real2Array1.deleteElement(real2Array.size() - 1);
 				polygon = new SVGPolygon(real2Array1);
-			} else if (this.isClosed()) {
+				polygon.copyNonSVGAttributesFrom(this);
+			} else if (isClosed()) {
 				Real2Array real2Array1 = new Real2Array(real2Array);
 				polygon = new SVGPolygon(real2Array1);
+				polygon.copyNonSVGAttributesFrom(this);
 			}
 		}
 		return polygon;
@@ -364,7 +380,8 @@ public class SVGPolyline extends SVGPoly {
 		return duplicate;
 	}
 
-	/** makes a new list composed of the polylines in the list
+	/** 
+	 * Makes a new list composed of the polylines in the list.
 	 * 
 	 * @param elements
 	 * @return
@@ -379,7 +396,8 @@ public class SVGPolyline extends SVGPoly {
 		return polylineList;
 	}
 	
-	/** convenience method to extract list of svgTexts in element
+	/** 
+	 * Convenience method to extract list of svgTexts in element.
 	 * 
 	 * @param svgElement
 	 * @return
@@ -389,10 +407,11 @@ public class SVGPolyline extends SVGPoly {
 	}
 
 
-	/** appends points in polyline into this
-	 * 'start' allows for skipping common point(s) 
+	/** 
+	 * Appends points in polyline into this.
+	 * 
 	 * @param polyline
-	 * @param start point in polyline to start at
+	 * @param start point in polyline to start at; allows for skipping common point(s)
 	 */
 	public void appendIntoSingleLine(SVGPoly polyline, int start) {
 		Real2Array r2a = polyline.real2Array;
@@ -405,11 +424,11 @@ public class SVGPolyline extends SVGPoly {
 		createMarkerList();
 	}
 
-	/** replaces polyline by its split SVGLines.
-	 *  
-	 *  <p>
-	 *  inserts new lines at old position of polyline
-	 *  </p>
+	/** 
+	 * Replaces polyline by its split SVGLines.
+	 * <p>
+	 * Inserts new lines at old position of polyline.
+	 * 
 	 * @param polyline
 	 */
 	public static void replacePolyLineBySplitLines(SVGPoly polyline) {
@@ -424,7 +443,8 @@ public class SVGPolyline extends SVGPoly {
 		}
 	}
 
-	/** number of lines.
+	/** 
+	 * Number of lines.
 	 * 
 	 * @return
 	 */
