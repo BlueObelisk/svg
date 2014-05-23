@@ -25,9 +25,9 @@
         </license>
     </licenses>
     <scm>
-        <url>https://bitbucket.org/petermr/svg/src</url>
-        <connection>scm:hg:http://bitbucket.org/petermr/svg</connection>
-        <developerConnection>scm:hg:https://bitbucket.org/petermr/svg</developerConnection>
+        <url>https://bitbucket.org/wwmm/svg/src</url>
+        <connection>scm:hg:http://bitbucket.org/wwmm/svg</connection>
+        <developerConnection>scm:hg:https://bitbucket.org/wwmm/svg</developerConnection>
     </scm>
 
     <developers>
