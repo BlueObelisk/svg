@@ -16,48 +16,49 @@
 
 package org.xmlcml.graphics.svg;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Range;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-
-
-/** grouping element
+/** 
+ * Grouping element
  * 
  * @author pm286
- *
  */
 public class SVGG extends SVGElement {
+	
 	@SuppressWarnings("unused")
 	private static Logger LOG = Logger.getLogger(SVGG.class);
 
 	public final static String TAG ="g";
-	/** constructor
+	public final static String ALL_G_XPATH = ".//svg:g";
+	
+	/** 
+	 * Constructor
 	 */
 	public SVGG() {
 		super(TAG);
 	}
 
 	public SVGG(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGG(Element element) {
         super((SVGElement) element);
 	}
 	
     /**
-     * copy node .
+     * Copy node
      *
      * @return Node
      */
@@ -80,30 +81,28 @@ public class SVGG extends SVGElement {
 	}
 
 	/**
-	 * 
 	 * @param width
 	 */
 	public void setWidth(double width) {
-		this.addAttribute(new Attribute("width", ""+width+"px"));
+		addAttribute(new Attribute("width", String.valueOf(width)+"px"));
 	}
 
 	/**
-	 * 
 	 * @param height
 	 */
 	public void setHeight(double height) {
-		this.addAttribute(new Attribute("height", ""+height+"px"));
+		addAttribute(new Attribute("height", String.valueOf(height)+"px"));
 	}
 
 	/**
-	 * 
 	 * @param scale
 	 */
 	public void setScale(double scale) {
-		this.addAttribute(new Attribute("transform", "scale("+scale+","+scale+")"));
+		addAttribute(new Attribute("transform", "scale("+scale+","+scale+")"));
 	}
 	
-	/** traverse all children recursively
+	/** 
+	 * Traverse all children recursively
 	 * 
 	 * @return null by default
 	 */
@@ -114,7 +113,8 @@ public class SVGG extends SVGElement {
 		return boundingBox;
 	}
 
-	/** makes a new list composed of the gs in the list
+	/** 
+	 * Makes a new list composed of the SVGGs in the list
 	 * 
 	 * @param elements
 	 * @return
@@ -128,7 +128,38 @@ public class SVGG extends SVGElement {
 		}
 		return gList;
 	}
+	
+	/** 
+	 * Convenience method to extract list of SVGGs in element
+	 * 
+	 * @param svgElement
+	 * @return
+	 */
+	public static List<SVGG> extractSelfAndDescendantGs(SVGElement svgElement) {
+		return SVGG.extractGs(SVGUtil.getQuerySVGElements(svgElement, ALL_G_XPATH));
+	}
 
+	public void copyElementsFrom(List<? extends SVGElement> elementList) {
+		if (elementList != null) {
+			for (SVGElement element : elementList) {
+				this.appendChild(SVGElement.readAndCreateSVG(element));
+			}
+		}
+	}
 
+	/** 
+	 * Convenience method to return the SVGG (&lt;g&gt;) indicated by the path
+	 * 
+	 * @param svgFile
+	 * @param xPath (returns a list)
+	 * @param index in list (Java counting from 0, not XPath)
+	 * @return null if not found
+	 */
+	public final static SVGG createSVGGChunk(File svgFile, String xPath, int index) {
+		SVGElement svgElement = SVGElement.readAndCreateSVG(svgFile);
+		List<SVGElement> elementList = SVGG.generateElementList(svgElement, xPath);
+		SVGG graphic = (elementList.size() == 0) ? null : (SVGG) elementList.get(index);
+		return graphic;
+	}
 
 }

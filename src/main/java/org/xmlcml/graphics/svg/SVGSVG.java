@@ -19,15 +19,13 @@ package org.xmlcml.graphics.svg;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.List;
 
 import nu.xom.Attribute;
 import nu.xom.Node;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
-import org.xmlcml.cml.base.CMLUtil;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.xml.XMLConstants;
 
 /** container for SVG
  * "svg"
@@ -52,7 +50,7 @@ public class SVGSVG extends SVGElement {
 	/** constructor
 	 */
 	public SVGSVG(SVGSVG element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
     /**
@@ -72,14 +70,8 @@ public class SVGSVG extends SVGElement {
 		return TAG;
 	}
 
-	/** just draw first g element
-	 * 
-	 */
 	protected void drawElement(Graphics2D g2d) {
-		if (this.getChildElements().size() > 0) {
-			SVGElement g = (SVGElement) this.getChildElements().get(0);
-			g.drawElement(g2d);
-		}
+		super.drawElement(g2d);
 	}
 	
 	public void setId(String id) {
@@ -90,18 +82,40 @@ public class SVGSVG extends SVGElement {
 		return this.getAttributeValue("id");
 	}
 
-	public static SVGSVG wrapAndWriteAsSVG(SVGG svgg, File file) {
+	/** defaults to heigh=800 width=700.
+	 * 
+	 * */
+	public static SVGSVG wrapAndWriteAsSVG(SVGElement svgg, File file) {
+		return wrapAndWriteAsSVG(svgg, file, 800.0, 700.0);
+	}
+	
+	/**	creates an SVGSVG wrapper for any element and outputs to file.
+	 * 
+	 *   <p>mainly for debugging.</p>
+	 *   
+	 * @param svgg
+	 * @param file
+	 * @param height
+	 * @param width
+	 * @return
+	 */
+	public static SVGSVG wrapAndWriteAsSVG(SVGElement svgg, File file, double height, double width) {
 		SVGSVG svgsvg = wrapAsSVG(svgg);
+		svgsvg.setHeight(height);
+		svgsvg.setWidth(width);
 		try {
 			LOG.trace("Writing SVG "+file.getAbsolutePath());
-			CMLUtil.debug(svgsvg, new FileOutputStream(file), 1);
+			file.getParentFile().mkdirs();
+			FileOutputStream fos = new FileOutputStream(file);
+			SVGUtil.debug(svgsvg, fos, 1);
+			fos.close();
 		} catch (Exception e) {
 			throw new RuntimeException("cannot write svg to "+file, e);
 		}
 		return svgsvg;
 	}
 
-	public static SVGSVG wrapAsSVG(SVGG svgg) {
+	public static SVGSVG wrapAsSVG(SVGElement svgg) {
 		if (svgg.getParent() != null) {
 			svgg.detach();
 		}
@@ -111,7 +125,7 @@ public class SVGSVG extends SVGElement {
 	}
 
 	public static String createFileName(String id) {
-		return id + CMLConstants.S_PERIOD+svgSuffix ;
+		return id + XMLConstants.S_PERIOD+svgSuffix ;
 	}
 
 	public void setDur(Double d) {

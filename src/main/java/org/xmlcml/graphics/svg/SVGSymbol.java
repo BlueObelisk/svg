@@ -16,15 +16,8 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Graphics2D;
-import java.util.ArrayList;
-
 import nu.xom.Element;
 import nu.xom.Node;
-
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.Transform2;
 
 /** supports use/symbol
   <defs>

@@ -1,50 +1,64 @@
 package org.xmlcml.graphics.svg;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
+import nu.xom.*;
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.*;
+import org.xmlcml.graphics.svg.fonts.FontWidths;
+import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.Nodes;
-import nu.xom.Text;
-
-import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
-import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.EuclidConstants;
-import org.xmlcml.euclid.Real;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealSquareMatrix;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.euclid.Util;
-import org.xmlcml.euclid.Vector2;
-
-/** draws text.
+/** 
+ * Draws text.
  * 
- * NOTE: Text can be rotated and the additonal fields manage some of the
- * metrics for this. Still very experimental
+ * NOTE: text can be rotated and the additional fields manage some of the
+ * metrics for this. Still very experimental.
  * 
  * @author pm286
- *
  */
 public class SVGText extends SVGElement {
-	private static Logger LOG = Logger.getLogger(SVGText.class);
-	
 
+	private static final String X = "x";
+
+	private static Logger LOG = Logger.getLogger(SVGText.class);
+
+	// just in case there is a scaling problem
+	private static final double _SVG2AWT_FONT_SCALE = 1.0;
+	
 	public final static String TAG ="text";
 	
-    public static String SUB0 = CMLConstants.S_UNDER+CMLConstants.S_LCURLY;
-    public static String SUP0 = CMLConstants.S_CARET+CMLConstants.S_LCURLY;
-    public static String SUB1 = CMLConstants.S_RCURLY+CMLConstants.S_UNDER;
-    public static String SUP1 = CMLConstants.S_RCURLY+CMLConstants.S_CARET;
+    public static String SUB0 = XMLConstants.S_UNDER+XMLConstants.S_LCURLY;
+    public static String SUP0 = XMLConstants.S_CARET+XMLConstants.S_LCURLY;
+    public static String SUB1 = XMLConstants.S_RCURLY+XMLConstants.S_UNDER;
+    public static String SUP1 = XMLConstants.S_RCURLY+XMLConstants.S_CARET;
     
     public final static Double DEFAULT_FONT_WIDTH_FACTOR = 10.0;
     public final static Double MIN_WIDTH = 0.001; // useful for non printing characters
-    
+	private final static Double SCALE1000 = 0.001; // width multiplied by 1000
+
+	public final static String ALL_TEXT_XPATH = ".//svg:text";
+
+	private static final String BOLD = "bold";
+	private static final String ITALIC = "italic";
+
+	public static final String FONT_NAME = "fontName";
+	public static final String WIDTH = "width";
+
+	/** 
+	 * Rough average of width of "n" 
+	 */
+	private static final Double N_SPACE = 0.55;
+	public static final Double SPACE_FACTOR = 0.1; //extra space that denotes a space
+	private Double SPACE_WIDTH1000 = /*274.0*/ 200.;
+	public final static Double DEFAULT_SPACE_FACTOR = 0.05;
+
+	private static final double MIN_FONT_SIZE = 0.01;
+
+	private static final Double DEFAULT_CHARACTER_WIDTH = 500.0;
+
 	// these are all when text is used for concatenation, etc.
 	private double estimatedHorizontallength = Double.NaN; 
 	private double currentFontSize = Double.NaN;
@@ -54,15 +68,19 @@ public class SVGText extends SVGElement {
 	private List<SVGTSpan> tspans;
 
 	private FontWeight fontWeight;
+	private Double widthOfFirstCharacter;
+	private Double heightOfFirstCharacter;
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGText() {
 		super(TAG);
 		init();
 	}
 	
-	/** constructor.
+	/** 
+	 * Constructor
 	 * 
 	 * @param xy
 	 * @param text
@@ -77,7 +95,8 @@ public class SVGText extends SVGElement {
 		setText(text);
 	}
 
-	/** constructor.
+	/** 
+	 * Constructor.
 	 * 
 	 * @param xy
 	 * @param text
@@ -96,24 +115,24 @@ public class SVGText extends SVGElement {
 		estimatedHorizontallength = Double.NaN; 
 		currentBaseY = Double.NaN;
 		calculatedTextEndCoordinate = Double.NaN;
-		this.setBoundingBoxCached(false);
+		setBoundingBoxCached(false);
 	}
 
-	public static void setDefaultStyle(SVGText text) {
+	public static void setDefaultStyle(SVGElement text) {
 		text.setStroke("none");
 		text.setFontSize(1.0);
 	}
 	
 	/** constructor
 	 */
-	public SVGText(SVGText element) {
-        super((SVGElement) element);
+	public SVGText(SVGElement element) {
+        super(element);
 	}
 	
 	/** constructor
 	 */
-	protected SVGText(SVGText element, String tag) {
-        super((SVGElement) element, tag);
+	protected SVGText(SVGElement element, String tag) {
+        super(element, tag);
 	}
 	
 	/** constructor
@@ -140,43 +159,62 @@ public class SVGText extends SVGElement {
         return new SVGText(this, TAG);
     }
 
-    public double getX() {
-    	String s = this.getAttributeValue("x");
-    	return (s != null) ? new Double(s).doubleValue()  : 0.0;
+    @Override
+    public Double getX() {
+    	Double x = null;
+    	String s = this.getAttributeValue(X);
+    	if (s != null) {
+    		x = new Double(s);
+    	}
+    	return x;
     }
 
-    public double getY() {
+    public Double getY() {
     	String s = this.getAttributeValue("y");
-    	return (s != null) ? new Double(s).doubleValue() : 0.0;
+    	return (s != null) ? new Double(s) : null;
     }
     
 	protected void drawElement(Graphics2D g2d) {
-		double fontSize = this.getFontSize();
-		fontSize *= cumulativeTransform.getMatrixAsArray()[0] * 0.3;
-		fontSize = (fontSize < 8) ? 8 : fontSize;
+		saveGraphicsSettingsAndApplyTransform(g2d);
 		String text = this.getText();
-		Real2 xy = this.getXY();
-		xy = transform(xy, cumulativeTransform);
-		xy.plusEquals(new Real2(fontSize*0.65, -0.65*fontSize));
-		Color color = this.getColor("fill");
-		color = (color == null) ? Color.DARK_GRAY : color;
-		g2d.setColor(color);
-		g2d.setFont(new Font("SansSerif", Font.PLAIN, (int)fontSize));
-		g2d.drawString(text, (int)xy.x, (int)xy.y);
+		if (text != null) {
+			String fill = this.getFill();
+			Color fillColor = getJava2DColor(fill); 
+			float fontSize = (float) (double) this.getFontSize();
+			fontSize *= cumulativeTransform.getMatrixAsArray()[0] * _SVG2AWT_FONT_SCALE;
+			Font font = g2d.getFont();
+			font = font.deriveFont(fontSize);
+			if (isItalic()) {
+				font = font.deriveFont(Font.ITALIC);
+			}
+			setTextAntialiasing(g2d, true);
+			Real2 xy = this.getXY();
+			xy = transform(xy, cumulativeTransform);
+			LOG.trace("CUM "+cumulativeTransform+"XY "+xy);
+			saveColor(g2d);
+			if (fillColor != null) {
+				g2d.setColor(fillColor);
+			}
+			g2d.setFont(font);
+			g2d.drawString(text, (int)xy.x, (int)xy.y);
+			restoreColor(g2d);
+		}
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
-	
+
 	public void applyTransform(Transform2 t2) {
-		//assume scale and translation only
+		// transform the position and scale
 		Real2 xy = getXY();
 		xy.transformBy(t2);
 		this.setXY(xy);
 		transformFontSize(t2);
-		//rotate text? // not tested
 		Angle angle = t2.getAngleOfRotation();
+		//rotate characters to preserve relative orientation
 		if (angle != null && !angle.isEqualTo(0.0, EPS)) {
+			angle = angle.multiplyBy(-1.0);
 			Transform2 t = Transform2.getRotationAboutPoint(angle, xy);
+			t = t.concatenate(t2);
 			this.setTransform(t);
-			LOG.trace("text: "+this.toXML());
 		}
 	}
 
@@ -189,8 +227,9 @@ public class SVGText extends SVGElement {
 		// transform fontSize
 		if (fontSize != null) {
 			Real2 ff = new Real2(fontSize, 1.0);
-			ff.transformBy(t2);
-//			double size = ff.getX(); // old
+			Transform2 rotMat = new Transform2(t2);
+			rotMat.setTranslation(new Real2(0.0,0.0));
+			ff.transformBy(rotMat);
 			double size = Math.max(ff.getX(), ff.getY()); // takes account of rotation
 			LOG.trace("FS "+ff+" .. "+size);
 			this.setFontSize(size);
@@ -223,12 +262,13 @@ public class SVGText extends SVGElement {
 	 * @return the text
 	 */
 	public String getText() {
-		Nodes nodes = this.query("./text()");
-		return nodes.size() == 1 ? nodes.get(0).getValue() : null;
+		Nodes nodes = query("./text()");
+		return (nodes.size() == 1 ? nodes.get(0).getValue() : null);
 	}
 
 	/**
-	 * clears text and replaces if not null
+	 * Clears text and replaces if not null
+	 * 
 	 * @param text the text to set
 	 */
 	public void setText(String text) {
@@ -238,6 +278,8 @@ public class SVGText extends SVGElement {
 				node.detach();
 			} else if (node instanceof SVGTSpan) {
 				// expected child
+			} else if (node instanceof SVGTitle) {
+				// expected child
 			} else {
 				LOG.debug("unexpected child of SVGText: "+node.getClass());
 			}
@@ -246,7 +288,7 @@ public class SVGText extends SVGElement {
 			try {
 				this.appendChild(text);
 			} catch (nu.xom.IllegalCharacterDataException e) {
-//				e.printStackTrace();
+				//e.printStackTrace();
 				throw new RuntimeException("Cannot append text: "+text+" (char-"+(int)text.charAt(0)+")", e);
 			}
 		}
@@ -262,8 +304,8 @@ public class SVGText extends SVGElement {
 	 */
 	public Real2Range getBoundingBoxForCenterOrigin() {
 		
-//		double fontWidthFactor = DEFAULT_FONT_WIDTH_FACTOR;
-//		double fontWidthFactor = 1.0;
+		//double fontWidthFactor = DEFAULT_FONT_WIDTH_FACTOR;
+		//double fontWidthFactor = 1.0;
 		// seems to work??
 		double fontWidthFactor = 0.3;
 		double halfWidth = getEstimatedHorizontalLength(fontWidthFactor) / 2.0;
@@ -276,8 +318,10 @@ public class SVGText extends SVGElement {
 		return boundingBox;
 	}
 
-	/** extent of text
-	 * defined as the point origin (i.e. does not include font)
+	/** 
+	 * Extent of text.
+	 * Defined as the point origin (i.e. does not include font).
+	 * 
 	 * @return
 	 */
 	public Real2Range getBoundingBox() {
@@ -296,19 +340,19 @@ public class SVGText extends SVGElement {
 				width = getEstimatedHorizontalLength(fontWidthFactor);
 				if (width == null || Double.isNaN(width)) {
 					width = MIN_WIDTH;
-					String text = this.getText();
+					String text = getText();
 					if (text == null) {
 						setText("");
 					} else if (text.length() == 0) {
 						throw new RuntimeException("found empty text ");
 					} else if (text.contains("\n")) {
-						throw new RuntimeException("found LF "+""+((int)text.charAt(0)));
+						throw new RuntimeException("found LF "+String.valueOf(((int) text.charAt(0))));
 					} else {
-						throw new RuntimeException("found strange Null text "+""+((int)text.charAt(0)));
+						throw new RuntimeException("found strange Null text "+String.valueOf(((int) text.charAt(0))));
 					}
 				}
-				height = this.getFontSize() * fontWidthFactor;
-				Real2 xy = this.getXY();
+				height = getFontSize() * fontWidthFactor;
+				Real2 xy = getXY();
 				boundingBox = new Real2Range(xy, xy.plus(new Real2(width, -height)));
 			}	
 			if (!boundingBox.isValid()) {
@@ -321,7 +365,7 @@ public class SVGText extends SVGElement {
 	}
 	
 	private void rotateBoundingBoxForRotatedText() {
-		Transform2 t2 = this.getTransform();
+		Transform2 t2 = getTransform();
 		if (t2 != null) {
 			Angle rotation = t2.getAngleOfRotation();
 			if (rotation == null) {
@@ -337,29 +381,32 @@ public class SVGText extends SVGElement {
 		}
 	}
 
-	/** this is a hack and depends on what information is available
-	 * include fontSize and factor
+	/** 
+	 * This is a hack and depends on what information is available.
+	 * 
+	 * Include fontSize and factor.
+	 * 
 	 * @param fontWidthFactor
 	 * @return
 	 */
 	public Double getEstimatedHorizontalLength(double fontWidthFactor) {
 		estimatedHorizontallength = Double.NaN;
-		if (this.getChildTSpans().size() ==0) {
+		if (getChildTSpans().size() == 0) {
 			String s = getText();
 			if (s != null) {
-				String family = this.getFontFamily();
+				String family = getFontFamily();
 				double[] lengths = FontWidths.getFontWidths(family);
 				if (lengths == null) {
 					lengths = FontWidths.SANS_SERIF;
 				}
-				double fontSize = this.getFontSize();
+				double fontSize = getFontSize();
 				estimatedHorizontallength = 0.0;
 				for (int i = 0; i < s.length(); i++) {
 					char c = s.charAt(i);
 					if (c > 255) {
 						c = 's';  // as good as any
 					}
-					double length = fontSize * fontWidthFactor * lengths[(int)c];
+					double length = fontSize * fontWidthFactor * lengths[(int) c];
 					estimatedHorizontallength += length;
 				}
 			}
@@ -479,8 +526,6 @@ public class SVGText extends SVGElement {
 		// TODO update for different orientation
 		double coordHoriz0 = (rotate0 == null) ? xy0.getX() : xy0.getY();
 		double coordHoriz1 = (rotate1 == null) ? xy1.getX() : xy1.getY();
-//		double coordHoriz1 = xy1.getX();
-//		double coordVert0 = xy0.getY();
 		double coordVert0 = this.getCurrentBaseY();
 		double coordVert1 = (rotate1 == null) ? xy1.getY() : xy1.getX();
 		double deltaVert = coordVert0 - coordVert1;
@@ -493,7 +538,7 @@ public class SVGText extends SVGElement {
 		double spaceWidth = fontWidths[(int)C_SPACE] * maxFontSize * fontWidthFactor;
 		
 		// same size of font?
-		LOG.debug(""+this.getText()+"]["+text1.getText()+ " ...fonts... " + fontSize0+"/"+fontSize1);
+		LOG.debug(String.valueOf(this.getText())+"]["+text1.getText()+ " ...fonts... " + fontSize0+"/"+fontSize1);
 		// has vertical changed by more than the larger font size?
 		if (!Real.isEqual(coordVert0, coordVert1, maxFontSize * fontHeightFactor)) {
 			LOG.debug("changed vertical height "+coordVert0+" => "+coordVert1+" ... "+maxFontSize);
@@ -521,9 +566,9 @@ public class SVGText extends SVGElement {
 				}
 				linker = null;
 				if (nspaces == 0) {
-					linker = CMLConstants.S_EMPTY;
+					linker = XMLConstants.S_EMPTY;
 				} else if (nspaces == 1) {
-					linker = CMLConstants.S_SPACE;
+					linker = XMLConstants.S_SPACE;
 				}
 			} else {
 				LOG.debug("slight vertical change: "+coordVert0+" => "+coordVert1);
@@ -562,21 +607,21 @@ public class SVGText extends SVGElement {
 				LOG.debug("ignored font change");
 			}
 			if (newText != null) {
-				this.setCurrentBaseY(text1.getCurrentBaseY());
+				setCurrentBaseY(text1.getCurrentBaseY());
 			}
 			unscriptFontSize = text1.getFontSize();
 		} else {
-			LOG.debug("change of font size: "+fontSize0+"/"+fontSize1+" .... "+this.getText()+" ... "+text1.getText());
+			LOG.debug("change of font size: "+fontSize0+"/"+fontSize1+" .... "+getText()+" ... "+text1.getText());
 		}
 		if (linker != null) {
 			newText = string0 + linker + string1;
-			this.setText(newText);
-			this.setCurrentFontSize(text1.getFontSize());
+			setText(newText);
+			setCurrentFontSize(text1.getFontSize());
 			// preserve best estimate of text length
-			this.setCalculatedTextEndCoordinate(text1.getCalculatedTextEndCoordinate(fontWidthFactor));
+			setCalculatedTextEndCoordinate(text1.getCalculatedTextEndCoordinate(fontWidthFactor));
 			if (!Double.isNaN(unscriptFontSize)) {
-				this.setFontSize(unscriptFontSize);
-				this.setCurrentFontSize(unscriptFontSize);
+				setFontSize(unscriptFontSize);
+				setCurrentFontSize(unscriptFontSize);
 				LOG.debug("setting font to "+unscriptFontSize);
 			}
 			LOG.debug("merged => "+newText);
@@ -592,16 +637,20 @@ public class SVGText extends SVGElement {
 		return rect;
 	}
 	
-	/** property of graphic bounding box
-	 * can be overridden
+	/** 
+	 * Property of graphic bounding box.
+	 * Can be overridden.
+	 * 
 	 * @return default none
 	 */
 	protected String getBBFill() {
 		return "none";
 	}
 
-	/** property of graphic bounding box
-	 * can be overridden
+	/** 
+	 * Property of graphic bounding box.
+	 * Can be overridden.
+	 * 
 	 * @return default magenta
 	 */
 	protected String getBBStroke() {
@@ -621,17 +670,17 @@ public class SVGText extends SVGElement {
 		if (textS.length() == 0) {
 			return;
 		}
-		this.setText(null);
-		double fontSize = fSize == null ? this.getFontSize() : fSize;
+		setText(null);
+		double fontSize = (fSize == null ? getFontSize() : fSize);
 		String[] tokens = textS.split(EuclidConstants.S_WHITEREGEX);
-		Double x0 = boundingBox.getXRange().getMin();
-		Double x1 = boundingBox.getXRange().getMax();
+		Double x0 = boundingBox.getXMin();
+		Double x1 = boundingBox.getXMax();
 		Double x = x0;
-		Double y0 = boundingBox.getYRange().getMin();
+		Double y0 = boundingBox.getYMin();
 		Double y = y0;
 		Double deltay = fontSize*1.2;
 		y += deltay;
-		SVGTSpan span = this.createSpan(tokens[0], new Real2(x0, y), fontSize);
+		SVGTSpan span = createSpan(tokens[0], new Real2(x0, y), fontSize);
 		int ntok = 1;
 		while (ntok < tokens.length) { 
 			String s = span.getText();
@@ -640,11 +689,11 @@ public class SVGText extends SVGElement {
 			if (xx > x1) {
 				span.setText(s);
 				y += deltay;
-				span = this.createSpan(tokens[ntok], new Real2(x0, y), fontSize);
+				span = createSpan(tokens[ntok], new Real2(x0, y), fontSize);
 			}
 			ntok++;
 		}
-		this.clearRotate();
+		clearRotate();
 	}
 	
 	public SVGTSpan createSpan(String text, Real2 xy, Double fontSize) {
@@ -670,11 +719,22 @@ public class SVGText extends SVGElement {
 		}
 		return textList;
 	}
-	/** special routine to make sure characters are correctly oriented
+	
+	/** 
+	 * Convenience method to extract list of svgTexts in element
 	 * 
+	 * @param svgElement
+	 * @return
+	 */
+	public static List<SVGText> extractSelfAndDescendantTexts(SVGElement svgElement) {
+		return SVGText.extractTexts(SVGUtil.getQuerySVGElements(svgElement, ALL_TEXT_XPATH));
+	}
+
+	/** 
+	 * Special routine to make sure characters are correctly oriented
 	 */
 	public void setTransformToRotateAboutTextOrigin() {
-		Transform2 transform2 = this.getTransform();
+		Transform2 transform2 = getTransform();
 		RealSquareMatrix rotMat = transform2.getRotationMatrix();
 		setTransformToRotateAboutTextOrigin(rotMat);
 	}
@@ -726,6 +786,145 @@ public class SVGText extends SVGElement {
 		return f;
 	}
 	
+	public boolean isBold() {
+		String fontWeight = this.getFontWeight();
+		return SVGText.BOLD.equalsIgnoreCase(fontWeight);
+	}
+	
+	public boolean isItalic() {
+		String fontStyle = this.getFontStyle();
+		return SVGText.ITALIC.equalsIgnoreCase(fontStyle);
+	}
+
+	/** normally only present when added by PDF2SVG
+	 * of form svgx:fontName="ABCDEF+FOOBar"
+	 * @return name (or null)
+	 */
+	public String getSVGXFontName() {
+		String fontName = SVGUtil.getSVGXAttribute(this, FONT_NAME);
+		return fontName; 
+	}
+	
+	/** 
+	 * Normally only present when added by PDF2SVG.
+	 * <p>
+	 * Of form svgx:width="234.0".
+	 * <p>
+	 * Different to getWidth, which uses "width" attribute and is probably wrong for SVGText.
+	 * 
+	 * @return width (or null)
+	 */
+	public Double getSVGXFontWidth() {
+		String width = SVGUtil.getSVGXAttribute(this, WIDTH);
+		return width == null ? null : new Double(width); 
+	}
+	
+	/** 
+	 * Adds svgx:width attribute.
+	 * <p>
+	 * Only use when constructing new characters, such as spaces, and deconstructing
+	 * ligatures.
+	 * </p>
+	 * <p>
+	 * Of form svgx:width="234.0".
+	 * </p>
+	 * <p>
+	 * Different to getWidth, which uses "width" attribute and is probably wrong for SVGText.
+	 * </p>
+	 * 
+	 * @return width (or null)
+	 */
+	public void setSVGXFontWidth(Double width) {
+		if (width != null) {
+			Attribute widthAtt = SVGUtil.getSVGXAttributeAttribute(this, WIDTH);
+			if (widthAtt == null) {
+				widthAtt.detach();
+			}
+		} else {
+			SVGUtil.setSVGXAttribute(this, WIDTH, String.valueOf(width));
+		}
+	}
+	
+	public Double getScaledWidth() {
+		Double scaledWidth = null;
+		Double width = getSVGXFontWidth();
+		Double fontSize = getFontSize();
+		if (width != null && fontSize != null) {
+			scaledWidth = width * SCALE1000 * fontSize;
+		}
+		return scaledWidth;
+	}
+
+	public Double getScaledWidth(boolean guessWidth) {
+		Double scaledWidth = null;
+		Double width = getSVGXFontWidth();
+		if (width == null && guessWidth) {
+			width = DEFAULT_CHARACTER_WIDTH;
+		}
+		Double fontSize = getFontSize();
+		if (width != null && fontSize != null) {
+			scaledWidth = width * SCALE1000 * fontSize;
+		}
+		return scaledWidth;
+	}
+
+	/** 
+	 * Get separation between two characters.
+	 * <p>
+	 * This is from the end of "this" to the start of nextText.
+	 * 
+	 * @param nextText
+	 * @return
+	 */
+	public Double getSeparation(SVGText nextText) {
+		Double separation = null;
+		Double x = getX();
+		Double xNext = (nextText == null ? null : nextText.getX());
+		Double scaledWidth = getScaledWidth();
+		if (x != null && xNext != null && scaledWidth != null) {
+			separation = xNext - (x + scaledWidth); 
+		}
+		return separation;
+	}
+	
+	/** 
+	 * Will be zero if fontSize is zero.
+	 * 
+	 * @return
+	 */
+	public Double getScaledWidthOfEnSpace() {
+		Double fontSize = getFontSize();
+		return (fontSize == null ? null : N_SPACE * fontSize);
+	}
+	
+
+	public Double getEnSpaceCount(SVGText nextText) {
+		Double separation = getSeparation(nextText);
+		Double enSpace = getScaledWidthOfEnSpace();
+		enSpace = Math.max(enSpace, nextText.getScaledWidthOfEnSpace());
+		return (separation == null || enSpace == null || Math.abs(enSpace) < MIN_FONT_SIZE ? null : separation / enSpace);
+	}
+
+	/**
+	 * @param newCharacters
+	 * @param endOfLastCharacterX
+	 * @param templateText to copy attributes from
+	 */
+	public SVGText createSpaceCharacterAfter() {
+		SVGText spaceText = new SVGText();
+		XMLUtil.copyAttributesFromTo(this, spaceText);
+		spaceText.setText(" ");
+		spaceText.setX(getCalculatedTextEndX());
+		spaceText.setSVGXFontWidth(SPACE_WIDTH1000);
+		return spaceText;
+	}
+
+	public Double getCalculatedTextEndX() {
+		Double scaledWidth = getScaledWidth(); 
+		Double x = getX();
+		return (x == null || scaledWidth == null ? null : x + scaledWidth);
+	}
+
 	public String getString() {
 		String s = "";
 		List<SVGTSpan> tspans = getChildTSpans();
@@ -738,4 +937,38 @@ public class SVGText extends SVGElement {
 		}
 		return s;
 	}
+
+	/** 
+	 * Get centre point of text.
+	 * <p>
+	 * Only works for single character.
+	 * 
+	 * @param i position of character (currently only 0)
+	 * @return
+	 */
+	public Real2 getCentrePointOfFirstCharacter() {
+		getWidthOfFirstCharacter();
+		heightOfFirstCharacter = getFontSize();
+		Real2 delta = new Real2(widthOfFirstCharacter / 2.0, -heightOfFirstCharacter / 2.0); 
+		Real2 xy = getXY();
+		return xy.plus(delta);
+	}
+
+	public Double getWidthOfFirstCharacter() {
+		widthOfFirstCharacter = getSVGXFontWidth() / 1000.0 * getFontSize();
+		return widthOfFirstCharacter;
+	}
+	
+	public Double getheightOfFirstCharacter() {
+		heightOfFirstCharacter = getFontSize();
+		return heightOfFirstCharacter;
+	}
+	
+	public Double getRadiusOfFirstCharacter() {
+		getWidthOfFirstCharacter();
+		getheightOfFirstCharacter();
+		return (heightOfFirstCharacter == null || widthOfFirstCharacter == null ? null :
+			Math.sqrt(heightOfFirstCharacter * heightOfFirstCharacter + widthOfFirstCharacter * widthOfFirstCharacter) / 2.0);
+	}
+	
 }

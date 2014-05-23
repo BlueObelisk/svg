@@ -16,25 +16,33 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
-
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
-
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
+
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 /** draws a straight line.
  * NOT TESTED
  * @author pm286
  *
  */
-public class SVGEllipse extends SVGElement {
+public class SVGEllipse extends SVGShape {
 
+
+	@SuppressWarnings("unused")
+	private final static Logger LOG = Logger.getLogger(SVGEllipse.class);
+
+	private static final String RX = "rx";
+	private static final String RY = "ry";
+	private static final String R = "r";
+
+	
 	public final static String TAG ="ellipse";
 
 	/** constructor
@@ -47,7 +55,7 @@ public class SVGEllipse extends SVGElement {
 	/** constructor
 	 */
 	public SVGEllipse(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor
@@ -86,16 +94,17 @@ public class SVGEllipse extends SVGElement {
 	}
 	
 	protected void drawElement(Graphics2D g2d) {
+		saveGraphicsSettingsAndApplyTransform(g2d);
 		Real2 xy0 = getCXY();
 		Real2 rxy = getRXY();
 		xy0 = transform(xy0, cumulativeTransform);
-		double rrx = rxy.getX() * cumulativeTransform.getMatrixAsArray()[0] * 0.5;
-		double rry = rxy.getY() * cumulativeTransform.getMatrixAsArray()[0] * 0.5;
+		double rrx = transform(rxy.getX(), cumulativeTransform) * 0.5;
+		double rry = transform(rxy.getY(), cumulativeTransform) * 0.5;
 		
-		Ellipse2D ellipse = new Ellipse2D.Double(xy0.x-rrx, xy0.y-rry, rrx+rrx, rry+rry);
-		Color color = this.getColor("fill");
-		g2d.setColor(color);
-		g2d.fill(ellipse);
+		Ellipse2D ellipse = new Ellipse2D.Double(xy0.x - rrx, xy0.y - rry, rrx + rrx, rry + rry);
+		fill(g2d, ellipse);
+		draw(g2d, ellipse);
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 	
 	public Real2 getRXY() {
@@ -103,11 +112,11 @@ public class SVGEllipse extends SVGElement {
 	}
 	
 	public double getRX() {
-		return this.getCoordinateValueDefaultZero("rx");
+		return this.getCoordinateValueDefaultZero(RX);
 	}
 	
 	public double getRY() {
-		return this.getCoordinateValueDefaultZero("ry");
+		return this.getCoordinateValueDefaultZero(RY);
 	}
 	
 	public void applyTransform(Transform2 transform) {
@@ -128,11 +137,11 @@ public class SVGEllipse extends SVGElement {
 	}
 
 	public void setRX(double x) {
-		this.addAttribute(new Attribute("rx", ""+x));
+		this.addAttribute(new Attribute(RX, String.valueOf(x)));
 	}
 
 	public void setRY(double y) {
-		this.addAttribute(new Attribute("ry", ""+y));
+		this.addAttribute(new Attribute(RY, String.valueOf(y)));
 	}
 
 	/**
@@ -146,7 +155,7 @@ public class SVGEllipse extends SVGElement {
 	 * @param rad the rad to set
 	 */
 	public void setRad(double rad) {
-		this.addAttribute(new Attribute("r", ""+rad));
+		this.addAttribute(new Attribute(R, String.valueOf(rad)));
 	}
 
 	/** extent of ellipse
@@ -162,6 +171,11 @@ public class SVGEllipse extends SVGElement {
 			boundingBox.add(center.plus(rad));
 		}
 		return boundingBox;
+	}
+
+	@Override
+	public String getGeometricHash() {
+		return getAttributeValue(CX)+" "+getAttributeValue(CY)+" "+getAttributeValue(RX)+" "+getAttributeValue(RY);
 	}
 	
 	

@@ -1,9 +1,7 @@
 package org.xmlcml.graphics.svg;
 
 import junit.framework.Assert;
-
 import nu.xom.Attribute;
-
 import org.junit.Test;
 import org.xmlcml.cml.testutil.JumboTestUtils;
 import org.xmlcml.euclid.Real2;

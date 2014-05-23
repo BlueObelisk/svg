@@ -16,12 +16,14 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
 import nu.xom.Element;
 import nu.xom.Node;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Array;
 
 /** draws a straight line.
@@ -30,6 +32,10 @@ import org.xmlcml.euclid.Real2Array;
  *
  */
 public class SVGPolygon extends SVGPoly {
+	
+	private static Logger LOG = Logger.getLogger(SVGPolygon.class);
+
+	public final static String ALL_POLYGON_XPATH = ".//svg:polygon";
 
 	public final static String TAG ="polygon";
 	
@@ -43,13 +49,15 @@ public class SVGPolygon extends SVGPoly {
 	/** constructor
 	 */
 	public SVGPolygon(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
+        init();
 	}
 	
 	/** constructor
 	 */
 	public SVGPolygon(Element element) {
-        super((SVGElement) element);
+        super(element);
+        init();
 	}
 	
 	/** constructor.
@@ -59,7 +67,13 @@ public class SVGPolygon extends SVGPoly {
 	 */
 	public SVGPolygon(Real2Array real2Array) {
 		this();
+		init();
 		setReal2Array(real2Array);
+	}
+	
+	protected void init() {
+		super.init();
+		isClosed = true;
 	}
 	
     /**
@@ -78,10 +92,17 @@ public class SVGPolygon extends SVGPoly {
 		return TAG;
 	}
 
+	
 	public int size() {
+		getReal2Array();
 		return real2Array.size();
 	}
 
+	@Override
+	protected void drawElement(Graphics2D g2d) {
+		super.drawPolylineOrGon(g2d, true);
+	}
+	
 	/** makes a new list composed of the polygons in the list
 	 * 
 	 * @param elements
@@ -95,5 +116,23 @@ public class SVGPolygon extends SVGPoly {
 			}
 		}
 		return polygonList;
+	}
+
+	public static List<SVGPolygon> extractSelfAndDescendantPolygons(SVGG g) {
+		return SVGPolygon.extractPolygons(SVGUtil.getQuerySVGElements(g, ALL_POLYGON_XPATH));
+	}
+	
+	public List<SVGLine> createLineList(boolean clear) {
+		List<SVGLine> polyList = super.createLineList(clear);
+		SVGLine line = new SVGLine(real2Array.elementAt(real2Array.size() - 1), real2Array.elementAt(0));
+		copyNonSVGAttributes(this, line);
+		SVGMarker point = new SVGMarker(real2Array.get(0));
+		markerList.get(0).addLine(line);
+		markerList.get(markerList.size() - 1).addLine(line);
+		if (line.getEuclidLine().getLength() < 0.0000001) {
+			LOG.trace("ZERO LINE");
+		}
+		lineList.add(line);
+		return lineList;
 	}
 }

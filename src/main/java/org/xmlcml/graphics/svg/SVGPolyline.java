@@ -16,8 +16,8 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,76 +25,72 @@ import java.util.Set;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
+import nu.xom.ParentNode;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLElement;
-import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealArray;
+import org.xmlcml.xml.XMLUtil;
 
-/** draws a straight line.
+/** 
+ * Represents a collection of straight lines (not implicitly closed).
  * 
  * @author pm286
- *
  */
 public class SVGPolyline extends SVGPoly {
+
+	
+	public final static String ALL_POLYLINE_XPATH = ".//svg:polyline";
+
+	private static final String X1 = "x1";
+	private static final String X2 = "x2";
+	private static final String Y1 = "y1";
+	private static final String Y2 = "y2";
+
 	private static Logger LOG = Logger.getLogger(SVGPolyline.class);
 	
 	public final static String TAG ="polyline";
-	private Boolean isClosed = false;
-	
-	public Boolean getIsClosed() {
-		return isClosed;
-	}
 
-	public Boolean getIsBox() {
-		return isBox;
-	}
-
-	public Boolean getIsAligned() {
-		return isAligned;
-	}
-
-	private Boolean isBox;
-	private Boolean isAligned = null;
-
-	/** constructor
+	/** 
+	 * Constructor.
 	 */
 	public SVGPolyline() {
 		super(TAG);
 		init();
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor.
 	 */
 	public SVGPolyline(SVGLine line) {
         this();
-        CMLElement.copyAttributesFromTo(line, this);
-        CMLElement.deleteAttribute(this, "x1");
-        CMLElement.deleteAttribute(this, "y1");
-        CMLElement.deleteAttribute(this, "x2");
-        CMLElement.deleteAttribute(this, "y2");
+        XMLUtil.copyAttributesFromTo(line, this);
+        XMLUtil.deleteAttribute(this, X1);
+        XMLUtil.deleteAttribute(this, Y1);
+        XMLUtil.deleteAttribute(this, X2);
+        XMLUtil.deleteAttribute(this, Y2);
         this.real2Array = new Real2Array();
         this.real2Array.add(line.getXY(0));
         this.real2Array.add(line.getXY(1));
         this.setReal2Array(real2Array);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor.
 	 */
 	public SVGPolyline(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor.
 	 */
 	public SVGPolyline(Element element) {
         super((SVGElement) element);
 	}
 	
-	/** constructor.
+	/** 
+	 * Constructor.
 	 * 
 	 * @param x1
 	 * @param x2
@@ -106,7 +102,7 @@ public class SVGPolyline extends SVGPoly {
 	}
 	
     /**
-     * copy node .
+     * Copies node.
      *
      * @return Node
      */
@@ -114,61 +110,64 @@ public class SVGPolyline extends SVGPoly {
         return new SVGPolyline(this);
     }
 
-	/** pass polyline or convert line.
+	/** 
+	 * Passes polyline or converts line.
 	 * 
 	 * @param element
 	 * @return
 	 */
-	public static SVGPolyline getOrCreatePolyline(SVGElement element) {
-		SVGPolyline polyline = null;
+	public static SVGPoly getOrCreatePolyline(SVGElement element) {
+		SVGPoly polyline = null;
 		if (element instanceof SVGLine) {
 			polyline = new SVGPolyline((SVGLine) element);
 			
 		} else if (element instanceof SVGPolyline) {
-			polyline = (SVGPolyline) element;
+			polyline = (SVGPoly) element;
 		}
 		return polyline;
 	}
 
-	/** get tag.
+	/** 
+	 * Gets tag.
+	 * 
 	 * @return tag
 	 */
 	public String getTag() {
 		return TAG;
 	}
 
-	public Boolean isClosed() {
-		return isClosed;
+	@Override
+	protected void drawElement(Graphics2D g2d) {
+		super.drawPolylineOrGon(g2d, false);
 	}
 	
-	public void setClosed(boolean isClosed) {
-		this.isClosed = isClosed;
-	}
-	
-	/** pass polyline or convert line.
+	/** 
+	 * Passes polyline or converts line.
 	 * 
 	 * @param element
 	 * @return
 	 */
-	public static SVGPolyline createPolyline(SVGElement element) {
-		SVGPolyline polyline = null;
+	public static SVGPoly createPolyline(SVGElement element) {
+		SVGPoly polyline = null;
 		if (element instanceof SVGLine) {
 			polyline = new SVGPolyline((SVGLine) element);
 		} else if (element instanceof SVGPath) {
 			polyline = ((SVGPath) element).createPolyline();
 		} else if (element instanceof SVGPolyline) {
-			polyline = (SVGPolyline) element;
+			polyline = (SVGPoly) element;
 		}
 		return polyline;
 	}
 
-	/** creates a polyline IFF consists of a M(ove) followed by one or
-	 * more L(ines)
+	/** 
+	 * Creates a polyline IFF consists of a M(ove) followed by one or
+	 * more L(ines).
+	 * 
 	 * @param element
 	 * @return null if not transformable into a Polyline
 	 */
-	public static SVGPolyline createPolyline(SVGPath element) {
-		SVGPolyline polyline = null;
+	public static SVGPoly createPolyline(SVGPath element) {
+		SVGPoly polyline = null;
 		System.err.println("Beware NYI");
 		return polyline;
 	}
@@ -178,27 +177,31 @@ public class SVGPolyline extends SVGPoly {
 		List<SVGPolyline> newList = new ArrayList<SVGPolyline>();
 		int size = polylineList.size();
 		int niter = size / 2;
-		for (int i = 0; i < niter*2; i += 2) {
-			SVGPolyline line0 = polylineList.get(i);
-			SVGPolyline line1 = polylineList.get(i + 1);
+		for (int i = 0; i < niter * 2; i += 2) {
+			SVGPoly line0 = polylineList.get(i);
+			SVGPoly line1 = polylineList.get(i + 1);
 			SVGPolyline newLine = createMergedLine(line0, line1, eps);
 			newList.add(newLine);
 		}
 		if (size %2 != 0) {
-			newList.add(polylineList.get(size-1));
+			newList.add(polylineList.get(size - 1));
 		}
 		return newList;
 	}
 
-	/** appends poly1 to poly0.
-	 * does not duplicate common element
-	 * copy semantics
+	/** 
+	 * Appends poly1 to poly0.
+	 * <p>
+	 * Does not duplicate common element.
+	 * <p>
+	 * Copy semantics.
+	 * 
 	 * @param poly0 not changed
 	 * @param poly1 not changed
 	 * @param eps
 	 * @return
 	 */
-	public static SVGPolyline createMergedLine(SVGPolyline poly0, SVGPolyline poly1, double eps) {
+	public static SVGPolyline createMergedLine(SVGPoly poly0, SVGPoly poly1, double eps) {
 		SVGPolyline newPoly = null;
 		Real2 last0 = poly0.getLast();
 		Real2 first1 = poly1.getFirst();
@@ -216,11 +219,11 @@ public class SVGPolyline extends SVGPoly {
 
 	public SVGLine createSingleLine() {
 		createLineList();
-		return lineList.size() == 1 ? lineList.get(0) : null;
+		return (lineList.size() == 1 ? lineList.get(0) : null);
 	}
 	
-	/** is polyline aligned with axes?
-	 * 
+	/** 
+	 * Is polyline aligned with axes?
 	 */
 	public Boolean isAlignedWithAxes(double epsilon) {
 		if (isAligned  == null) {
@@ -236,46 +239,13 @@ public class SVGPolyline extends SVGPoly {
 		return isAligned;
 	}
 	
-	/** calculates whether 4 lines form a rectangle aligned with the axes
-	 * 
-	 * @param epsilon tolerance in coords
-	 * @return is rectangle
-	 */
-	public boolean isBox(double epsilon) {
-		if (isBox == null) {
-			isBox = false;
-			createLineList();
-			if (lineList == null) {
-			} else if (lineList.size() == 4) {
-				SVGLine line0 = lineList.get(0);
-				SVGLine line2 = lineList.get(2);
-				Real2 point0 = line0.getXY(0);
-				Real2 point1 = line0.getXY(1);
-				Real2 point2 = line2.getXY(0);
-				Real2 point3 = line2.getXY(1);
-				// vertical
-				isBox = Real.isEqual(point0.getX(), point1.getX(), epsilon) &&
-					Real.isEqual(point2.getX(), point3.getX(), epsilon) &&
-					Real.isEqual(point1.getY(), point2.getY(), epsilon) &&
-					Real.isEqual(point3.getY(), point0.getY(), epsilon);
-				if (!isBox) {
-					isBox = Real.isEqual(point0.getY(), point1.getY(), epsilon) &&
-							Real.isEqual(point2.getY(), point3.getY(), epsilon) &&
-							Real.isEqual(point1.getX(), point2.getX(), epsilon) &&
-							Real.isEqual(point3.getX(), point0.getX(), epsilon);
-				}
-			}
-		}
-		return isBox;
-	}
-
 	public void removeLastLine() {
 		createLineList();
 		if (lineList.size() > 0) {
 			lineList.remove(lineList.size()-1);
-			pointList.remove(pointList.size()-1);
-			if (pointList.size() == 1) {
-				pointList.remove(0);
+			markerList.remove(markerList.size()-1);
+			if (markerList.size() == 1) {
+				markerList.remove(0);
 			}
 		}
 	}
@@ -284,9 +254,9 @@ public class SVGPolyline extends SVGPoly {
 		createLineList();
 		if (lineList.size() > 0) {
 			lineList.remove(0);
-			pointList.remove(0);
-			if (pointList.size() == 1) {
-				pointList.remove(0);
+			markerList.remove(0);
+			if (markerList.size() == 1) {
+				markerList.remove(0);
 			}
 		}
 	}
@@ -294,7 +264,7 @@ public class SVGPolyline extends SVGPoly {
 	public void add(SVGLine line) {
 		ensureLineList();
 		ensurePointList();
-		if (pointList.size() == 0) {
+		if (markerList.size() == 0) {
 			addNewMarker(line);
 		}
 		lineList.add(line);
@@ -304,31 +274,37 @@ public class SVGPolyline extends SVGPoly {
 	private void addNewMarker(SVGLine line) {
 		SVGMarker marker = new SVGMarker();
 		marker.addLine(line);
-		pointList.add(marker);
+		markerList.add(marker);
 	}
-	
-	public List<SVGPolyline> createLinesSplitAtPoint(int split) {
+
+	/** 
+	 * Split polyline at given position.
+	 * 
+	 * @param splitPosition
+	 * @return
+	 */
+	public List<SVGPolyline> createLinesSplitAtPoint(int splitPosition) {
 		createLineList();
 		List<SVGPolyline> polylines = null;
-		if (split > 0 && split <= lineList.size() ) {
+		if (splitPosition > 0 && splitPosition <= lineList.size() ) {
 			polylines = new ArrayList<SVGPolyline>();
 			SVGPolyline polyline0 = new SVGPolyline();
 			polylines.add(polyline0);
-			for (int i = 0; i < split; i++) {
+			for (int i = 0; i < splitPosition; i++) {
 				polyline0.add(new SVGLine(lineList.get(i)));
 			}
 			SVGPolyline polyline1 = new SVGPolyline();
 			polylines.add(polyline1);
-			for (int i = split; i < lineList.size(); i++) {
+			for (int i = splitPosition; i < lineList.size(); i++) {
 				polyline1.add(new SVGLine(lineList.get(i)));
 			}
 		}
 		return polylines;
 	}
 	
-	public SVGPolyline createJoinedLines(List<SVGPolyline> polylineList) {
+	public SVGPoly createJoinedLines(List<SVGPolyline> polylineList) {
 		SVGPolyline newPolyline = new SVGPolyline();
-		for (SVGPolyline polyline : polylineList) {
+		for (SVGPoly polyline : polylineList) {
 			List<SVGLine> lineList = polyline.createLineList();
 			for (SVGLine line : lineList) {
 				newPolyline.add(line);
@@ -337,8 +313,8 @@ public class SVGPolyline extends SVGPoly {
 		return newPolyline;
 	}
 	
-	/** alters direction of line MODIFIES THIS
-	 * 
+	/** 
+	 * Alters direction of line. MODIFIES THIS.
 	 */
 	public void reverse() {
 		Real2Array r2a = this.getReal2Array();
@@ -349,8 +325,8 @@ public class SVGPolyline extends SVGPoly {
 	@Override
 	public void setReal2Array(Real2Array r2a) {
 		super.setReal2Array(r2a);
-//		lineList = null;
-//		pointList = null;
+		//lineList = null;
+		//pointList = null;
 	}
 	
 	public SVGPolygon createPolygon(double eps) {
@@ -360,23 +336,18 @@ public class SVGPolyline extends SVGPoly {
 			throw new RuntimeException("null real2Array");
 		}
 		if (real2Array.size() > 2) {
-			if (real2Array.get(0).isEqualTo(real2Array.get(real2Array.size()-1), eps)) {
+			if (real2Array.get(0).isEqualTo(real2Array.get(real2Array.size() - 1), eps)) {
 				Real2Array real2Array1 = new Real2Array(real2Array);
-				real2Array1.deleteElement(real2Array.size()-1);
+				real2Array1.deleteElement(real2Array.size() - 1);
 				polygon = new SVGPolygon(real2Array1);
+				polygon.copyNonSVGAttributesFrom(this);
+			} else if (isClosed()) {
+				Real2Array real2Array1 = new Real2Array(real2Array);
+				polygon = new SVGPolygon(real2Array1);
+				polygon.copyNonSVGAttributesFrom(this);
 			}
 		}
 		return polygon;
-	}
-
-	public SVGRect createRect(double epsilon) {
-		SVGRect rect = null;
-		if (this != null && isBox(epsilon)) {
-			Real2Range r2r = this.getBoundingBox();
-			rect = new SVGRect(r2r.getCorners()[0], r2r.getCorners()[1]);
-			rect.setFill("none");
-		}
-		return rect;
 	}
 
 	public boolean removeDuplicateLines() {
@@ -409,7 +380,8 @@ public class SVGPolyline extends SVGPoly {
 		return duplicate;
 	}
 
-	/** makes a new list composed of the polylines in the list
+	/** 
+	 * Makes a new list composed of the polylines in the list.
 	 * 
 	 * @param elements
 	 * @return
@@ -423,13 +395,25 @@ public class SVGPolyline extends SVGPoly {
 		}
 		return polylineList;
 	}
-
-	/** appends points in polyline into this
-	 * 'start' allows for skipping common point(s) 
-	 * @param polyline
-	 * @param start point in polyline to start at
+	
+	/** 
+	 * Convenience method to extract list of svgTexts in element.
+	 * 
+	 * @param svgElement
+	 * @return
 	 */
-	public void appendIntoSingleLine(SVGPolyline polyline, int start) {
+	public static List<SVGPolyline> extractSelfAndDescendantPolylines(SVGElement svgElement) {
+		return SVGPolyline.extractPolylines(SVGUtil.getQuerySVGElements(svgElement, ALL_POLYLINE_XPATH));
+	}
+
+
+	/** 
+	 * Appends points in polyline into this.
+	 * 
+	 * @param polyline
+	 * @param start point in polyline to start at; allows for skipping common point(s)
+	 */
+	public void appendIntoSingleLine(SVGPoly polyline, int start) {
 		Real2Array r2a = polyline.real2Array;
 		if (start != 0) {
 			r2a = r2a.createSubArray(start);
@@ -437,6 +421,35 @@ public class SVGPolyline extends SVGPoly {
 		this.real2Array.add(r2a);
 		this.setReal2Array(real2Array);
 		createLineList(true);
-		createPointList();
+		createMarkerList();
+	}
+
+	/** 
+	 * Replaces polyline by its split SVGLines.
+	 * <p>
+	 * Inserts new lines at old position of polyline.
+	 * 
+	 * @param polyline
+	 */
+	public static void replacePolyLineBySplitLines(SVGPoly polyline) {
+		List<SVGLine> lines = polyline.createLineList();
+		ParentNode parent = polyline.getParent();
+		if (parent != null) {
+			int index = parent.indexOf(polyline);
+			for (int i = lines.size() - 1; i >= 0; i--) {
+				parent.insertChild(lines.get(i), index);
+			}
+			polyline.detach();
+		}
+	}
+
+	/** 
+	 * Number of lines.
+	 * 
+	 * @return
+	 */
+	public int size() {
+		getReal2Array();
+		return real2Array.size() - 1;
 	}
 }

@@ -38,7 +38,7 @@ public class SVGDesc extends SVGElement {
 	/** constructor
 	 */
 	public SVGDesc(SVGDesc element) {
-        super((SVGDesc) element);
+        super(element);
 	}
 	
 	/** constructor

@@ -16,34 +16,38 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.BasicStroke;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
-import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.Nodes;
 
-import org.xmlcml.cml.base.CMLConstants;
-import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Euclid;
-import org.xmlcml.euclid.Line2;
-import org.xmlcml.euclid.Real;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealRange;
-import org.xmlcml.euclid.Transform2;
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.*;
+import org.xmlcml.xml.XMLConstants;
+
+import java.awt.*;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.List;
 
 /** draws a straight line.
  * 
  * @author pm286
  *
  */
-public class SVGLine extends SVGElement {
+public class SVGLine extends SVGShape {
+
+	private static Logger LOG = Logger.getLogger(SVGLine.class);
+	
+	public final static String ALL_LINE_XPATH = ".//svg:line";
+	
+	private static final String STYLE = "style";
+	private static final String X1 = "x1";
+	private static final String X2 = "x2";
+	private static final String Y1 = "y1";
+	private static final String Y2 = "y2";
+	private static final String X = "x";
+	private static final String Y = "y";
 
 	public final static String TAG ="line";
 
@@ -60,7 +64,7 @@ public class SVGLine extends SVGElement {
 	/** constructor
 	 */
 	public SVGLine(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor
@@ -78,6 +82,10 @@ public class SVGLine extends SVGElement {
 		this();
 		setXY(x1, 0);
 		setXY(x2, 1);
+		updateEuclidLine(x1, x2);
+	}
+
+	private void updateEuclidLine(Real2 x1, Real2 x2) {
 		euclidLine = new Line2(x1, x2);
 	}
 	
@@ -112,11 +120,11 @@ public class SVGLine extends SVGElement {
 		throw new RuntimeException("Cannot define getXY() for lines");
 	}
 	
-	public double getX() {
+	public Double getX() {
 		throw new RuntimeException("Cannot define getY() for lines");
 	}
 	
-	public double getY() {
+	public Double getY() {
 		throw new RuntimeException("Cannot define getY() for lines");
 	}
 	
@@ -128,17 +136,21 @@ public class SVGLine extends SVGElement {
 		if (x12 == null) {
 			System.err.println("null x2/y2 in line: ");
 		} else {
-			this.addAttribute(new Attribute("x"+(serial+1), ""+x12.getX()));
-			this.addAttribute(new Attribute("y"+(serial+1), ""+x12.getY()));
+			this.addAttribute(new Attribute(X+(serial+1), String.valueOf(x12.getX())));
+			this.addAttribute(new Attribute(Y+(serial+1), String.valueOf(x12.getY())));
+			if (euclidLine != null) {
+				euclidLine.setXY(x12, serial);
+			}
+
 		}
 	}
 	
 	public Real2 getXY(int serial) {
 		Real2 xy = null;
 		if (serial == 0) {
-			xy = new Real2(this.getDouble("x1"), this.getDouble("y1"));
+			xy = new Real2(this.getDouble(X1), this.getDouble(Y1));
 		} else if (serial == 1) {
-			xy = new Real2(this.getDouble("x2"), this.getDouble("y2"));
+			xy = new Real2(this.getDouble(X2), this.getDouble(Y2));
 		}
 		return xy;
 	}
@@ -152,8 +164,11 @@ public class SVGLine extends SVGElement {
 		if (x12 == null) {
 			System.err.println("null x2/y2 in line: ");
 		} else {
-			this.addAttribute(new Attribute("x"+serial, ""+x12.getX()));
-			this.addAttribute(new Attribute("y"+serial, ""+x12.getY()));
+			this.addAttribute(new Attribute(X+serial, String.valueOf(x12.getX())));
+			this.addAttribute(new Attribute(Y+serial, String.valueOf(x12.getY())));
+			if (euclidLine != null) {
+				euclidLine.setXY(x12, serial);
+			}
 		}
 	}
 	
@@ -161,9 +176,9 @@ public class SVGLine extends SVGElement {
 	public Real2 getX12(int serial) {
 		Real2 xy = null;
 		if (serial == 1) {
-			xy = new Real2(this.getDouble("x1"), this.getDouble("y1"));
+			xy = new Real2(this.getDouble(X1), this.getDouble(Y1));
 		} else if (serial == 2) {
-			xy = new Real2(this.getDouble("x2"), this.getDouble("y2"));
+			xy = new Real2(this.getDouble(X2), this.getDouble(Y2));
 		}
 		return xy;
 	}
@@ -174,32 +189,36 @@ public class SVGLine extends SVGElement {
 //</g>
 	
 	protected void drawElement(Graphics2D g2d) {
+		saveGraphicsSettingsAndApplyTransform(g2d);
+		ensureCumulativeTransform();
 		Line2D line = createAndSetLine2D();
-		applyAttributes(g2d);
-		g2d.draw(line);
+		fill(g2d, line);
+		draw(g2d, line);
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
 	public void applyAttributes(Graphics2D g2d) {
 		if (g2d != null) {
-			double width = (double) this.getStrokeWidth();
-			Stroke s = new BasicStroke((float)width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+			double width = this.getStrokeWidth();
+			Stroke s = new BasicStroke((float) width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 			g2d.setStroke(s);
 			super.applyAttributes(g2d);
 		}
 	}
 
 	public Line2D.Double createAndSetLine2D() {
-		double x1 = this.getDouble("x1");
-		double y1 = this.getDouble("y1");
+		ensureCumulativeTransform();
+		double x1 = this.getDouble(X1);
+		double y1 = this.getDouble(Y1);
 		Real2 xy1 = new Real2(x1, y1);
 		xy1 = transform(xy1, cumulativeTransform);
-		double x2 = this.getDouble("x2");
-		double y2 = this.getDouble("y2");
+		double x2 = this.getDouble(X2);
+		double y2 = this.getDouble(Y2);
 		Real2 xy2 = new Real2(x2, y2);
 		xy2 = transform(xy2, cumulativeTransform);
 		float width = 5.0f;
-		String style = this.getAttributeValue("style");
-		if (style.startsWith("stroke-width:")) {
+		String style = this.getAttributeValue(STYLE);
+		if (style != null && style.startsWith("stroke-width:")) {
 			style = style.substring("stroke-width:".length());
 			style = style.substring(0, (style+S_SEMICOLON).indexOf(S_SEMICOLON));
 			width = (float) new Double(style).doubleValue();
@@ -349,12 +368,12 @@ public class SVGLine extends SVGElement {
 	}
 	
 	public String getXYString() {
-		return getXY(0)+ S_SPACE + getXY(1);
+		return getXY(0) + S_SPACE + getXY(1);
 	}
 
 	public static List<SVGLine> findHorizontalOrVerticalLines(SVGElement svgElement, double eps) {
 		List<SVGLine> horizontalVerticalList = new ArrayList<SVGLine>();
-		Nodes lines = svgElement.query(".//svg:line", CMLConstants.SVG_XPATH);
+		Nodes lines = svgElement.query(".//svg:line", XMLConstants.SVG_XPATH);
 		for (int i = 0; i < lines.size(); i++) {
 			SVGLine line = (SVGLine) lines.get(i);
 			if (line.isHorizontal(eps) || line.isVertical(eps)) {
@@ -365,7 +384,7 @@ public class SVGLine extends SVGElement {
 	}
 
 	public void setWidth(double width) {
-		this.addAttribute(new Attribute("stroke-width", ""+width));
+		this.addAttribute(new Attribute("stroke-width", String.valueOf(width)));
 	}
 
 	/**
@@ -374,10 +393,29 @@ public class SVGLine extends SVGElement {
 	 * @param d max difference in radians from zero
 	 * @return
 	 */
-	public boolean isParallelTo(SVGLine svgLine, double d) {
-		Angle angle = this.getEuclidLine().getAngleMadeWith(svgLine.getEuclidLine());
-		double dd = Math.abs(angle.getAngle());
-		return dd < d;
+	public boolean isParallelTo(SVGLine svgLine, Angle angleEps) {
+		return this.getEuclidLine().isParallelTo(svgLine.getEuclidLine(), angleEps);
+	}
+
+	/**
+	 * 
+	 * @param svgLine
+	 * @param d max difference in radians from zero
+	 * @return
+	 */
+	public boolean isAntiParallelTo(SVGLine svgLine, Angle angleEps) {
+		return this.getEuclidLine().isAntiParallelTo(svgLine.getEuclidLine(), angleEps);
+	}
+
+
+	/**
+	 * 
+	 * @param svgLine
+	 * @param d max difference in radians from zero
+	 * @return
+	 */
+	public boolean isParallelOrAntiParallelTo(SVGLine svgLine, Angle angleEps) {
+		return this.getEuclidLine().isParallelOrAntiParallelTo(svgLine.getEuclidLine(), angleEps);
 	}
 
 	/**
@@ -392,6 +430,10 @@ public class SVGLine extends SVGElement {
 		return (dd < eps && dd > -eps);
 	}
 
+	public Double calculateUnsignedDistanceBetweenLines(SVGLine line1, Angle eps) {
+		return this.getEuclidLine().calculateUnsignedDistanceBetweenLines(line1.getEuclidLine(), eps);
+	}
+	
 	/** makes a new list composed of the lines in the list
 	 * 
 	 * @param elements
@@ -431,4 +473,112 @@ public class SVGLine extends SVGElement {
 			}
 		}
 	}
+	
+	@Override
+	public String getGeometricHash() {
+		return getAttributeValue(X1)+" "+getAttributeValue(Y1)+" "+getAttributeValue(X2)+" "+getAttributeValue(Y2);
+	}
+
+	/** convenience method to extract list of svgTexts in element
+	 * 
+	 * @param svgElement
+	 * @return
+	 */
+	public static List<SVGLine> extractSelfAndDescendantLines(SVGElement svgElement) {
+		return SVGLine.extractLines(SVGUtil.getQuerySVGElements(svgElement, ALL_LINE_XPATH));
+	}
+
+	public String toString() {
+		return (euclidLine == null) ? null : euclidLine.toString();
+	}
+
+	public Real2 getMidPoint() {
+		return this.getEuclidLine().getMidPoint();
+	}
+
+	public Real2 getNearestPointOnLine(Real2 point) {
+		return getEuclidLine().getNearestPointOnLine(point);
+	}
+	
+	/** does either end of this fall within line2 without extension.
+	 * 
+	 * NOT TESTED
+	 * 
+	 * @param line2
+	 * @param eps to avoid rounding errors
+	 * @return
+	 */
+	public boolean overlapsWithLine(SVGLine line2, double eps) {
+		Real2 point = line2.getNearestPointOnLine(getXY(0));
+		if (line2.getEuclidLine().contains(point, eps, false)) return true;
+		point = line2.getNearestPointOnLine(getXY(1));
+		if (line2.getEuclidLine().contains(point, eps, false)) return true;
+		return false;
+	}
+
+	/**
+	 * creates a mean line.
+	 * 
+	 * <p>
+	 * averages the point at end of the two lines. If lines are parallel use
+	 * XY(0) and line.XY(0), as first/from point. If antiparallel use XY(0) and line.XY(1).
+	 * Similarly second/to uses XY(1) and line.XY(1) for parallel and XY(1) and line.XY(0)
+	 * for antiparallel. Mean line is always aligned with line 0.
+	 * </p>
+	 * <p>Does not check for overlap of lines - that's up to the user to decide the cases. 
+	 * Does not add any style</p>
+	 * 
+	 * @param line
+	 * @param angleEps to test whether anti/parallel
+	 * @return null if lines not parallel
+	 */
+	public SVGLine getMeanLine(SVGLine line, Angle angleEps) {
+		SVGLine meanLine = null;
+		if (isParallelTo(line, angleEps)) {
+			meanLine = new SVGLine(getXY(0).getMidPoint(line.getXY(0)), 
+			                       getXY(1).getMidPoint(line.getXY(1)));
+		} else if (isAntiParallelTo(line, angleEps)) {
+			meanLine = new SVGLine(getXY(0).getMidPoint(line.getXY(1)), 
+                    getXY(1).getMidPoint(line.getXY(0)));
+		}
+		return meanLine;
+	}
+
+	public Real2 getIntersection(SVGLine line) {
+		return (line == null ? null : this.getEuclidLine().getIntersection(line.getEuclidLine()));
+	}
+
+	/** create set of concatenated lines.
+	 * 
+	 * @param points
+	 * @param close if true create line (n-1)->0
+	 * @return
+	 */
+	public static SVGG plotPointsAsTouchingLines(List<Real2> points, boolean close) {
+		SVGG g = new SVGG();
+		for (int i = 0; i < points.size() - 1; i++) {
+			SVGLine line = new SVGLine(points.get(i), points.get((i + 1)));
+			g.appendChild(line);
+		}
+		if (close) {
+			g.appendChild(new SVGLine(points.get(points.size() - 1), points.get(0)));
+		}
+		return g;
+	}
+
+	public static Real2Array extractPoints(List<SVGLine> lines, double eps) {
+		Real2Array points = new Real2Array();
+		Real2 lastPoint = null;
+		for (SVGLine line : lines) {
+			Real2 p0 = line.getXY(0);
+			if (lastPoint != null && !p0.isEqualTo(lastPoint, eps)) {
+				points.add(p0);
+			}
+			Real2 p1 = line.getXY(1);
+			points.add(p1);
+			lastPoint = p1;
+		}
+		return points;
+	}
+
 }

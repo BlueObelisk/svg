@@ -16,16 +16,15 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.List;
-
 import nu.xom.Element;
 import nu.xom.Node;
-
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** a virtual point. May not correspond completely with SVG <marker>
  * creates a "point", drawn by an arbitrary symbol
@@ -98,6 +97,7 @@ public class SVGMarker extends SVGElement {
 	}
 
 	protected void drawElement(Graphics2D g2d) {
+		saveGraphicsSettingsAndApplyTransform(g2d);
 //		double x1 = this.getDouble("x");
 //		double y1 = this.getDouble("y");
 //		Real2 xy1 = new Real2(x1, y1);
@@ -127,6 +127,7 @@ public class SVGMarker extends SVGElement {
 //		g2d.setColor(color);
 //		Line2D line = new Line2D.Double(xy1.x, xy1.y, xy2.x, xy2.y);
 //		g2d.draw(line);
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 	
 	public void applyTransform(Transform2 t2) {

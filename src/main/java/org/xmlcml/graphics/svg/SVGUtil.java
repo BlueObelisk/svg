@@ -1,23 +1,19 @@
 package org.xmlcml.graphics.svg;
 
-import java.awt.geom.AffineTransform;
+import nu.xom.*;
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.Transform2;
+import org.xmlcml.euclid.Vector2;
+import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import nu.xom.Attribute;
-import nu.xom.Builder;
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.Nodes;
-
-import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLUtil;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealSquareMatrix;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.euclid.Vector2;
 
 public class SVGUtil {
 
@@ -43,6 +39,18 @@ public class SVGUtil {
 
 	/** creates an SVGElement
 	 * 
+	 * throws RuntimeException on errors
+	 * 
+	 * @param xmlString
+	 * @return
+	 */
+	public static SVGElement parseToSVGElement(String xmlString) {
+		Element element = XMLUtil.parseXML(xmlString);
+		return SVGElement.readAndCreateSVG(element);
+	}
+
+	/** creates an SVGElement
+	 * 
 	 * @param is
 	 * @return
 	 */
@@ -57,13 +65,13 @@ public class SVGUtil {
 	}
 
 	public static List<SVGElement> getQuerySVGElements(SVGElement svgElement, String xpath) {
-		List<Element> elements = CMLUtil.getQueryElements(svgElement, xpath, SVGConstants.SVG_XPATH);
+		List<Element> elements = XMLUtil.getQueryElements(svgElement, xpath, SVGConstants.SVG_XPATH);
 		List<SVGElement> svgElements = new ArrayList<SVGElement>();
 		for (Element element : elements) {
 			if (!(element instanceof SVGElement)) {
 				throw new RuntimeException("Element was not SVGElement: "+element.toXML());
 			}
-			svgElements.add((SVGElement)element);
+			svgElements.add((SVGElement) element);
 		}
 		return svgElements;
 	}
@@ -88,7 +96,7 @@ public class SVGUtil {
 
 	public static Double decimalPlaces(Double width, int i) {
 		int ii = (int) Math.pow(10., i);
-		return (double)Math.round(width*(int)ii) / (double)ii;
+		return (double)Math.round(width* ii) / (double)ii;
 	}
 
 	/** applies to leaf nodes
@@ -177,11 +185,11 @@ public class SVGUtil {
 		List<SVGElement> gs = SVGUtil.getQuerySVGElements(svg, "//svg:g[@font-size and svg:text[not(@font-size)]]");
 		for (SVGElement g : gs) {
 			Double fontSize = g.getFontSize();
-			System.out.println("FS "+fontSize);
+			LOG.trace("FS "+fontSize);
 			g.getAttribute("font-size").detach();
 			List<SVGElement> texts = SVGUtil.getQuerySVGElements(g, "./svg:text[not(@font-size)]");
 			for (SVGElement text : texts) {
-				((SVGText)text).setFontSize(fontSize);
+				text.setFontSize(fontSize);
 			}
 		}
 	}
@@ -212,8 +220,12 @@ public class SVGUtil {
 			element.setBoundingBoxCached(cached);
 		}
 	}
-	
-	public static Real2Range createBoundingBox(List<SVGElement> elementList) {
+	/** creates an inclusive bounding box for a list of SVGElements.
+	 * 
+	 * @param elementList
+	 * @return bbox; null if empty list or all elements have null bboxes
+	 */
+	public static Real2Range createBoundingBox(List<? extends SVGElement> elementList) {
 		Real2Range r2r = null;
 		if (elementList != null && elementList.size() > 0) {
 			r2r = elementList.get(0).getBoundingBox();
@@ -224,4 +236,173 @@ public class SVGUtil {
 		return r2r;
 	}
 	
+	/** find all elements completely within a bounding box.
+	 * 
+	 * uses Real2Range.includes(Real2Range)
+	 * 
+	 * @param boundingBox outer container
+	 * @param elementList elements to be examined
+	 * @return empty list if parameters are null or no elements fit criterion
+	 */
+	public static List<SVGElement> findElementsWithin(Real2Range boundingBox, List <? extends SVGElement> elementList) {
+		List<SVGElement> includedList = new ArrayList<SVGElement>();
+		if (boundingBox != null && elementList != null) {
+			for (SVGElement element : elementList) {
+				Real2Range bbox = element.getBoundingBox();
+				if (boundingBox.includes(bbox)) {
+					includedList.add(element);
+				}
+			}
+		} 
+		return includedList;
+	}
+	
+	
+	/** find all elements completely within a bounding box.
+	 * 
+	 * uses Real2Range.includes(Real2Range)
+	 * 
+	 * @param boundingBox outer container
+	 * @param elementList elements to be examined
+	 * @return empty list if parameters are null or no elements fit criterion
+	 */
+	public static List<SVGElement> findElementsIntersecting(Real2Range boundingBox, List <? extends SVGElement> elementList) {
+		List<SVGElement> includedList = new ArrayList<SVGElement>();
+		if (boundingBox != null && elementList != null) {
+			for (SVGElement element : elementList) {
+				Real2Range bbox = element.getBoundingBox();
+				// the signature for Real2Range is messy
+				Real2Range intersect = boundingBox.intersectionWith(bbox);
+				if (intersect != null && intersect.isValid()) {
+					includedList.add(element);
+				}
+			}
+		} 
+		return includedList;
+	}
+	
+	/** crude quick method to create list of non-Overlapping BoundingBoxes
+	 * use only for small number of paths
+	 * will only work if paths a
+	 * @return
+	 */
+	public static List<Real2Range> createNonOverlappingBoundingBoxList(List<? extends SVGElement> svgElementList) {
+		List<Real2Range> bboxList = new ArrayList<Real2Range>();
+		for (SVGElement element : svgElementList) {
+			Real2Range bbox = element.getBoundingBox();
+			if (bboxList.size() == 0) {
+				bboxList.add(bbox);
+			} else {
+				for (int i = 0; i < bboxList.size(); i++) {
+					Real2Range bbox1 = bboxList.get(i);
+					// merge into existing box
+					if (bbox != null && bbox1 != null && bbox.intersectionWith(bbox1) != null) {
+						bbox1 = bbox1.plus(bbox); 
+						bboxList.set(i, bbox1);
+						bbox = null;
+					}
+				}
+				if (bbox != null) {
+					bboxList.add(bbox);
+				}
+			}
+		}
+		contractOverLappingBoxes(bboxList);
+		return bboxList;
+	}
+
+	private static void contractOverLappingBoxes(List<Real2Range> bboxList) {
+		while (true) {
+			Real2Range bboxi = null;
+			int detach = -1;
+			outer:
+			for (int i = 1; i < bboxList.size(); i++) {
+				bboxi = bboxList.get(i);
+				for (int j = 0; j < i; j++) {
+					Real2Range bboxj = bboxList.get(j);
+					// merge into existing box
+					if (bboxi.intersectionWith(bboxj) != null) {
+						bboxj = bboxj.plus(bboxi); 
+						bboxList.set(j, bboxj);
+						detach = i;
+						break outer;
+					}
+				}
+			}
+			if (detach >= 0) {
+				bboxList.remove(detach);
+			} else {
+				break;
+			}
+		}
+	}
+
+	public static String getSVGXAttribute(SVGElement svgElement, String attName) {
+		Attribute attribute = getSVGXAttributeAttribute(svgElement, attName);
+		return (attribute == null) ? null : attribute.getValue();
+	}
+
+	public static Attribute getSVGXAttributeAttribute(SVGElement svgElement, String attName) {
+		Attribute attribute = svgElement.getAttribute(attName, SVGConstants.SVGX_NS);
+		return attribute;
+	}
+
+	public static void setSVGXAttribute(SVGElement svgElement, String attName, String value) {
+		if (attName != null && value != null) {
+			Attribute attribute = new Attribute(SVGConstants.SVGX_PREFIX+XMLConstants.S_COLON+attName, SVGConstants.SVGX_NS, value);
+			svgElement.addAttribute(attribute);
+		}
+	}
+
+	public static void debug(Element gChunk, FileOutputStream fileOutputStream,
+			int indent) {
+		try {
+			XMLUtil.debug(gChunk, fileOutputStream, indent);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static void debug(Element element, String filename, int indent) {
+		try {
+			debug(element, new FileOutputStream(filename), indent);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static SVGSVG createSVGSVG(List<? extends SVGElement> elementList) {
+		SVGSVG svg = new SVGSVG();
+		Real2Range boundingBox = SVGElement.createBoundingBox(elementList);
+		if (boundingBox != null) {
+			svg.setWidth(boundingBox.getXRange().getRange());
+			svg.setHeight(boundingBox.getYRange().getRange());
+			Real2 origin = boundingBox.getCorners()[0];
+			Transform2 t2 = new Transform2(new Vector2(origin.multiplyBy(-1.0)));
+			SVGG g = new SVGG();
+			svg.appendChild(g);
+			g.setTransform(t2);
+			for (SVGElement element : elementList) {
+				g.appendChild(SVGElement.readAndCreateSVG(element));
+			}
+		}
+		return svg;
+	}
+
+//	public static AffineTransform createAffineTransform(Transform2 transform2) {
+//		AffineTransform affineTransform = null;
+//		if (transform2 != null) {
+//			double[][] t2matrix = transform2.getMatrix();
+//			double[] array = new double[6];
+//			array[0] = t2matrix[0][0];
+//			array[1] = t2matrix[0][1];
+//			array[2] = t2matrix[0][2];
+//			array[3] = t2matrix[1][0];
+//			array[4] = t2matrix[1][1];
+//			array[5] = t2matrix[1][2];
+//			affineTransform = new AffineTransform(
+//					array[0], array[1], array[2], array[3], array[4], array[5]);
+//		}
+//		return affineTransform;
+//	}
 }
