@@ -84,17 +84,7 @@ public class HiddenGraphics {
 	}
 	
 	public BufferedImage createImageTranslatedToOrigin(SVGElement element) {
-		// element is already shifted to origin?
-//		LOG.debug("CUM: "+element.getCumulativeTransform());
-//		LOG.debug("Before shift: "+element.toXML().substring(0, 300));
 		SVGElement elementCopy = SVGElement.readAndCreateSVG(element);
-//		Real2Range boundingBox = element.getBoundingBox();
-//		Real2 shift = new Real2(boundingBox.getXMin(), boundingBox.getYMin());
-//		Real2 shift = new Real2(-boundingBox.getXMin(), -boundingBox.getYMin());
-//		Real2 shift = new Real2(0., 0.);
-//		elementCopy.translate(shift);
-//		LOG.debug("CUM: "+elementCopy.getCumulativeTransform());
-//		LOG.debug("Shifted to orgin: "+elementCopy.toXML().substring(0, 300));
 		return createImage(elementCopy);
 	}
 		
