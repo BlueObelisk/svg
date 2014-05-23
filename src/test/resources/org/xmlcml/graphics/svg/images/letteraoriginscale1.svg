@@ -1,0 +1,31 @@
+<svg width="600.0" height="800.0" stroke="none" stroke-width="0.0" xmlns="http://www.w3.org/2000/svg"> 
+<!-- this is a letter "a" inverted. The transformation puts it at origin
+correct way up with bounding box NW corner touching origin -->
+ <rect x="0" y="0" width="168" height="990" fill="none" stroke="blue" stroke-width="3" opacity="0.3"/>
+ <image transform="matrix(1.0,-0.0,-0.0,-1.0, 0.,990.0)" x="0.0" y="0.0" width="168.0" height="990.0" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAFKCAYAAABIG5xgAAABQ0lEQVR42u3aQQ7CMAwAwf7/0+HEjYJa4thOZySOkCyIplgcBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8GDjxyNqjfSwGZuKet3pYXc2E/3mhcRd2dBYHTkCHlHrlYj7tpmx8KsQHvhpQ2Nl5MpP586a314//Tg4e+7MN7HElSzyIlXmLIo6aqYtmnHW9los4xYt5V5QoECBlxcT2D1wdA48nhC4OlJg1GRt1aJpgatmoemB0Z9micDIyDKBUaHlAmeHlg2ctcHygf9utE3g3dFHu8AZI8I2gTND29g+sMKo8nQDFY+ZkjfYArNHFkOgQIECOyyYdtBvP1F7xMiw0h8Rtp2ktRwXlvyZlPWPwrbjhy3GhO1/uW8b1uri8fYCr8WfmTxzW6MAAAAASUVORK5CYII=" xmlns:xlink="http://www.w3.org/1999/xlink" opacity="0.2"/>
+ 
+ <!-- scale down and keep at origin (this is actual size of image from bufferedImage.getHeight() etc -->
+ <rect x="0" y="0" width="16.8" height="99.0" fill="red" opacity="0.3"/>
+ <image transform="matrix(1.0,-0.0,-0.0,-1.0, 0., 99)" x="0.0" y="0.0" width="16.8" height="99.0" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAFKCAYAAABIG5xgAAABQ0lEQVR42u3aQQ7CMAwAwf7/0+HEjYJa4thOZySOkCyIplgcBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8GDjxyNqjfSwGZuKet3pYXc2E/3mhcRd2dBYHTkCHlHrlYj7tpmx8KsQHvhpQ2Nl5MpP586a314//Tg4e+7MN7HElSzyIlXmLIo6aqYtmnHW9los4xYt5V5QoECBlxcT2D1wdA48nhC4OlJg1GRt1aJpgatmoemB0Z9micDIyDKBUaHlAmeHlg2ctcHygf9utE3g3dFHu8AZI8I2gTND29g+sMKo8nQDFY+ZkjfYArNHFkOgQIECOyyYdtBvP1F7xMiw0h8Rtp2ktRwXlvyZlPWPwrbjhy3GhO1/uW8b1uri8fYCr8WfmTxzW6MAAAAASUVORK5CYII=" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+ 
+ <!-- keep scaling down; converges to origin as long as translation is same as height -->
+ <image transform="matrix(1.0,-0.0,-0.0,-1.0, 0., 33)" x="0.0" y="0.0" width="5.6" height="33" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAFKCAYAAABIG5xgAAABQ0lEQVR42u3aQQ7CMAwAwf7/0+HEjYJa4thOZySOkCyIplgcBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8GDjxyNqjfSwGZuKet3pYXc2E/3mhcRd2dBYHTkCHlHrlYj7tpmx8KsQHvhpQ2Nl5MpP586a314//Tg4e+7MN7HElSzyIlXmLIo6aqYtmnHW9los4xYt5V5QoECBlxcT2D1wdA48nhC4OlJg1GRt1aJpgatmoemB0Z9micDIyDKBUaHlAmeHlg2ctcHygf9utE3g3dFHu8AZI8I2gTND29g+sMKo8nQDFY+ZkjfYArNHFkOgQIECOyyYdtBvP1F7xMiw0h8Rtp2ktRwXlvyZlPWPwrbjhy3GhO1/uW8b1uri8fYCr8WfmTxzW6MAAAAASUVORK5CYII=" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+ 
+ <!-- increasing width beyond aspect ratio translates right (i.e. right justified, whitespace at left -->
+ <rect x="91.6" y="0.0" width="16.8" height="99" fill="yellow" opacity="0.3"/>
+ <image transform="matrix(1.0,-0.0,-0.0,-1.0, 0., 99.0)" x="0.0" y="0.0" width="200" height="99" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAFKCAYAAABIG5xgAAABQ0lEQVR42u3aQQ7CMAwAwf7/0+HEjYJa4thOZySOkCyIplgcBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8GDjxyNqjfSwGZuKet3pYXc2E/3mhcRd2dBYHTkCHlHrlYj7tpmx8KsQHvhpQ2Nl5MpP586a314//Tg4e+7MN7HElSzyIlXmLIo6aqYtmnHW9los4xYt5V5QoECBlxcT2D1wdA48nhC4OlJg1GRt1aJpgatmoemB0Z9micDIyDKBUaHlAmeHlg2ctcHygf9utE3g3dFHu8AZI8I2gTND29g+sMKo8nQDFY+ZkjfYArNHFkOgQIECOyyYdtBvP1F7xMiw0h8Rtp2ktRwXlvyZlPWPwrbjhy3GhO1/uW8b1uri8fYCr8WfmTxzW6MAAAAASUVORK5CYII=" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+ 
+ <!-- increasing width beyond aspect ratio translates right (i.e. mid justified, whitespace at left and right-->
+ <rect x="91.6" y="0.0" width="16.8" height="99" fill="yellow" opacity="0.3"/>
+ <image transform="matrix(1.0,-0.0,-0.0,-1.0, 0., 99.0)" x="0.0" y="0.0" width="200" height="99" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAFKCAYAAABIG5xgAAABQ0lEQVR42u3aQQ7CMAwAwf7/0+HEjYJa4thOZySOkCyIplgcBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8GDjxyNqjfSwGZuKet3pYXc2E/3mhcRd2dBYHTkCHlHrlYj7tpmx8KsQHvhpQ2Nl5MpP586a314//Tg4e+7MN7HElSzyIlXmLIo6aqYtmnHW9los4xYt5V5QoECBlxcT2D1wdA48nhC4OlJg1GRt1aJpgatmoemB0Z9micDIyDKBUaHlAmeHlg2ctcHygf9utE3g3dFHu8AZI8I2gTND29g+sMKo8nQDFY+ZkjfYArNHFkOgQIECOyyYdtBvP1F7xMiw0h8Rtp2ktRwXlvyZlPWPwrbjhy3GhO1/uW8b1uri8fYCr8WfmTxzW6MAAAAASUVORK5CYII=" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+ 
+ <!-- increasing height beyond aspect ratio translates bottom up (i.e. mid justified, whitespace at left and right 
+ (568 - 168) / 2 = 200  -->
+ <rect x="200.0" y="0.0" width="168" height="990" fill="magenta" opacity="0.3"/>
+ <image transform="matrix(1.0,-0.0,-0.0,-1.0, 0., 990)" x="0.0" y="0.0" width="568" height="990" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAFKCAYAAABIG5xgAAABQ0lEQVR42u3aQQ7CMAwAwf7/0+HEjYJa4thOZySOkCyIplgcBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8GDjxyNqjfSwGZuKet3pYXc2E/3mhcRd2dBYHTkCHlHrlYj7tpmx8KsQHvhpQ2Nl5MpP586a314//Tg4e+7MN7HElSzyIlXmLIo6aqYtmnHW9los4xYt5V5QoECBlxcT2D1wdA48nhC4OlJg1GRt1aJpgatmoemB0Z9micDIyDKBUaHlAmeHlg2ctcHygf9utE3g3dFHu8AZI8I2gTND29g+sMKo8nQDFY+ZkjfYArNHFkOgQIECOyyYdtBvP1F7xMiw0h8Rtp2ktRwXlvyZlPWPwrbjhy3GhO1/uW8b1uri8fYCr8WfmTxzW6MAAAAASUVORK5CYII=" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+ 
+ <!-- increasing height beyond aspect ratio translates bottom up (i.e. top justified, whitespace at bottom -->
+ <image transform="matrix(1.0,-0.0,-0.0,-1.0, 0., 99)" x="0.0" y="-100.0" width="16.8" height="120" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAFKCAYAAABIG5xgAAABQ0lEQVR42u3aQQ7CMAwAwf7/0+HEjYJa4thOZySOkCyIplgcBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8GDjxyNqjfSwGZuKet3pYXc2E/3mhcRd2dBYHTkCHlHrlYj7tpmx8KsQHvhpQ2Nl5MpP586a314//Tg4e+7MN7HElSzyIlXmLIo6aqYtmnHW9los4xYt5V5QoECBlxcT2D1wdA48nhC4OlJg1GRt1aJpgatmoemB0Z9micDIyDKBUaHlAmeHlg2ctcHygf9utE3g3dFHu8AZI8I2gTND29g+sMKo8nQDFY+ZkjfYArNHFkOgQIECOyyYdtBvP1F7xMiw0h8Rtp2ktRwXlvyZlPWPwrbjhy3GhO1/uW8b1uri8fYCr8WfmTxzW6MAAAAASUVORK5CYII=" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+ 
+ 
+</svg>

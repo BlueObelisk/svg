@@ -16,31 +16,28 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
-import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.List;
-
-import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
+import org.xmlcml.euclid.*;
 
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealRange;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.euclid.Util;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 
 /** draws a straight line.
  * 
  * @author pm286
  *
  */
-public class SVGRect extends SVGElement {
+public class SVGRect extends SVGShape {
 
+	public final static String ALL_RECT_XPATH = ".//svg:rect";
+
+	private static final String HEIGHT = "height";
+	private static final String WIDTH = "width";
+	private static final String Y = "y";
+	private static final String X = "x";
 	final public static String TAG ="rect";
 
 	/** constructor
@@ -53,7 +50,7 @@ public class SVGRect extends SVGElement {
 	/** constructor
 	 */
 	public SVGRect(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor
@@ -102,7 +99,9 @@ public class SVGRect extends SVGElement {
 		SVGRect rect = null;
 		if (r2r != null) {
 			Real2[] corners = r2r.getCorners();
-			rect = new SVGRect(corners[0], corners[1]);
+			if (corners != null && corners.length == 2) {
+				rect = new SVGRect(corners[0], corners[1]);
+			}
 		}
 		return rect;
 	}
@@ -120,41 +119,41 @@ public class SVGRect extends SVGElement {
 //  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="white" style="stroke-width:0.12;"/>
 //</g>
 	
+	@Deprecated //"use createFromReal2Range which deals with nulls"
 	public SVGRect(Real2Range bbox) {
-		this(bbox.getXRange().getMin(), bbox.getYRange().getMin(), bbox.getXRange().getRange(), bbox.getYRange().getRange());
+		this(bbox.getXMin(), bbox.getYMin(), bbox.getXRange().getRange(), bbox.getYRange().getRange());
 	}
+	
+//	public static SVGRect createSVGRect(Real2Range bbox) {
+//		SVGRect rect = null;
+//		if (bbox != null) {
+//			RealRange xRange = bbox.getXRange();
+//			RealRange yRange = bbox.getYRange();
+//			if (xRange != null && yRange != null) {
+//				rect = new SVGRect(xRange.getMin(), yRange.getMin(), xRange.getRange(), yRange.getRange());
+//			}
+//		}
+//		return rect;
+//	}
 
 	protected void drawElement(Graphics2D g2d) {
-		double x1 = this.getDouble("x");
-		double y1 = this.getDouble("y");
+		saveGraphicsSettingsAndApplyTransform(g2d);
+		ensureCumulativeTransform();
+		double x1 = this.getDouble(X);
+		double y1 = this.getDouble(Y);
 		Real2 xy1 = new Real2(x1, y1);
 		xy1 = transform(xy1, cumulativeTransform);
-		double w = this.getDouble("width");
-		double h = this.getDouble("height");
+		double w = this.getDouble(WIDTH);
+		double h = this.getDouble(HEIGHT);
 		Real2 xy2 = new Real2(x1+w, y1+h);
 		xy2 = transform(xy2, cumulativeTransform);
-		float width = 1.0f;
-		String style = this.getAttributeValue("style");
-		if (style.startsWith("stroke-width:")) {
-			style = style.substring("stroke-width:".length());
-			style = style.substring(0, (style+S_SEMICOLON).indexOf(S_SEMICOLON));
-			width = (float) new Double(style).doubleValue();
-			width *= 15.f;
-		}
 		
-		Stroke s = new BasicStroke(width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
-		g2d.setStroke(s);
-		
-		String colorS = "black";
-		String stroke = this.getAttributeValue("stroke");
-		if (stroke != null) {
-			colorS = stroke;
-		}
-		Color color = colorMap.get(colorS);
-		g2d.setColor(color);
-		Line2D line = new Line2D.Double(xy1.x, xy1.y, xy2.x, xy2.y);
-		g2d.draw(line);
+		Rectangle2D rect = new Rectangle2D.Double(xy1.x, xy1.y, xy2.x-xy1.x, xy2.y-xy1.y);
+		fill(g2d, rect);
+		draw(g2d, rect);
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
+
 	
 	public void applyTransform(Transform2 t2) {
 		//assume scale and translation only
@@ -222,5 +221,14 @@ public class SVGRect extends SVGElement {
 			}
 		}
 		return rectList;
+	}
+	
+	@Override
+	public String getGeometricHash() {
+		return getAttributeValue(X)+" "+getAttributeValue(Y)+" "+getAttributeValue(WIDTH)+" "+getAttributeValue(HEIGHT);
+	}
+
+	public static List<SVGRect> extractSelfAndDescendantRects(SVGG g) {
+		return SVGRect.extractRects(SVGUtil.getQuerySVGElements(g, ALL_RECT_XPATH));
 	}
 }

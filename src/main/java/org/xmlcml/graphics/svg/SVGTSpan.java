@@ -16,28 +16,17 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
+import nu.xom.Element;
+import nu.xom.Node;
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real2;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.Text;
-
-import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
-import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Real;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.euclid.Util;
-
 /** draws text.
  * 
- * NOTE: Text can be rotated and the additonal fields manage some of the
+ * NOTE: Text can be rotated and the additional fields manage some of the
  * metrics for this. Still very experimental
  * 
  * @author pm286
@@ -45,7 +34,7 @@ import org.xmlcml.euclid.Util;
  */
 public class SVGTSpan extends SVGText {
 	private static Logger LOG = Logger.getLogger(SVGTSpan.class);
-	public final static String TAG ="tspan";
+	public final static String TAG = "tspan";
 	
 	
 	/** constructor
@@ -63,7 +52,7 @@ public class SVGTSpan extends SVGText {
 	/** constructor
 	 */
 	public SVGTSpan(SVGTSpan element) {
-        super((SVGElement) element, TAG);
+        super(element, TAG);
 	}
 	
 	/** constructor

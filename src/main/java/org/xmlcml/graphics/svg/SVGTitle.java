@@ -16,13 +16,13 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Graphics2D;
-
 import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.Text;
-
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Array;
+
+import java.awt.*;
 
 /** draws a straight line.
  * 
@@ -30,6 +30,8 @@ import org.xmlcml.euclid.Real2Array;
  *
  */
 public class SVGTitle extends SVGElement {
+	
+	private final static Logger LOG = Logger.getLogger(SVGTitle.class);
 
 	public final static String TAG ="title";
 
@@ -45,7 +47,7 @@ public class SVGTitle extends SVGElement {
 	/** constructor
 	 */
 	public SVGTitle(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor
@@ -82,9 +84,12 @@ public class SVGTitle extends SVGElement {
     }
 	
 	protected void drawElement(Graphics2D g2d) {
-//		Path2D path = createAndSetPath2D();
-		applyAttributes(g2d);
-//		g2d.draw(path);
+		LOG.error("SVGTitle.drawElement NYI");
+//		processTransformToAffineTransform(g2d);
+////		Path2D path = createAndSetPath2D();
+//		applyAttributes(g2d);
+////		g2d.draw(path);
+//		resetAffineTransform(g2d);
 	}
 
 	public void applyAttributes(Graphics2D g2d) {

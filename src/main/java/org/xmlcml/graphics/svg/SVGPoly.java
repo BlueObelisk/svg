@@ -17,34 +17,34 @@
 package org.xmlcml.graphics.svg;
 
 
-import java.awt.BasicStroke;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
+import nu.xom.Attribute;
+import nu.xom.Element;
+import nu.xom.Node;
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Axis.Axis2;
+import org.xmlcml.euclid.*;
+import org.xmlcml.euclid.RealArray.Monotonicity;
+import org.xmlcml.xml.XMLConstants;
+
+import java.awt.*;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import nu.xom.Attribute;
-import nu.xom.Element;
-import nu.xom.Node;
-
-import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
-import org.xmlcml.euclid.Axis.Axis2;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealArray;
-import org.xmlcml.euclid.RealArray.Monotonicity;
-import org.xmlcml.euclid.Transform2;
-
-/** draws a straight line.
+/** 
+ * Represents a collection of straight lines.
  * 
  * @author pm286
  *
  */
-public abstract class SVGPoly extends SVGElement {
+public abstract class SVGPoly extends SVGShape {
+	private static final String X1 = "x1";
+	private static final String X2 = "x2";
+	private static final String Y1 = "y1";
+	private static final String Y2 = "y2";
+
 	@SuppressWarnings("unused")
 	private static Logger LOG = Logger.getLogger(SVGPoly.class);
 	
@@ -54,29 +54,32 @@ public abstract class SVGPoly extends SVGElement {
 		POINTS
 	};
 	public final static List<String> SVG_ATTS = Arrays.asList(
-		new String[] {
-			POINTS
-		}
-	);
-	
+            POINTS);
 	
 	protected Real2Array real2Array;
 	protected List<SVGLine> lineList;
-	protected List<SVGMarker> pointList;
-	
-	/** constructor
+	protected List<SVGMarker> markerList;
+
+	protected Boolean isClosed = false;
+	protected Boolean isBox;
+	protected Boolean isAligned = null;
+
+	/** 
+	 * Constructor
 	 */
 	public SVGPoly(String name) {
 		super(name);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPoly(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
-	/** constructor
+	/** 
+	 * Constructor
 	 */
 	public SVGPoly(Element element) {
         super((SVGElement) element);
@@ -91,8 +94,9 @@ public abstract class SVGPoly extends SVGElement {
 		line.setStroke("black");
 		line.setStrokeWidth(1.0);
 	}
+	
     /**
-     * copy node .
+     * Copies node.
      *
      * @return Node
      */
@@ -108,10 +112,10 @@ public abstract class SVGPoly extends SVGElement {
 			System.err.println("null real2Array in polyline: ");
 		} else {
 			String points = r2a.getStringArray();
-			this.addAttribute(new Attribute(POINTS, points));
+			addAttribute(new Attribute(POINTS, points));
 			// copy unless same object
-			if (this.real2Array != r2a) {
-				this.real2Array = new Real2Array(r2a);
+			if (real2Array != r2a) {
+				real2Array = new Real2Array(r2a);
 			}
 		}
 	}
@@ -119,39 +123,36 @@ public abstract class SVGPoly extends SVGElement {
 	public Real2Array getReal2Array() {
 		if (real2Array == null) {
 			real2Array = Real2Array.createFromPairs(
-					this.getAttributeValue("points"), CMLConstants.S_COMMA+S_PIPE+S_SPACE);
+					getAttributeValue("points"), XMLConstants.S_COMMA+S_PIPE+S_SPACE);
 		}
 		return real2Array;
 	}
 	
 	
-//  <g style="stroke-width:0.2;">
-//  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="black" style="stroke-width:0.36;"/>
-//  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="white" style="stroke-width:0.12;"/>
-//</g>
-	
-	protected void drawElement(Graphics2D g2d) {
-		Line2D path = createAndSetLine2D();
-		applyAttributes(g2d);
-		g2d.draw(path);
-	}
+	/*<g style="stroke-width:0.2;">
+	  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="black" style="stroke-width:0.36;"/>
+	  <line x1="-1.9021130325903073" y1="0.6180339887498945" x2="-1.175570504584946" y2="-1.618033988749895" stroke="white" style="stroke-width:0.12;"/>
+	</g>*/
+
+	protected abstract void drawElement(Graphics2D g2d);
 
 	public void applyAttributes(Graphics2D g2d) {
 		if (g2d != null) {
-			double width = (double) this.getStrokeWidth();
-			Stroke s = new BasicStroke((float)width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+			double width = getStrokeWidth();
+			Stroke s = new BasicStroke((float) width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
 			g2d.setStroke(s);
 			super.applyAttributes(g2d);
 		}
 	}
 
-	public List<SVGMarker> createPointList() {
+	public List<SVGMarker> createMarkerList() {
 		createLineList();
-		return pointList;
+		return markerList;
 	}
 	
 	public Line2D.Double createAndSetLine2D() {
-		double x1 = this.getDouble("x1");
+		ensureCumulativeTransform();
+		double x1 = this.getDouble(X1);
 		double y1 = this.getDouble("y1");
 		Real2 xy1 = new Real2(x1, y1);
 		xy1 = transform(xy1, cumulativeTransform);
@@ -161,7 +162,8 @@ public abstract class SVGPoly extends SVGElement {
 		xy2 = transform(xy2, cumulativeTransform);
 		float width = 5.0f;
 		String style = this.getAttributeValue("style");
-		if (style.startsWith("stroke-width:")) {
+		// does this work???
+		if (style != null && style.startsWith("stroke-width:")) {
 			style = style.substring("stroke-width:".length());
 			style = style.substring(0, (style+S_SEMICOLON).indexOf(S_SEMICOLON));
 			width = (float) new Double(style).doubleValue();
@@ -183,8 +185,13 @@ public abstract class SVGPoly extends SVGElement {
      * @return this
      */
     public void format(int places) {
-    	real2Array.format(places);
-    	setReal2Array(real2Array);
+    	getReal2Array();
+    	if (real2Array == null) {
+    		throw new RuntimeException("Null real2Array");
+    	} else {
+	    	real2Array.format(places);
+	    	setReal2Array(real2Array);
+    	}
     }
     
     public Real2 getLast() {
@@ -209,7 +216,8 @@ public abstract class SVGPoly extends SVGElement {
     }
  	
     /**
-     * inspects if all values along axis increase or decrease monotonically
+     * Inspects if all values along axis increase or decrease monotonically
+     * 
      * @param axis (null returns null)
      * @return {@link Monotonicity} null if not monotonic or only one value
      */
@@ -217,21 +225,22 @@ public abstract class SVGPoly extends SVGElement {
     	Monotonicity monotonicity = null;
     	if (axis != null) {
 	    	Real2Array real2Array = getReal2Array(); 
-	    	RealArray realArray = (axis.equals(Axis2.X)) ? real2Array.getXArray() : real2Array.getYArray();
+	    	RealArray realArray = (axis.equals(Axis2.X) ? real2Array.getXArray() : real2Array.getYArray());
 	    	monotonicity = realArray.getMonotonicity();
     	}
     	return monotonicity;
     }
     
     public void clearMonotonicities() {
-    	this.removeAttribute(this.getAttribute(MONOTONIC+Axis2.X));
-    	this.removeAttribute(this.getAttribute(MONOTONIC+Axis2.Y));
+    	removeAttribute(getAttribute(MONOTONIC+Axis2.X));
+    	removeAttribute(getAttribute(MONOTONIC+Axis2.Y));
     }
     
     public void addMonotonicityAttributes() {
-		this.addMonotonicity(Axis2.X);
-		this.addMonotonicity(Axis2.Y);
+		addMonotonicity(Axis2.X);
+		addMonotonicity(Axis2.Y);
     }
+    
 	/**
 	 * @param polyline
 	 * @param axis
@@ -239,29 +248,38 @@ public abstract class SVGPoly extends SVGElement {
 	private void addMonotonicity(Axis2 axis) {
 		Monotonicity mono = this.getMonotonicity(axis);
 		if (mono != null) {
-			this.addAttribute(new Attribute(MONOTONIC+axis, ""+mono));
+			addAttribute(new Attribute(MONOTONIC+axis, String.valueOf(mono)));
 		}
 	}
 	
-	/** property of graphic bounding box
-	 * can be overridden
+	/** 
+	 * Property of graphic bounding box
+	 * <p>
+	 * Can be overridden
+	 * 
 	 * @return default none
 	 */
 	protected String getBBFill() {
 		return "none";
 	}
 
-	/** property of graphic bounding box
-	 * can be overridden
+	/** 
+	 * Property of graphic bounding box
+	 * <p>
+	 * Can be overridden
+	 * 
 	 * @return default red
 	 */
 	protected String getBBStroke() {
 		return "red";
 	}
 
-	/** property of graphic bounding box
-	 * can be overridden
-	 * @return default 0.5
+	/** 
+	 * Property of graphic bounding box
+	 * <p>
+	 * Can be overridden
+	 * 
+	 * @return default 0.3
 	 */
 	protected double getBBStrokeWidth() {
 		return 0.3;
@@ -275,10 +293,10 @@ public abstract class SVGPoly extends SVGElement {
 	}
 
 	public List<SVGMarker> getPointList() {
-		if (pointList == null) {
-			createPointList();
+		if (markerList == null) {
+			createMarkerList();
 		}
-		return pointList;
+		return markerList;
 	}
 
 	public List<SVGLine> createLineList() {
@@ -286,7 +304,7 @@ public abstract class SVGPoly extends SVGElement {
 	}
 	
 	public List<SVGLine> createLineList(boolean clear) {
-		Attribute pointsAtt = this.getAttribute(POINTS);
+		Attribute pointsAtt = getAttribute(POINTS);
 		if (clear) {
 			lineList = null;
 			if (pointsAtt != null) {
@@ -295,19 +313,19 @@ public abstract class SVGPoly extends SVGElement {
 		}
 		if (lineList == null) {
 			if (pointsAtt != null) {
-				real2Array = Real2Array.createFromPairs(pointsAtt.getValue(), CMLConstants.S_SPACE);
+				real2Array = Real2Array.createFromPairs(pointsAtt.getValue(), XMLConstants.S_SPACE);
 			}
-			String id = this.getId();
+			String id = getId();
 			lineList = new ArrayList<SVGLine>();
-			pointList = new ArrayList<SVGMarker>();
+			markerList = new ArrayList<SVGMarker>();
 			SVGMarker lastPoint = new SVGMarker(real2Array.get(0));
-			pointList.add(lastPoint);
+			markerList.add(lastPoint);
 			SVGLine line;
 			for (int i = 1; i < real2Array.size(); i++) {
-				line = new SVGLine(real2Array.elementAt(i-1), real2Array.elementAt(i));
+				line = new SVGLine(real2Array.elementAt(i - 1), real2Array.elementAt(i));
 				copyNonSVGAttributes(this, line);
 				SVGMarker point = new SVGMarker(real2Array.get(i));
-				pointList.add(point);
+				markerList.add(point);
 				lastPoint.addLine(line);
 				point.addLine(line);
 				if (line.getEuclidLine().getLength() < 0.0000001) {
@@ -322,11 +340,37 @@ public abstract class SVGPoly extends SVGElement {
 		return lineList;
 	}
 	
-	private void copyNonSVGAttributes(SVGPoly svgPoly, SVGLine line) {
+	/** 
+	 * Iterates over all polys and extracts lines.
+	 * <p>
+	 * Uses poly.createLineList().
+	 * 
+	 * @param polyList list of polys
+	 * @return
+	 */
+	public static List<SVGLine> splitPolylinesToLines(List<? extends SVGPoly> polyList) {
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		for (SVGPoly poly : polyList) {
+			List<SVGLine> lines = poly.createLineList();
+			lineList.addAll(lines);
+		}
+		return lineList;
+	}
+	
+	protected void copyNonSVGAttributesFrom(Element element) {
+		for (int i = 0; i < element.getAttributeCount(); i++) {
+			Attribute attribute = element.getAttribute(i);
+			if (!SVG_ATTS.contains(attribute.getLocalName())) {
+				addAttribute((Attribute) attribute.copy());
+			}
+		}
+	}
+	
+	protected void copyNonSVGAttributes(SVGPoly svgPoly, SVGLine line) {
 		for (int i = 0; i < svgPoly.getAttributeCount(); i++) {
 			Attribute attribute = svgPoly.getAttribute(i);
 			if (!SVG_ATTS.contains(attribute.getLocalName())) {
-				line.addAttribute((Attribute)attribute.copy());
+				line.addAttribute((Attribute) attribute.copy());
 			}
 		}
 	}
@@ -339,10 +383,123 @@ public abstract class SVGPoly extends SVGElement {
 	}
 
 	protected List<SVGMarker> ensurePointList() {
-		if (pointList == null) {
-			pointList = new ArrayList<SVGMarker>();
+		if (markerList == null) {
+			markerList = new ArrayList<SVGMarker>();
 		}
-		return pointList;
+		return markerList;
 	}
 
+	@Override
+	public String getGeometricHash() {
+		return String.valueOf(real2Array);
+	}
+
+	protected void drawPolylineOrGon(Graphics2D g2d, boolean closed) {
+		saveGraphicsSettingsAndApplyTransform(g2d);
+		getReal2Array();
+		GeneralPath poly = 
+		        new GeneralPath(GeneralPath.WIND_EVEN_ODD, real2Array.size());
+		Real2 xy0 = real2Array.elementAt(0);
+		xy0 = transform(xy0, cumulativeTransform);
+		poly.moveTo(xy0.getX(), xy0.getY());
+		for (int i = 1; i < real2Array.size(); i++) {
+			Real2 xy = real2Array.elementAt(i);
+			xy = transform(xy, cumulativeTransform);
+		    poly.lineTo(xy.getX(), xy.getY());
+		}
+        if (closed) {
+			poly.closePath();
+		}
+		fill(g2d, poly);
+		draw(g2d, poly);
+		restoreGraphicsSettingsAndTransform(g2d);
+	}
+
+	public SVGRect createRect(double epsilon) {
+		SVGRect rect = null;
+		if (this != null && isBox(epsilon)) {
+			Real2Range r2r = getBoundingBox();
+			rect = new SVGRect(r2r.getCorners()[0], r2r.getCorners()[1]);
+			rect.setFill("none");
+		}
+		return rect;
+	}
+
+	public Boolean isClosed() {
+		return isClosed;
+	}
+
+	public Boolean isBox() {
+		return isBox;
+	}
+
+	@Deprecated
+	public Boolean getIsBox() {
+		return isBox;
+	}
+	
+	public void setClosed(boolean isClosed) {
+		this.isClosed = isClosed;
+	}
+
+	/** calculates whether 4 lines form a rectangle aligned with the axes
+	 * 
+	 * @param epsilon tolerance in coords
+	 * @return is rectangle
+	 */
+	public boolean isBox(double epsilon) {
+		if (isBox == null) {
+			isBox = false;
+			createLineList();
+			if (lineList == null) {
+				
+			} else if (lineList.size() == 4 || (lineList.size() == 3 && isClosed)) {
+				SVGLine line0 = lineList.get(0);
+				SVGLine line2 = lineList.get(2);
+				Real2 point0 = line0.getXY(0);
+				Real2 point1 = line0.getXY(1);
+				Real2 point2 = line2.getXY(0);
+				Real2 point3 = line2.getXY(1);
+				// vertical
+				// so we can debug!
+				double point0x = point0.getX();
+				double point1x = point1.getX();
+				double point2x = point2.getX();
+				double point3x = point3.getX();
+				double point0y = point0.getY();
+				double point1y = point1.getY();
+				double point2y = point2.getY();
+				double point3y = point3.getY();
+				
+				isBox = 
+					Real.isEqual(point0x, point1x, epsilon) &&
+					Real.isEqual(point2x, point3x, epsilon) &&
+					Real.isEqual(point1y, point2y, epsilon) &&
+					Real.isEqual(point3y, point0y, epsilon);
+				if (!isBox) {
+					isBox = Real.isEqual(point0y, point1y, epsilon) &&
+							Real.isEqual(point2y, point3y, epsilon) &&
+							Real.isEqual(point1x, point2x, epsilon) &&
+							Real.isEqual(point3x, point0x, epsilon);
+				}
+			}
+		}
+		return isBox;
+	}
+
+	public Boolean isAligned() {
+		return isAligned;
+	}
+
+	@Deprecated
+	public Boolean getIsAligned() {
+		return isAligned;
+	}
+
+	public static void replacePolyLinesBySplitLines(SVGElement svgElement) {
+		List<SVGPolyline> polylineList = SVGPolyline.extractSelfAndDescendantPolylines(svgElement);
+		for (SVGPoly polyline : polylineList) {
+			SVGPolyline.replacePolyLineBySplitLines(polyline);
+		}		
+	}
 }

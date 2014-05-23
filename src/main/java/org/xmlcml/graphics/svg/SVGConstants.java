@@ -17,10 +17,9 @@
 package org.xmlcml.graphics.svg;
 
 import nu.xom.XPathContext;
+import org.xmlcml.xml.XMLConstants;
 
-import org.xmlcml.cml.base.CMLConstants;
-
-public interface SVGConstants extends CMLConstants {
+public interface SVGConstants extends XMLConstants {
 
 	/** standard namespace for SVG
 	 * 
@@ -28,7 +27,11 @@ public interface SVGConstants extends CMLConstants {
 	public static final String SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 	public static final String XLINK_NS = "http://www.w3.org/1999/xlink";
 
-    /** XPathContext for CML.
+	public final static String SVGX_NS = "http://www.xml-cml.org/schema/svgx";
+	public final static String SVGX_PREFIX = "svgx";
+
+
+    /** XPathContext for SVG.
      */
     XPathContext SVG_XPATH = new XPathContext("svg", SVG_NAMESPACE);
     

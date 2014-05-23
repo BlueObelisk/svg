@@ -16,7 +16,7 @@
 
 package org.xmlcml.graphics.svg;
 
-import org.xmlcml.cml.base.CMLConstants;
+import org.xmlcml.xml.XMLConstants;
 
 /** superclass for graphics operations
  * allows (hopefully) rerouting to Java, SVG, etc.
@@ -24,7 +24,7 @@ import org.xmlcml.cml.base.CMLConstants;
  * @author pm286
  *
  */
-public class GraphicsTool implements CMLConstants {
+public class GraphicsTool implements XMLConstants {
 
 	SVGSVG svg;
 	

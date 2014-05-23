@@ -19,10 +19,9 @@ package org.xmlcml.graphics.svg;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
-
-import org.xmlcml.cml.base.CMLConstants;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.xml.XMLConstants;
 
 /** supports defs
  * 
@@ -43,7 +42,7 @@ public class SVGScript extends SVGElement {
 	/** constructor
 	 */
 	public SVGScript(SVGElement element) {
-        super((SVGElement) element);
+        super(element);
 	}
 	
 	/** constructor
@@ -79,7 +78,7 @@ public class SVGScript extends SVGElement {
 	}
 	
 	public void setHRef(String value) {
-		this.addAttribute(new Attribute(CMLConstants.XLINK_PREFIX+CMLConstants.S_COLON+HREF, CMLConstants.XLINK_NS, value));
+		this.addAttribute(new Attribute(XMLConstants.XLINK_PREFIX+XMLConstants.S_COLON+HREF, XMLConstants.XLINK_NS, value));
 	}
 	
 }

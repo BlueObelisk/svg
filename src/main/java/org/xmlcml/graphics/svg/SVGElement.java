@@ -16,47 +16,30 @@
 
 package org.xmlcml.graphics.svg;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import nu.xom.Attribute;
-import nu.xom.Comment;
-import nu.xom.Element;
-import nu.xom.Elements;
-import nu.xom.Node;
-import nu.xom.Nodes;
-import nu.xom.ParentNode;
-import nu.xom.ProcessingInstruction;
-import nu.xom.Text;
-
+import nu.xom.*;
+import nu.xom.canonical.Canonicalizer;
 import org.apache.log4j.Logger;
-import org.xmlcml.cml.base.CMLConstants;
-import org.xmlcml.cml.base.CMLElement;
-import org.xmlcml.cml.base.CMLUtil;
-import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Real;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealArray;
-import org.xmlcml.euclid.RealRange;
-import org.xmlcml.euclid.RealSquareMatrix;
-import org.xmlcml.euclid.Transform2;
+import org.xmlcml.euclid.*;
+import org.xmlcml.euclid.RealRange.Direction;
+import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
 
-/** base class for lightweight generic SVG element.
- * no checking - i.e. can take any name or attributes
+import java.awt.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+/** 
+ * Base class for lightweight generic SVG element.
+ * <p>
+ * No checking - i.e. can take any name or attributes.
+ * 
  * @author pm286
- *
  */
 public class SVGElement extends GraphicsElement {
-	private static Logger LOG = Logger.getLogger(GraphicsElement.class);
+	private static Logger LOG = Logger.getLogger(SVGElement.class);
+
+	public final static String ALL_ELEMENT_XPATH = "//svg:element";
 
 	public final static String SVG_CLASS = "class";
 	public final static String IMPROPER = "improper";
@@ -76,14 +59,19 @@ public class SVGElement extends GraphicsElement {
 	public final static String TITLE = "title";
 	public final static String ID = "id";
 
-	private static final String BOUNDING_BOX = "boundingBox";
+	protected static final String BOUNDING_BOX = "boundingBox";
 	
 	private Element userElement;
 	private String strokeSave;
 	private String fillSave;
 
+	protected Real2Range boundingBox = null;
+	protected boolean boundingBoxCached = false;
+	//private AffineTransform savedAffineTransform;
 	
-	/** constructor.
+	
+	/** 
+	 * Constructor.
 	 * 
 	 * @param name
 	 */
@@ -92,16 +80,17 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	public SVGElement(SVGElement element) {
-        super((GraphicsElement) element);
+        super(element);
         this.userElement = element.userElement;
 	}
 	
 	public SVGElement(SVGElement element, String tag) {
-        super((GraphicsElement) element, tag);
+        super(element, tag);
         this.userElement = element.userElement;
 	}
 	
-	/** copy constructor from non-subclassed elements
+	/** 
+	 * Copy constructor from non-subclassed elements
 	 */
 	public static SVGElement readAndCreateSVG(Element element) {
 		SVGElement newElement = null;
@@ -154,27 +143,28 @@ public class SVGElement extends GraphicsElement {
 	        createSubclassedChildren(element, newElement);
 		}
         return newElement;
-		
 	}
 	
-	/** converts a SVG file to SVGElement
+	/** 
+	 * Converts an SVG file to SVGElement
 	 * 
 	 * @param file
 	 * @return
 	 */
 	public static SVGElement readAndCreateSVG(File file) {
-		Element element = CMLUtil.parseQuietlyToDocument(file).getRootElement();
-		return (element == null) ? null : (SVGElement) readAndCreateSVG(element);
+		Element element = XMLUtil.parseQuietlyToDocument(file).getRootElement();
+		return (element == null ? null : readAndCreateSVG(element));
 	}
 	
-	/** converts a SVG file to SVGElement
+	/** 
+	 * Converts an SVG file to SVGElement
 	 * 
 	 * @param file
 	 * @return
 	 */
 	public static SVGElement readAndCreateSVG(InputStream is) {
-		Element element = CMLUtil.parseQuietlyToDocument(is).getRootElement();
-		return (element == null) ? null : (SVGElement) readAndCreateSVG(element);
+		Element element = XMLUtil.parseQuietlyToDocument(is).getRootElement();
+		return (element == null ? null : readAndCreateSVG(element));
 	}
 	
 	protected static void createSubclassedChildren(Element oldElement, SVGElement newElement) {
@@ -183,7 +173,8 @@ public class SVGElement extends GraphicsElement {
 				Node node = oldElement.getChild(i);
 				Node newNode = null;
 				if (node instanceof Text) {
-					newNode = new Text(node.getValue());
+					String value = node.getValue();
+					newNode = new Text(value);
 				} else if (node instanceof Comment) {
 					newNode = new Comment(node.getValue());
 				} else if (node instanceof ProcessingInstruction) {
@@ -196,6 +187,27 @@ public class SVGElement extends GraphicsElement {
 				newElement.appendChild(newNode);
 			}
 		}
+	}
+	
+	public boolean isEqualTo(SVGElement element) {
+		boolean equals = false;
+		if (element.getClass().equals(this.getClass())) {
+			XMLUtil.equalsCanonically(element, this, true);
+		}
+		return equals;
+	}
+	
+	public String getCanonicalizedXML() {
+		OutputStream out = new ByteArrayOutputStream();
+		Canonicalizer canonicalizer = new Canonicalizer(out, false);
+		String s = null;
+		try {
+			canonicalizer.write(this);
+			s = out.toString();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return s;
 	}
 	
 	/**
@@ -217,11 +229,13 @@ public class SVGElement extends GraphicsElement {
 	 * @param g2d
 	 */
 	protected void drawElement(Graphics2D g2d) {
+		saveGraphicsSettingsAndApplyTransform(g2d);
 		Elements gList = this.getChildElements();
 		for (int i = 0; i < gList.size(); i++) {
 			SVGElement svge = (SVGElement) gList.get(i);
 			svge.drawElement(g2d);
 		}
+		restoreGraphicsSettingsAndTransform(g2d);
 	}
 	
 	/**
@@ -321,13 +335,13 @@ public class SVGElement extends GraphicsElement {
 			List<Transform2> transformList = new ArrayList<Transform2>();
 			String s = transformAttributeValue.trim();
 			while (s.length() > 0) {
-				int lb = s.indexOf(CMLConstants.S_LBRAK);
-				int rb = s.indexOf(CMLConstants.S_RBRAK);
+				int lb = s.indexOf(XMLConstants.S_LBRAK);
+				int rb = s.indexOf(XMLConstants.S_RBRAK);
 				if (lb == -1 || rb == -1 || rb < lb) {
 					throw new RuntimeException("Unbalanced or missing brackets in transform");
 				}
 				String kw = s.substring(0, lb);
-				String values = s.substring(lb+1, rb);
+				String values = s.substring(lb + 1, rb);
 				// remove unwanted spaces
 				values = values.replaceAll("  *", " ");
 				s = s.substring(rb+1).trim();
@@ -476,24 +490,6 @@ public class SVGElement extends GraphicsElement {
 		}
 	}
 	
-	static Map<String, Color> colorMap;
-
-	protected Real2Range boundingBox = null;
-
-	protected boolean boundingBoxCached = false;
-	
-	static {
-		colorMap = new HashMap<String, Color>();
-		colorMap.put("black", new Color(0, 0, 0));
-		colorMap.put("white", new Color(255, 255, 255));
-		colorMap.put("red", new Color(255, 0, 0));
-		colorMap.put("green", new Color(0, 255, 0));
-		colorMap.put("blue", new Color(0, 0, 255));
-		colorMap.put("yellow", new Color(255, 255, 0));
-		colorMap.put("orange", new Color(255, 127, 0));
-		colorMap.put("#ff00ff", new Color(255, 0, 255));
-	}
-
 	/**
 	 * 
 	 * @param attName
@@ -501,55 +497,11 @@ public class SVGElement extends GraphicsElement {
 	 */
 	public Color getColor(String attName) {
 		String attVal = this.getAttributeValue(attName);
-		return getJava2DColor(attVal, this.getOpacity());
-	}
-
-	/**
-	 * translate SVG string to Java2D
-	 * opacity defaults to 1.0
-	 * @param color
-	 * @param colorS
-	 * @return
-	 */
-	public static Color getJava2DColor(String colorS) {
-		return getJava2DColor(colorS, 1.0);
-	}
-
-	/**
-	 * 
-	 * @param colorS common colors ("yellow"), etc or hexString
-	 * @param opacity 0.0 to 1.0
-	 * @return java Color or null
-	 */
-	public static Color getJava2DColor(String colorS, double opacity) {
-		Color color = null;
-		if ("none".equals(colorS)) {
-		} else if (colorS != null) {
-			color = colorMap.get(colorS);
-			if (color == null) {
-				if (colorS.length() == 7 && colorS.startsWith(S_HASH)) {
-					try {
-						int red = Integer.parseInt(colorS.substring(1, 3), 16);
-						int green = Integer.parseInt(colorS.substring(3, 5), 16);
-						int blue = Integer.parseInt(colorS.substring(5, 7), 16);
-						color = new Color(red, green, blue, 0);
-					} catch (Exception e) {
-						throw new RuntimeException("Cannot parse: "+colorS);
-					}
-					colorS = colorS.substring(1);
-				} else {
-//					System.err.println("Unknown color: "+colorS);
-				}
-			}
-		}
-		if (color != null) {
-			color = (Double.isNaN(opacity)) ? color : new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (255.0 * opacity));
-		} else {
-			color = new Color(255, 255, 255, 0);
-		}
+		Double opacity = this.getOpacity();
+		Color color = getJava2DColor(attVal, opacity);
 		return color;
 	}
-	
+
 	/**
 	 * transforms xy
 	 * messy
@@ -559,8 +511,20 @@ public class SVGElement extends GraphicsElement {
 	 */
 	public static Real2 transform(Real2 xy, Transform2 transform) {
 		xy.transformBy(transform);
-//		xy = xy.plus(new Real2(250, 250));
 		return xy;
+	}
+
+	/**
+	 * transforms xy
+	 * messy
+	 * @param xy is transformed
+	 * @param transform
+	 * @return transformed xy
+	 */
+	public static Double transform(Double d, Transform2 transform) {
+		RealArray ra = transform.getScales();
+		d = (ra == null) ? d : d * ra.get(0);
+		return d;
 	}
 
 	protected double getDouble(String attName) {
@@ -588,7 +552,7 @@ public class SVGElement extends GraphicsElement {
 				throw new RuntimeException("Bad transform: "+ts);
 			}
 			ts = ts.substring((MATRIX+"(").length());
-			ts = ts.substring(0, ts.length()-1);
+			ts = ts.substring(0, ts.length() - 1);
 			ts = ts.replace(S_COMMA, S_SPACE);
 			RealArray realArray = new RealArray(ts);
 			t = createTransformFrom1D(realArray.getArray());
@@ -625,9 +589,9 @@ public class SVGElement extends GraphicsElement {
 		}
 	}
 	
-
 	/**
 	 */
+	@Deprecated
 	public void draw() {
 //		FileOutputStream fos = new FileOutputStream(outfile);
 //		SVGElement g = MoleculeTool.getOrCreateTool(molecule).
@@ -635,7 +599,7 @@ public class SVGElement extends GraphicsElement {
 //		int indent = 2;
 //		SVGSVG svg = new SVGSVG();
 //		svg.appendChild(g);
-//		CMLUtil.debug(svg, fos, indent);
+//		SVGUtil.debug(svg, fos, indent);
 //		fos.close();
 //		LOG.debug("wrote SVG "+outfile);
 	}
@@ -715,7 +679,7 @@ public class SVGElement extends GraphicsElement {
 		text.setFontStyle(FontStyle.ITALIC);
 		text.setFontWeight(FontWeight.BOLD);
 		g.appendChild(text);
-		CMLUtil.debug(svg, fos, 2);
+		SVGUtil.debug(svg, fos, 2);
 		fos.close();		
 	}
 	
@@ -807,19 +771,19 @@ public class SVGElement extends GraphicsElement {
 		return t2;
 	}
 
-	public double getX() {
+	public Double getX() {
 		return this.getCoordinateValueDefaultZero(X);
 	}
 
-	public double getY() {
+	public Double getY() {
 		return this.getCoordinateValueDefaultZero(Y);
 	}
 
-	public double getCX() {
+	public Double getCX() {
 		return this.getCoordinateValueDefaultZero(CX);
 	}
 
-	public double getCY() {
+	public Double getCY() {
 		return this.getCoordinateValueDefaultZero(CY);
 	}
 	
@@ -829,7 +793,8 @@ public class SVGElement extends GraphicsElement {
 			if (decimalPlaces != null) {
 				r2r.format(decimalPlaces);
 			}
-			CMLElement.addCMLXAttribute(this, BOUNDING_BOX, r2r.toString());
+//			CMLElement.addCMLXAttribute(this, BOUNDING_BOX, r2r.toString());
+			SVGUtil.setSVGXAttribute(this, BOUNDING_BOX, r2r.toString());
 		}
 	}
 
@@ -842,11 +807,11 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	public void setCX(double x) {
-		this.addAttribute(new Attribute(CX, ""+x));
+		this.addAttribute(new Attribute(CX, String.valueOf(x)));
 	}
 
 	public void setCY(double y) {
-		this.addAttribute(new Attribute(CY, ""+y));
+		this.addAttribute(new Attribute(CY, String.valueOf(y)));
 	}
 
 	public Real2 getCXY() {
@@ -854,15 +819,17 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	public void setX(double x) {
-		this.addAttribute(new Attribute(X, ""+x));
+		this.addAttribute(new Attribute(X, String.valueOf(x)));
 	}
 
 	public void setY(double y) {
-		this.addAttribute(new Attribute(Y, ""+y));
+		this.addAttribute(new Attribute(Y, String.valueOf(y)));
 	}
 	
 	public Real2 getXY() {
-		return new Real2(this.getX(), this.getY());
+		Double x = this.getX();
+		Double y = this.getY();
+		return new Real2(x, y);
 	}
 	
 	public void setXY(Real2 xy) {
@@ -870,20 +837,22 @@ public class SVGElement extends GraphicsElement {
 		setY(xy.getY());
 	}
 	
-	public double getWidth() {
-		return new Double(this.getAttributeValue("width")).doubleValue();
+	public Double getWidth() {
+		String w = this.getAttributeValue("width");
+		return (w == null) ? null : new Double(w);
 	}
 	
-	public double getHeight() {
-		return new Double(this.getAttributeValue("height")).doubleValue();
+	public Double getHeight() {
+		String h = this.getAttributeValue("height");
+		return (h == null) ? null : new Double(h);
 	}
 
 	public void setWidth(double w) {
-		this.addAttribute(new Attribute("width", ""+w));
+		this.addAttribute(new Attribute("width", String.valueOf(w)));
 	}
 	
 	public void setHeight(double h) {
-		this.addAttribute(new Attribute("height", ""+h));
+		this.addAttribute(new Attribute("height", String.valueOf(h)));
 	}
 	
 	public void setClassName(String name) {
@@ -895,7 +864,8 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	/** traverse all children recursively
-	 * often  copied to subclasses to improve readability
+	 * often copied to subclasses to improve readability
+	 * 
 	 * @return null by default
 	 */
 	public Real2Range getBoundingBox() {
@@ -904,14 +874,40 @@ public class SVGElement extends GraphicsElement {
 		}
 		return boundingBox;
 	}
+	
+	/** return unrooted x-y range of element.
+	 * 
+	 * @return the (integer) ranges of the element.
+	 */
+	public java.awt.Dimension getDimension() {
+		Real2 real2 = getReal2Dimension();
+		return new Dimension((int) real2.getX(), (int) real2.getY());
+	}
+
+	/** return unrooted x-y range of element.
+	 * 
+	 * @return
+	 */
+	public Real2 getReal2Dimension() {
+		Real2 dimension = null;
+		getBoundingBox();
+		if (boundingBox != null) {
+			RealRange xrange = boundingBox.getXRange();
+			RealRange yrange = boundingBox.getYRange();
+			if (xrange != null && yrange != null) {
+				dimension = new Real2(xrange.getRange(),  yrange.getRange());
+			}
+		}
+		return dimension;
+	}
 
 	protected void aggregateBBfromSelfAndDescendants() {
-		Nodes childNodes = this.query("./svg:*", CMLConstants.SVG_XPATH);
+		Nodes childNodes = this.query("./svg:*", XMLConstants.SVG_XPATH);
 		if (childNodes.size() > 0) {
 			boundingBox = new Real2Range();
 		}
 		for (int i = 0; i < childNodes.size(); i++) {
-			SVGElement child = (SVGElement)childNodes.get(i);
+			SVGElement child = (SVGElement) childNodes.get(i);
 			Real2Range childBoundingBox = child.getBoundingBox();
 			if (childBoundingBox != null) {
 				if (!childBoundingBox.isValid()) {
@@ -923,7 +919,7 @@ public class SVGElement extends GraphicsElement {
 	}
 
 	protected boolean boundingBoxNeedsUpdating() {
-		return boundingBox == null || !boundingBoxCached ;
+		return boundingBox == null || !boundingBoxCached;
 	}
 	
 	public void setBoundingBoxCached(boolean boundingBoxCached) {
@@ -1015,31 +1011,29 @@ public class SVGElement extends GraphicsElement {
 	public static SVGRect drawBox(Real2Range box, SVGElement svgParent,
 			String stroke, String fill, double strokeWidth, double opacity) {
 		SVGRect svgBox = createGraphicalBox(box, stroke, fill, strokeWidth, opacity);
-		if (svgBox != null) {
+		if (svgBox != null && svgParent != null) {
 			svgParent.appendChild(svgBox);
 		}
 		return svgBox;
 	}
 
 	public SVGRect drawBox(String stroke, String fill, double strokeWidth, double opacity) {
-		return SVGElement.drawBox(this.getBoundingBox(), this, stroke, fill, strokeWidth, opacity);
+		return SVGElement.drawBox(getBoundingBox(), this, stroke, fill, strokeWidth, opacity);
 	}
 
 	public static void applyTransformsWithinElementsAndFormat(SVGElement svgElement) {
 		List<SVGElement> elementList = generateElementList(svgElement, ".//svg:*[@transform]");
-		LOG.debug("NODES "+elementList.size());
 		for (SVGElement element : elementList) {
 			element.applyTransformAttributeAndRemove();
 			element.format(2);
 		}
-		LOG.debug("... applied transformations");
 	}
 
 	/**
 	 * @return
 	 */
 	public static List<SVGElement> generateElementList(Element element, String xpath) {
-		Nodes childNodes = element.query(xpath, CMLConstants.SVG_XPATH);
+		Nodes childNodes = element.query(xpath, XMLConstants.SVG_XPATH);
 		List<SVGElement> elementList = new ArrayList<SVGElement>();
 		for (int i = 0; i < childNodes.size(); i++) {
 			elementList.add((SVGElement) childNodes.get(i));
@@ -1048,19 +1042,21 @@ public class SVGElement extends GraphicsElement {
 	}
 	
 	public void setTitle(String title) {
-		this.addAttribute(new Attribute(TITLE, title));
+		addAttribute(new Attribute(TITLE, title));
 	}
 	
 	public String getTitle() {
-		return this.getAttributeValue(TITLE);
+		return getAttributeValue(TITLE);
 	}
 	
 	public void setId(String id) {
-		this.addAttribute(new Attribute(ID, id));
+		if (id != null) {
+			addAttribute(new Attribute(ID, id));
+		}
 	}
 	
 	public String getId() {
-		return this.getAttributeValue(ID);
+		return getAttributeValue(ID);
 	}
 
 	/** removes all transformation attributes
@@ -1069,7 +1065,7 @@ public class SVGElement extends GraphicsElement {
 	 * also dangerous as the ancestor may govern other descendants
 	 */
 	public void removeAncestorTransformations() {
-		Nodes ancestorAttributes = this.query("ancestor::*/@transform");
+		Nodes ancestorAttributes = query("ancestor::*/@transform");
 		for (int i = 0; i < ancestorAttributes.size(); i++) {
 			ancestorAttributes.get(i).detach();
 		}
@@ -1094,4 +1090,137 @@ public class SVGElement extends GraphicsElement {
 		Real2Range elementBox = (element == null) ? null : element.getBoundingBox();
 		return thisBbox != null && thisBbox.includes(elementBox);
 	}
+
+	public boolean isIncludedBy(RealRangeArray mask, Direction direction) {
+		Real2Range bbox = this.getBoundingBox();
+		RealRange range = Direction.HORIZONTAL.equals(direction) ? bbox.getXRange() : bbox.getYRange();
+		return mask.includes(range);
+	}
+
+	public boolean isIncludedBy(RealRange mask, Direction direction) {
+		Real2Range bbox = this.getBoundingBox();
+		RealRange range = Direction.HORIZONTAL.equals(direction) ? bbox.getXRange() : bbox.getYRange();
+		return mask.includes(range);
+	}
+
+	/** elements filtered by yrange
+	 * 
+	 * @param textList
+	 * @param yrange
+	 * @return
+	 */
+	public static List<? extends SVGElement> getElementListFilteredByRange(
+			List<? extends SVGElement> elemList, RealRange range, RealRange.Direction dir) {
+		List<SVGElement> elemList0 = new ArrayList<SVGElement>();
+		for (SVGElement elem : elemList) {
+			RealRange range0 = getRange(elem, dir);
+			if (range.includes(range0)) {
+				elemList0.add(elem);
+			}
+		}
+		return elemList0;
+	}
+
+	private static RealRange getRange(SVGElement elem, RealRange.Direction dir) {
+		Real2Range bbox = elem.getBoundingBox();
+		RealRange range = (RealRange.Direction.HORIZONTAL.equals(dir)) ? 
+				bbox.getXRange() : bbox.getYRange();
+		return range;
+	}
+
+	public static RealRangeArray getRealRangeArray(List<? extends SVGElement> elementList, RealRange.Direction dir) {
+//		List<? extends SVGElement> elementList0 = getElementListFilteredByRange(elementList, dir);
+		RealRangeArray realRangeArray = new RealRangeArray();
+		for (SVGElement element : elementList) {
+			RealRange range = getRange(element, dir);
+			realRangeArray.add(range);
+		}
+		return realRangeArray;
+	}
+	
+	/** returns elements which are included in mask
+	 * 
+	 * @param elementList
+	 * @param direction
+	 * @param mask
+	 * @return
+	 */
+	public static List<? extends SVGElement> filter(List<? extends SVGElement> elementList, Direction direction, RealRangeArray mask) {
+		List<SVGElement> eList = new ArrayList<SVGElement>();
+		for (SVGElement element : elementList) {
+			if (element.isIncludedBy(mask, direction)) {
+				eList.add(element);
+			}
+		}
+		return eList;
+	}
+
+	public static List<? extends SVGElement> filterHorizontally(List<? extends SVGElement> elementList, RealRangeArray horizontalMask) {
+		return filter(elementList, Direction.HORIZONTAL, horizontalMask);
+	}
+	
+	public static List<? extends SVGElement> filterVertically(List<? extends SVGElement> elementList, RealRangeArray verticalMask) {
+		return filter(elementList, Direction.VERTICAL, verticalMask);
+	}
+	
+	/**
+	 * Creates a mask (list of RealRanges) that mirror the elements added
+	 * Example
+	 *   SVGRect(new Real2(0., 10.), new Real2(30., 40.) 
+	 *   SVGRect(new Real2(40., 10.), new Real2(50., 40.) 
+	 *   SVGRect(new Real2(45., 10.), new Real2(55., 40.) 
+	 *   creates a horizontal mask RealRange(0., 30.),  RealRange(40., 55.),
+	 * @param elementList elements to create mask
+	 * @return RealRange array corresponding to (overlapped) ranges of elements
+	 */
+	public static RealRangeArray createMask(List<? extends SVGElement> elementList, Direction direction) {
+		RealRangeArray realRangeArray = new RealRangeArray();
+		for (SVGElement element : elementList) {
+			Real2Range bbox = element.getBoundingBox();
+			realRangeArray.add((Direction.HORIZONTAL.equals(direction) ? bbox.getXRange() : bbox.getYRange()));
+		}
+		realRangeArray.sortAndRemoveOverlapping();
+		return realRangeArray;
+	}
+
+	public static RealRangeArray createMask(List<SVGElement> elementList, Direction direction, double tolerance) {
+			RealRangeArray realRangeArray = new RealRangeArray();
+			for (SVGElement element : elementList) {
+				Real2Range bbox = element.getBoundingBox();
+				RealRange range = (Direction.HORIZONTAL.equals(direction) ? bbox.getXRange() : bbox.getYRange());
+				range.extendBothEndsBy(tolerance);
+				realRangeArray.add((Direction.HORIZONTAL.equals(direction) ? bbox.getXRange() : bbox.getYRange()));
+			}
+			realRangeArray.sortAndRemoveOverlapping();
+			return realRangeArray;
+	}
+	
+	public final static Real2Range createBoundingBox(List<? extends SVGElement> elementList) {
+		Real2Range bbox = null;
+		if (elementList != null && elementList.size() > 0) {
+			bbox = new Real2Range(elementList.get(0).getBoundingBox());
+			for (int i = 1; i < elementList.size(); i++) {
+				SVGElement element = elementList.get(i);
+				bbox = bbox.plus(element.getBoundingBox());
+			}
+		}
+		return bbox;
+	}
+	
+
+	public RealRange getRealRange(Direction direction) {
+		Real2Range bbox = this.getBoundingBox();
+		return bbox == null ? null : bbox.getRealRange(direction);
+	}
+
+	public static List<SVGElement> extractSelfAndDescendantElements(SVGElement element) {
+		return SVGUtil.getQuerySVGElements(element, ALL_ELEMENT_XPATH);
+	}
+
+	@Deprecated
+	public static List<SVGElement> extractSelfAndDescendantElements(SVGG g) {
+		return SVGUtil.getQuerySVGElements(g, ALL_ELEMENT_XPATH);
+	}
+
+
 }
