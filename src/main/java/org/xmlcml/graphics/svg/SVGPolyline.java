@@ -28,6 +28,8 @@ import nu.xom.Node;
 import nu.xom.ParentNode;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.xml.XMLUtil;
@@ -451,5 +453,17 @@ public class SVGPolyline extends SVGPoly {
 	public int size() {
 		getReal2Array();
 		return real2Array.size() - 1;
+	}
+
+	public Angle getSignedAngleOfDeviation() {
+		Angle angle = new Angle(0.0);
+		if (size() > 1) {
+			List<SVGLine> lineList = getLineList();
+			Line2 line0 = lineList.get(0).getEuclidLine();
+			Line2 line1 = lineList.get(lineList.size() - 1).getEuclidLine();
+			angle = line0.getAngleMadeWith(line1);
+		}
+		angle.setRange(Angle.Range.SIGNED);
+		return angle;
 	}
 }
