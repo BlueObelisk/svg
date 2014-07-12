@@ -1,6 +1,8 @@
 package org.xmlcml.graphics.svg;
 
 import nu.xom.*;
+
+
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.*;
 import org.xmlcml.graphics.svg.fonts.FontWidths;
@@ -8,6 +10,7 @@ import org.xmlcml.xml.XMLConstants;
 import org.xmlcml.xml.XMLUtil;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,9 +57,7 @@ public class SVGText extends SVGElement {
 	public static final Double SPACE_FACTOR = 0.1; //extra space that denotes a space
 	private Double SPACE_WIDTH1000 = /*274.0*/ 200.;
 	public final static Double DEFAULT_SPACE_FACTOR = 0.05;
-
 	private static final double MIN_FONT_SIZE = 0.01;
-
 	private static final Double DEFAULT_CHARACTER_WIDTH = 500.0;
 
 	// these are all when text is used for concatenation, etc.
@@ -969,6 +970,24 @@ public class SVGText extends SVGElement {
 		getheightOfFirstCharacter();
 		return (heightOfFirstCharacter == null || widthOfFirstCharacter == null ? null :
 			Math.sqrt(heightOfFirstCharacter * heightOfFirstCharacter + widthOfFirstCharacter * widthOfFirstCharacter) / 2.0);
+	}
+
+	public BufferedImage createImage(int width, int height) {
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = (Graphics2D) image.createGraphics();
+		g.setBackground(Color.WHITE);
+		g.clearRect(0, 0, width, height);
+		int fontStyle = (isItalic()) ? Font.ITALIC : Font.PLAIN;
+		String fontFamily = getFontFamily();
+		int fontSize = (int)(double)getFontSize();
+		Font font = new Font(fontFamily, fontStyle, fontSize);
+		g.setFont(font);
+		g.setColor(Color.BLACK);
+		String value = getValue();
+		float x = (float) (double) getX();
+		float y = (float) (double) getY();
+		g.drawString(value, x, y);
+		return image;
 	}
 	
 }
