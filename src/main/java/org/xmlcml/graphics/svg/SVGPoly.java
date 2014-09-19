@@ -40,6 +40,7 @@ import java.util.List;
  *
  */
 public abstract class SVGPoly extends SVGShape {
+	
 	private static final String X1 = "x1";
 	private static final String X2 = "x2";
 	private static final String Y1 = "y1";
@@ -313,7 +314,7 @@ public abstract class SVGPoly extends SVGShape {
 		}
 		if (lineList == null) {
 			if (pointsAtt != null) {
-				real2Array = Real2Array.createFromPairs(pointsAtt.getValue(), XMLConstants.S_SPACE);
+				real2Array = Real2Array.createFromPairs(pointsAtt.getValue(), XMLConstants.S_SPACE + "|" + XMLConstants.S_COMMA);
 			}
 			String id = getId();
 			lineList = new ArrayList<SVGLine>();
@@ -502,4 +503,5 @@ public abstract class SVGPoly extends SVGShape {
 			SVGPolyline.replacePolyLineBySplitLines(polyline);
 		}		
 	}
+	
 }
