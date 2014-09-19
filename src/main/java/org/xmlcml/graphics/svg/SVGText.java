@@ -159,21 +159,6 @@ public class SVGText extends SVGElement {
     public Node copy() {
         return new SVGText(this, TAG);
     }
-
-    @Override
-    public Double getX() {
-    	Double x = null;
-    	String s = this.getAttributeValue(X);
-    	if (s != null) {
-    		x = new Double(s);
-    	}
-    	return x;
-    }
-
-    public Double getY() {
-    	String s = this.getAttributeValue("y");
-    	return (s != null) ? new Double(s) : null;
-    }
     
 	protected void drawElement(Graphics2D g2d) {
 		saveGraphicsSettingsAndApplyTransform(g2d);
