@@ -13,14 +13,14 @@ import java.util.List;
 public abstract class SVGShape extends SVGElement {
 	
 	public static final String ALL_SHAPE_XPATH = "" +
-			".//svg:circle | " +
-			".//svg:ellipse | " +
-			".//svg:image | " +
-			".//svg:line | " +
-			".//svg:path | " +
-			".//svg:polygon | " +
-			".//svg:polyline | " +
-			".//svg:rect" +
+			".//svg:circle[not(ancestor::svg:defs)] | " +
+			".//svg:ellipse[not(ancestor::svg:defs)] | " +
+			".//svg:image[not(ancestor::svg:defs)] | " +
+			".//svg:line[not(ancestor::svg:defs)] | " +
+			".//svg:path[not(ancestor::svg:defs)] | " +
+			".//svg:polygon[not(ancestor::svg:defs)] | " +
+			".//svg:polyline[not(ancestor::svg:defs)] | " +
+			".//svg:rect[not(ancestor::svg:defs)]" +
 			"";
 
 	protected SVGShape(String name) {
