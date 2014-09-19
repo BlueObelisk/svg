@@ -11,6 +11,7 @@ import org.xmlcml.xml.XMLUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -396,7 +397,7 @@ public class Path2ShapeConverter {
 		}
 	}
 	
-	private void replaceEachPathWithShapes(List<List<SVGShape>> shapeListList, List<SVGPath> pathList) {
+	private void replaceEachPathWithShapesOrPaths(List<List<SVGShape>> shapeListList, List<SVGPath> pathList) {
 		if (shapeListList.size() != pathList.size()){
 			throw new RuntimeException("converted paths ("+shapeListList.size()+") != old paths ("+pathList.size()+")");
 		}
@@ -409,12 +410,12 @@ public class Path2ShapeConverter {
 				int position = parent.indexOf(path);
 				for (SVGShape shape : shapeList) {
 					LOG.trace("CONV " + shape.toXML());
-					if (shape instanceof SVGPath) {
-						// no need to replace as no conversion done
-					} else {
-						path.detach();
-						parent.insertChild(shape, position++);
-					}
+					//if (shape instanceof SVGPath) {
+						//No need to replace as no conversion done
+					//} else {
+					path.detach();
+					parent.insertChild(shape, position++);
+					//}
 				}
 			}
 		}
@@ -538,7 +539,7 @@ public class Path2ShapeConverter {
 			SVGPath newPath = new SVGPath(newD);
 			XMLUtil.copyAttributesFromTo(path, newPath);
 			newPath.setDString(newD);
-			path.getParent().replaceChild(path, newPath);
+			//path.getParent().replaceChild(path, newPath);
 			LOG.trace(">>>"+d+"\n>>>"+newD);
 			return newPath;
 		}
@@ -871,12 +872,26 @@ public class Path2ShapeConverter {
 	public List<SVGShape> convertPathsToShapes(SVGElement svgElement) {
 		List<SVGPath> pathList = SVGPath.extractPaths(svgElement);
 		List<List<SVGShape>> shapeListList = convertPathsToShapesAndSplitAtMoves(pathList);
-		replaceEachPathWithShapes(shapeListList, pathList);
+		replaceEachPathWithShapesOrPaths(shapeListList, pathList);
+		removeEmptyPaths(shapeListList);
 		List<SVGShape> shapeListOut = new ArrayList<SVGShape>();
 		for (List<SVGShape> shapeList : shapeListList) {
 			shapeListOut.addAll(shapeList);
 		}
 		return shapeListOut;
+	}
+
+	private void removeEmptyPaths(List<List<SVGShape>> shapeListList) {
+		for (List<SVGShape> shapeList : shapeListList) {
+			Iterator<SVGShape> it = shapeList.iterator();
+			while (it.hasNext()) {
+				SVGShape shape = it.next();
+				if ((shape instanceof SVGPath) && "".equals(((SVGPath) shape).getDString().replaceAll(" ", ""))) {
+					shape.detach();
+					it.remove();
+				}
+			}
+		}
 	}
 
 	/**
