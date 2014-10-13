@@ -10,6 +10,9 @@ import org.xmlcml.xml.XMLConstants;
 import org.xmlcml.xml.XMLUtil;
 
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -830,28 +833,35 @@ public class SVGText extends SVGElement {
 			SVGUtil.setSVGXAttribute(this, WIDTH, String.valueOf(width));
 		}
 	}
-	
-	public Double getScaledWidth() {
-		Double scaledWidth = null;
-		Double width = getSVGXFontWidth();
-		Double fontSize = getFontSize();
-		if (width != null && fontSize != null) {
-			scaledWidth = width * SCALE1000 * fontSize;
+
+	public GlyphVector getGlyphVector() {
+		if (getFontSize() == null) {
+			return null;
 		}
-		return scaledWidth;
+		int arbitraryFontSize = 20;
+		Font font = new Font(getFontFamily(), (isItalic() ? (isBold() ? Font.BOLD | Font.ITALIC : Font.ITALIC): (isBold() ? Font.BOLD : Font.PLAIN)), arbitraryFontSize);
+		font = font.deriveFont((float) (double) getFontSize());
+		GlyphVector glyphVector = font.createGlyphVector(new FontRenderContext(new AffineTransform(), true, true), getText());
+		return glyphVector;
+	}
+	
+	/**
+	 * @return width of first character
+	 * @deprecated Use getWidthOfFirstCharacter(), which now calculates width if it isn't available (so this method does too).
+	 */
+	@Deprecated
+	public Double getScaledWidth() {
+		return getWidthOfFirstCharacter();
 	}
 
+	/**
+	 * @param guessWidth
+	 * @return width of first character
+	 * @deprecated Use getWidthOfFirstCharacter(), which now calculates width if it isn't available (so this method does too).
+	 */
+	@Deprecated
 	public Double getScaledWidth(boolean guessWidth) {
-		Double scaledWidth = null;
-		Double width = getSVGXFontWidth();
-		if (width == null && guessWidth) {
-			width = DEFAULT_CHARACTER_WIDTH;
-		}
-		Double fontSize = getFontSize();
-		if (width != null && fontSize != null) {
-			scaledWidth = width * SCALE1000 * fontSize;
-		}
-		return scaledWidth;
+		return getWidthOfFirstCharacter();
 	}
 
 	/** 
@@ -941,18 +951,27 @@ public class SVGText extends SVGElement {
 	}
 
 	public Double getWidthOfFirstCharacter() {
-		widthOfFirstCharacter = getSVGXFontWidth() / 1000.0 * getFontSize();
-		return widthOfFirstCharacter;
+		Double scaledWidth = null;
+		Double width = getSVGXFontWidth();
+		Double fontSize = getFontSize();
+		if (width == null) {
+			GlyphVector glyphVector = getGlyphVector();
+			if (glyphVector != null) {
+				scaledWidth = glyphVector.getGlyphLogicalBounds(0).getBounds2D().getWidth();
+			}
+		} else if (fontSize != null) {
+			scaledWidth = width * SCALE1000 * fontSize;
+		}
+		return (widthOfFirstCharacter = scaledWidth);
 	}
 	
-	public Double getheightOfFirstCharacter() {
-		heightOfFirstCharacter = getFontSize();
-		return heightOfFirstCharacter;
+	public Double getHeightOfFirstCharacter() {
+		return (heightOfFirstCharacter = getFontSize());
 	}
 	
 	public Double getRadiusOfFirstCharacter() {
 		getWidthOfFirstCharacter();
-		getheightOfFirstCharacter();
+		getHeightOfFirstCharacter();
 		return (heightOfFirstCharacter == null || widthOfFirstCharacter == null ? null :
 			Math.sqrt(heightOfFirstCharacter * heightOfFirstCharacter + widthOfFirstCharacter * widthOfFirstCharacter) / 2.0);
 	}
