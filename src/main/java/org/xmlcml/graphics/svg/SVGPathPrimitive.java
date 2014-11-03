@@ -123,7 +123,7 @@ public abstract class SVGPathPrimitive {
 			String token = null;
 			try {
 				token = tokenList.get(itok + i);
-				dd[i] = new Double(token);
+				dd[i] = Double.valueOf(token);
 			} catch (Exception e) {
 				throw new RuntimeException("Cannot parse as double ("+token+") at : "+itok+i);
 			}

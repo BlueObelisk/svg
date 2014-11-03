@@ -301,7 +301,7 @@ public class StyleBundle implements XMLConstants {
 		Double d = null;
 		if (s != null && !"null".equals(s)) {
 			try {
-				d = new Double(s).doubleValue();
+				d = Double.parseDouble(s);
 			} catch (NumberFormatException e) {
 				throw new RuntimeException("bad double in style: "+s);
 			}

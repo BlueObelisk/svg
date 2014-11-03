@@ -532,7 +532,7 @@ public class SVGElement extends GraphicsElement {
 		double xx = Double.NaN;
 		if (attVal != null) {
 			try {
-				xx = new Double(attVal).doubleValue();
+				xx = Double.parseDouble(attVal);
 			} catch (NumberFormatException e) {
 				throw e;
 			}
@@ -735,7 +735,7 @@ public class SVGElement extends GraphicsElement {
 		double d = Double.NaN;
 		String v = this.getAttributeValue(attName);
 		try {
-			d = (v == null) ? 0.0 : new Double(v).doubleValue();
+			d = (v == null) ? 0.0 : Double.parseDouble(v);
 		} catch (NumberFormatException e) {
 			throw new RuntimeException("Cannot parse SVG coordinate "+v);
 		}
@@ -839,12 +839,12 @@ public class SVGElement extends GraphicsElement {
 	
 	public Double getWidth() {
 		String w = this.getAttributeValue("width");
-		return (w == null) ? null : new Double(w);
+		return (w == null) ? null : Double.valueOf(w);
 	}
 	
 	public Double getHeight() {
 		String h = this.getAttributeValue("height");
-		return (h == null) ? null : new Double(h);
+		return (h == null) ? null : Double.valueOf(h);
 	}
 
 	public void setWidth(double w) {
