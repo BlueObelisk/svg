@@ -221,7 +221,7 @@ public class SVGLine extends SVGShape {
 		if (style != null && style.startsWith("stroke-width:")) {
 			style = style.substring("stroke-width:".length());
 			style = style.substring(0, (style+S_SEMICOLON).indexOf(S_SEMICOLON));
-			width = (float) new Double(style).doubleValue();
+			width = (float) Double.parseDouble(style);
 			width *= 15.f;
 		}
 		line2 = new Line2D.Double(xy1.x, xy1.y, xy2.x, xy2.y);
