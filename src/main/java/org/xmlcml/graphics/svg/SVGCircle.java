@@ -175,7 +175,7 @@ public class SVGCircle extends SVGShape {
 	 */
 	public double getRad() {
 		String r = this.getAttributeValue(R);
-		Double d = new Double(r);
+		Double d = Double.valueOf(r);
 		return (d == null) ? Double.NaN : d.doubleValue();
 	}
 
@@ -191,7 +191,7 @@ public class SVGCircle extends SVGShape {
 		if (style.startsWith("stroke-width:")) {
 			style = style.substring("stroke-width:".length());
 			style = style.substring(0, (style+S_SEMICOLON).indexOf(S_SEMICOLON));
-			width = (float) new Double(style).doubleValue();
+			width = (float) Double.parseDouble(style);
 			width *= 15.f;
 		}
 		circle2 = new Ellipse2D.Double(xy1.x - rad, xy1.y - rad, rad+rad, rad+rad);

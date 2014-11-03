@@ -401,7 +401,7 @@ public class GraphicsElement extends Element implements SVGConstants {
 	private Double getDouble(Object subStyle) {
 		Double d = null;
 		try {
-			d = new Double(String.valueOf(subStyle));
+			d = Double.valueOf(String.valueOf(subStyle));
 		} catch (Exception e) {
 			//return null
 		}
