@@ -805,7 +805,7 @@ public class SVGText extends SVGElement {
 	 */
 	public Double getSVGXFontWidth() {
 		String width = SVGUtil.getSVGXAttribute(this, WIDTH);
-		return width == null ? null : new Double(width); 
+		return width == null ? null : Double.valueOf(width); 
 	}
 	
 	/** 
