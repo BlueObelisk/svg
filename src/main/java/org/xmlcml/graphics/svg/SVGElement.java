@@ -136,7 +136,7 @@ public class SVGElement extends GraphicsElement {
 		} else {
 			newElement = new SVGG();
 			newElement.setClassName(tag);
-			System.err.println("unsupported svg element: "+tag);
+			LOG.trace("unsupported svg element: "+tag);
 		}
 		if (newElement != null) {
 	        newElement.copyAttributesFrom(element);
