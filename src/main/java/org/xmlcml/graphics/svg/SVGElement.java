@@ -272,7 +272,7 @@ public class SVGElement extends GraphicsElement {
 		if (transformAttribute != null) {
 			Transform2 transform2 = createTransform2FromTransformAttribute(transformAttribute.getValue());
 			this.applyTransform(transform2);
-			transformAttribute.detach();
+			getAttribute(TRANSFORM).detach();
 			double det = transform2.determinant();
 			// improper rotation ?
 			if (det < 0) {
