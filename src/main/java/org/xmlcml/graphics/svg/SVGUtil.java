@@ -336,6 +336,36 @@ public class SVGUtil {
 			}
 		}
 	}
+	
+	/**
+	 * Many shapes / paths are drawn twice; if two or more are equal, remove the later one(s)
+	 * 
+	 * @param shapeList
+	 * @return
+	 */
+	public static List<SVGShape> removeDuplicateShapes(List<SVGShape> shapeList) {
+		if (shapeList != null) {
+			Set<String> dStringSet = new HashSet<String>();
+			int count = 0;
+			List<SVGShape> newPathList = new ArrayList<SVGShape>();
+			for (SVGShape shape : shapeList) {
+				String dString = shape.getGeometricHash();
+				if (dStringSet.contains(dString)) {
+					LOG.trace("Detached a duplicate path "+dString);
+					shape.detach();
+					count++;
+				} else {
+					dStringSet.add(dString);
+					newPathList.add(shape);
+				}
+			}
+			if (count > 0) {
+				LOG.trace("Detached "+count+" duplicate paths");
+				shapeList = newPathList;
+			}
+		}
+		return shapeList;
+	}
 
 	public static String getSVGXAttribute(SVGElement svgElement, String attName) {
 		Attribute attribute = getSVGXAttributeAttribute(svgElement, attName);
