@@ -504,4 +504,14 @@ public abstract class SVGPoly extends SVGShape {
 		}		
 	}
 	
+	public void add(Real2 point) {
+		ensureReal2Array();
+		real2Array.add(point);
+	}
+
+	private void ensureReal2Array() {
+		if (real2Array == null) {
+			real2Array = new Real2Array();
+		}
+	}
 }
