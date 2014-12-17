@@ -24,7 +24,10 @@ import nu.xom.Element;
 import nu.xom.Node;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Line2;
+import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.Line2AndReal2Calculator;
 
 /** draws a straight line.
  * 
@@ -135,4 +138,31 @@ public class SVGPolygon extends SVGPoly {
 		lineList.add(line);
 		return lineList;
 	}
+
+	public boolean containsPoint(Real2 xy, double nearDuplicateRemovalDistance) {
+		Line2 line = new Line2(xy, xy.plus(new Real2(1, 10000000000000d)));
+		Real2 lastPoint = getReal2Array().getLastElement();
+		int intersections = 0;
+		boolean near = false;
+		for (Real2 point : getReal2Array()) {
+			Line2 edge = new Line2(lastPoint, point);
+			Line2AndReal2Calculator calc = new Line2AndReal2Calculator(edge, xy);
+			if (calc.minimumDistance < nearDuplicateRemovalDistance) {
+				near = true;
+				break;
+			}
+			Real2 intersection = edge.getIntersection(line);
+			if (Double.isNaN(intersection.getX()) || Double.isNaN(intersection.getY())) {
+				continue;
+			}
+			double lambda1 = edge.getLambda(intersection);
+			double lambda2 = line.getLambda(intersection);
+			if (lambda1 >= 0 && lambda1 <= 1 && lambda2 >= 0 && lambda2 <= 1) {
+				intersections++;
+			}
+			lastPoint = point;
+		}
+		return (near || intersections % 2 == 1);
+	}
+	
 }
