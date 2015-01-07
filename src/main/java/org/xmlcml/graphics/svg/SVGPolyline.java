@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.ParentNode;
@@ -465,5 +464,30 @@ public class SVGPolyline extends SVGPoly {
 		}
 		angle.setRange(Angle.Range.SIGNED);
 		return angle;
+	}
+
+	/** checks equality assuming points are in same order.
+	 * 
+	 * for cyclic polylines also assumes same starting point.
+	 * 
+	 * @param poly
+	 * @param delta
+	 * @return
+	 */
+	public boolean hasEqualCoordinates(SVGPolyline polyline, double delta) {
+		
+		if (this.size() != polyline.size()) {
+			return false;
+		}
+		this.getReal2Array();
+		Real2Array polyArray = polyline.getReal2Array();
+		for (int i = 0; i < this.size(); i++) {
+			Real2 thisp = this.real2Array.elementAt(i);
+			Real2 polyp = polyArray.elementAt(i);
+			if (thisp.getDistance(polyp) > delta) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

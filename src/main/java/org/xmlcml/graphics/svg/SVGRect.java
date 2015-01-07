@@ -231,4 +231,10 @@ public class SVGRect extends SVGShape {
 	public static List<SVGRect> extractSelfAndDescendantRects(SVGG g) {
 		return SVGRect.extractRects(SVGUtil.getQuerySVGElements(g, ALL_RECT_XPATH));
 	}
+
+	public boolean isEqual(SVGRect otherRect, double delta) {
+		Real2[] corners = this.getBoundingBox().getCorners();
+		Real2[] otherCorners = otherRect.getBoundingBox().getCorners();
+		return corners[0].getDistance(otherCorners[0]) < delta && corners[1].getDistance(otherCorners[1]) < delta;
+	}
 }
