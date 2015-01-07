@@ -581,4 +581,12 @@ public class SVGLine extends SVGShape {
 		return points;
 	}
 
+	public boolean hasEqualCoordinates(SVGLine line, double delta) {
+		Real2 thisPoint0 = this.getXY(0);
+		Real2 thisPoint1 = this.getXY(1);
+		Real2 otherPoint0 = line.getXY(0);
+		Real2 otherPoint1 = line.getXY(1);
+		return thisPoint0.getDistance(otherPoint0) < delta && thisPoint1.getDistance(otherPoint1) < delta;
+	}
+
 }
