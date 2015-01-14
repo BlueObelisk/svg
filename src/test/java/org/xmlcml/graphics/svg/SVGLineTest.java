@@ -1,11 +1,23 @@
 package org.xmlcml.graphics.svg;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.graphics.svg.SVGLine.LineDirection;
 
 public class SVGLineTest {
+	
+	
+	private static final Logger LOG = Logger.getLogger(SVGLineTest.class);
+	static {
+		LOG.setLevel(Level.DEBUG);
+	}
 
 	private final static Double FP_EPS = 0.000001;
 	private final static Angle ANGLE_EPS = new Angle(0.000001, Angle.Units.RADIANS);
@@ -79,5 +91,41 @@ public class SVGLineTest {
 		Assert.assertFalse(line0.overlapsWithLine(line3, FP_EPS));
 		Assert.assertFalse(line3.overlapsWithLine(line0, FP_EPS));
 		
+	}
+	
+	@Test
+	public void testExtractAndRemoveHorizontalVerticalLines() {
+		double eps = 0.5;
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		lineList.add(new SVGLine(new Real2(0, 0), new Real2(0, 1)));
+		lineList.add(new SVGLine(new Real2(0, 1), new Real2(0, 2)));
+		lineList.add(new SVGLine(new Real2(0, 0), new Real2(1, 0)));
+		lineList.add(new SVGLine(new Real2(1, 0), new Real2(2, 0)));
+		lineList.add(new SVGLine(new Real2(0, 1), new Real2(1, 0)));
+		lineList.add(new SVGLine(new Real2(2, 1), new Real2(1, 2)));
+		List<SVGLine> horizontalList = SVGLine.extractAndRemoveHorizontalVerticalLines(
+				lineList, eps, LineDirection.HORIZONTAL);
+		Assert.assertEquals("horizontal", 2, horizontalList.size());
+		List<SVGLine> verticalList = SVGLine.extractAndRemoveHorizontalVerticalLines(
+				lineList, eps, LineDirection.VERTICAL);
+		Assert.assertEquals("vertical", 2, verticalList.size());
+		Assert.assertEquals("non-axial", 2, lineList.size());
+	}
+	
+
+	@Test
+	public void testNormalizeAndMergeAxialLines() {
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		lineList.add(new SVGLine(new Real2(0, 0), new Real2(0, 1)));
+		lineList.add(new SVGLine(new Real2(0, 1), new Real2(0, 2)));
+		lineList.add(new SVGLine(new Real2(0, 0), new Real2(1, 0)));
+		lineList.add(new SVGLine(new Real2(1, 0), new Real2(2, 0)));
+		lineList.add(new SVGLine(new Real2(0, 1), new Real2(1, 0)));
+		lineList.add(new SVGLine(new Real2(2, 1), new Real2(1, 2)));
+		SVGLine.normalizeAndMergeAxialLines	(lineList, 0.5);
+		Assert.assertEquals("merged line", 4, lineList.size());
+		for (SVGLine line : lineList) {
+			LOG.debug(line);
+		}
 	}
 }
