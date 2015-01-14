@@ -16,19 +16,28 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.BasicStroke;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.List;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.Nodes;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.euclid.*;
+import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Line2;
+import org.xmlcml.euclid.Real;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealRange;
+import org.xmlcml.euclid.Transform2;
 import org.xmlcml.xml.XMLConstants;
-
-import java.awt.*;
-import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.List;
 
 /** draws a straight line.
  * 
@@ -39,6 +48,10 @@ public class SVGLine extends SVGShape {
 
 	private static Logger LOG = Logger.getLogger(SVGLine.class);
 	
+	public enum LineDirection {
+		HORIZONTAL,
+		VERTICAL
+	}
 	public final static String ALL_LINE_XPATH = ".//svg:line";
 	
 	private static final String STYLE = "style";
@@ -581,12 +594,125 @@ public class SVGLine extends SVGShape {
 		return points;
 	}
 
-	public boolean hasEqualCoordinates(SVGLine line, double delta) {
+	public boolean hasEqualCoordinates(SVGLine line, double eps) {
 		Real2 thisPoint0 = this.getXY(0);
 		Real2 thisPoint1 = this.getXY(1);
 		Real2 otherPoint0 = line.getXY(0);
 		Real2 otherPoint1 = line.getXY(1);
-		return thisPoint0.getDistance(otherPoint0) < delta && thisPoint1.getDistance(otherPoint1) < delta;
+		return thisPoint0.getDistance(otherPoint0) < eps && thisPoint1.getDistance(otherPoint1) < eps;
+	}
+
+	/** filters horizontal and vertical lines, normalizes the direction and merges touching ones.
+	 * 
+	 * modifies list and lines
+	 * 
+	 * @param lineList
+	 * @param eps
+	 * @return
+	 */
+	public static List<SVGLine> normalizeAndMergeAxialLines(List<SVGLine> lineList, double eps) {
+		List<SVGLine> newLineList = new ArrayList<SVGLine>();
+		SVGLine.normalizeDirections(lineList, eps);
+		List<SVGLine> horizontalList = SVGLine.extractAndRemoveHorizontalVerticalLines(lineList, eps, LineDirection.HORIZONTAL);
+		horizontalList = mergeParallelLines(horizontalList, eps);
+		newLineList.addAll(horizontalList);
+		List<SVGLine> verticalList = SVGLine.extractAndRemoveHorizontalVerticalLines(lineList, eps, LineDirection.VERTICAL);
+		verticalList = mergeParallelLines(verticalList, eps);
+		newLineList.addAll(verticalList);
+		lineList.addAll(newLineList);
+		return lineList;
+	}
+		
+	public static List<SVGLine> extractAndRemoveHorizontalVerticalLines(
+			List<SVGLine> lineList, double eps, LineDirection direction) {
+		List<SVGLine> newLineList = new ArrayList<SVGLine>();
+		for (int i = lineList.size() - 1; i >= 0; i--) {
+			SVGLine line = lineList.get(i);
+			if ((LineDirection.HORIZONTAL.equals(direction) && line.isHorizontal(eps)) ||
+				LineDirection.VERTICAL.equals(direction) && line.isVertical(eps)) {
+				lineList.remove(i);
+				newLineList.add(line);
+			}
+		}
+		return newLineList;
+	}
+
+	/** normalizes directions of all horizontal and vertical lines.
+	 * 
+	 * MODIFIES the lines
+	 * 
+	 * @param lineList
+	 * @param eps
+	 * @return
+	 */
+	private static void normalizeDirections(List<SVGLine> lineList, double eps) {
+		for (SVGLine line : lineList) {
+			line.normalizeDirection(eps);
+		}
+	}
+
+	/** merges touching parallel lines.
+	 * 
+	 * Assumes all lines are parallel; if not will fail messily
+	 * 
+	 * @param lineList
+	 * @param eps
+	 * @return
+	 */
+	private static List<SVGLine> mergeParallelLines(List<SVGLine> lineList, double eps) {
+		
+		/** runs through a list of lines joining where possible to create (smaller) list.
+		 * 
+		 * Crude algorithm. 
+		 *   1 start = 0;
+		 *   2 size = number of lines
+		 *   3 iline = start ... size-1
+		 *   4 test (iline, iline+1) for join at either end
+		 *      if join, replace lines with merged line
+		 *      start = iline
+		 *      goto 2
+		 *   5 exit if no change
+		 * 
+		 * does not check style attributes
+		 * 
+		 * @param lineList
+		 * @param eps
+		 * @return
+		 */
+		List<SVGLine> lineListNew = new ArrayList<SVGLine>(lineList);
+		boolean change = true;
+		int startLine = 0;
+		while (change) {
+			change = false;
+			int size = lineListNew.size();
+			for (int iline = startLine; iline < size - 1; iline++) {
+				SVGLine line0 = lineListNew.get(iline);
+				SVGLine line1 = lineListNew.get(iline + 1);
+				SVGLine newLine = createMergedLine(line0, line1, eps);
+				newLine = (newLine != null) ? newLine : createMergedLine(line1, line0, eps);
+				if (newLine != null) {
+					startLine = iline;
+					replaceLineAndCloseUp(iline, newLine, lineListNew);
+					break;
+				}
+			}
+		}
+		return lineListNew;
+	}
+
+	private static SVGLine createMergedLine(SVGLine line0, SVGLine line1, double eps) {
+		SVGLine newLine = null;
+		Real2 last0 = line0.getXY(1);
+		Real2 first1 = line1.getXY(0);
+		if (last0.isEqualTo(first1, eps)) {
+			newLine = new SVGLine(line0.getXY(0), line1.getXY(1));
+		}
+		return newLine;
+	}
+
+	private static void replaceLineAndCloseUp(int iline, SVGLine newLine, List<SVGLine> lineListNew) {
+		lineListNew.set(iline, newLine);
+		lineListNew.remove(iline + 1);
 	}
 
 }
