@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 import nu.xom.ParentNode;
@@ -173,8 +172,62 @@ public class SVGPolyline extends SVGPoly {
 		System.err.println("Beware NYI");
 		return polyline;
 	}
-		
 
+	/** runs through a list of lines joining where possible to create (samller) list.
+	 * 
+	 * Crude algorithm. 
+	 *   1 start = 0;
+	 *   2 size = number of lines
+	 *   3 iline = start ... size-1
+	 *   4 test (iline, iline+1) for join at either end
+	 *      if join, replace lines with merged line
+	 *      start = iline
+	 *      goto 2
+	 *   5 exit if no change
+	 * 
+	 * iterates from 
+	 * 
+	 * @param polylineList
+	 * @param eps
+	 * @return
+	 */
+	public static List<SVGPolyline> quadraticMergePolylines(List<SVGPolyline> polylineList, double eps) {
+		List<SVGPolyline> polylineListNew = new ArrayList<SVGPolyline>(polylineList);
+		boolean change = true;
+		int startLine = 0;
+		while (change) {
+			change = false;
+			int size = polylineListNew.size();
+			for (int iline = startLine; iline < size - 1; iline++) {
+				SVGPolyline line0 = polylineListNew.get(iline);
+				SVGPolyline line1 = polylineListNew.get(iline + 1);
+				SVGPolyline newLine = createMergedLine(line0, line1, eps);
+				newLine = (newLine != null) ? newLine : createMergedLine(line1, line0, eps);
+				if (newLine != null) {
+					startLine = iline;
+					replaceLineAndCloseUp(iline, newLine, polylineListNew);
+					break;
+				}
+			}
+		}
+		return polylineListNew;
+	}
+
+	private static void replaceLineAndCloseUp(int iline, SVGPolyline newLine, List<SVGPolyline> polylineListNew) {
+		polylineListNew.set(iline, newLine);
+		polylineListNew.remove(iline + 1);
+	}
+
+	/** merges lines where endA = startB.
+	 * 
+	 * I think it relies on lines being ordered
+	 * 
+	 * Not fully tested
+	 * 
+	 * @param polylineList
+	 * @param eps
+	 * @return
+	 */
 	public static List<SVGPolyline> binaryMergePolylines(List<SVGPolyline> polylineList, double eps) {
 		List<SVGPolyline> newList = new ArrayList<SVGPolyline>();
 		int size = polylineList.size();
@@ -182,8 +235,14 @@ public class SVGPolyline extends SVGPoly {
 		for (int i = 0; i < niter * 2; i += 2) {
 			SVGPoly line0 = polylineList.get(i);
 			SVGPoly line1 = polylineList.get(i + 1);
+			if (line0 == null || line1 == null) {
+				continue;
+			}
 			SVGPolyline newLine = createMergedLine(line0, line1, eps);
-			newList.add(newLine);
+			if (newLine != null) {
+				newList.add(newLine);
+//				polylineList.remove(i);
+			}
 		}
 		if (size %2 != 0) {
 			newList.add(polylineList.get(size - 1));
@@ -465,5 +524,30 @@ public class SVGPolyline extends SVGPoly {
 		}
 		angle.setRange(Angle.Range.SIGNED);
 		return angle;
+	}
+
+	/** checks equality assuming points are in same order.
+	 * 
+	 * for cyclic polylines also assumes same starting point.
+	 * 
+	 * @param poly
+	 * @param delta
+	 * @return
+	 */
+	public boolean hasEqualCoordinates(SVGPolyline polyline, double delta) {
+		
+		if (this.size() != polyline.size()) {
+			return false;
+		}
+		this.getReal2Array();
+		Real2Array polyArray = polyline.getReal2Array();
+		for (int i = 0; i < this.size(); i++) {
+			Real2 thisp = this.real2Array.elementAt(i);
+			Real2 polyp = polyArray.elementAt(i);
+			if (thisp.getDistance(polyp) > delta) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
