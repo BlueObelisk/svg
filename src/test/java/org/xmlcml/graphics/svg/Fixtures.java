@@ -57,6 +57,11 @@ public class Fixtures {
 	public static final File SVG_G_8_2_SVG = new File(Fixtures.SVG_DIR, "image.g.8.2.svg");
 	public static final File SVG_PAGE6_SVG = new File(Fixtures.SVG_DIR, "page6.svg");
 
+	public static final File FIGURE_DIR = new File(SVG_DIR, "unplot");
+	public static final File LINEPLOTS_10_2_SVG = new File(FIGURE_DIR, "lineplots.g.10.2.svg");
+	public static final File SCATTERPLOT_FIVE_7_2_SVG = new File(FIGURE_DIR, "scatterplot5.g.7.2.svg");
+	public static final File SCATTERPLOT_7_2_SVG = new File(FIGURE_DIR, "scatterplot.g.7.2.svg");
+
 	//	public final static String IMAGE_SVG = ""
 	//	 		+ "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" >"
 	//	 		+ "  <image transform=\"matrix(0.05999946966767311,-0.0,-0.0,-0.05999946966767311,197.92599487304688,562.9089965820312)\" x=\"0.0\" y=\"0.0\" "
