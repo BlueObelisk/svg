@@ -8,8 +8,6 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
 
-import nu.xom.Element;
-
 public class Fixtures {
 
 
@@ -29,6 +27,7 @@ public class Fixtures {
 	public static final File PATHS_NOPATH_SVG = new File(PATHS_DIR, "nopath.svg");
 	public static final File PATHS_RECT_LINE_SVG = new File(PATHS_DIR, "rectLine.svg");
 	public static final File PATHS_TEXT_LINE_SVG = new File(PATHS_DIR, "textLine.svg");
+	public static final File PATHS_SIMPLE_TREE_SVG = new File(Fixtures.PATHS_DIR, "simpleTree.svg");
 
 	public static final File CC0_SVG = new File(Fixtures.IMAGES_DIR, "cc0.png");
 	public static final File CCBY_PNG = new File(Fixtures.IMAGES_DIR, "ccby.png");
