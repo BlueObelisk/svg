@@ -56,11 +56,13 @@ private static final Logger LOG = Logger.getLogger(SVGArrow.class);
 	
 	private static SVGArrow createArrow(SVGLine subline, int lineEnd, SVGTriangle triangle, double delta) {
 		SVGArrow arrow = null;
-		int lineSerial = triangle.getLineTouchingPoint(subline.getXY(lineEnd), delta);
-		if (lineSerial != -1) {
-			int trianglePoint = (lineSerial + 2  ) % 3; // get opposite point
-			LOG.debug("line serial "+lineSerial+" / "+trianglePoint);
-			arrow = new SVGArrow(subline, lineEnd, triangle, trianglePoint);
+		if (subline != null && triangle != null) {
+			int lineSerial = triangle.getLineTouchingPoint(subline.getXY(lineEnd), delta);
+			if (lineSerial != -1) {
+				int trianglePoint = (lineSerial + 2  ) % 3; // get opposite point
+				LOG.debug("line serial "+lineSerial+" / "+trianglePoint);
+				arrow = new SVGArrow(subline, lineEnd, triangle, trianglePoint);
+			}
 		}
 		return arrow;
  
