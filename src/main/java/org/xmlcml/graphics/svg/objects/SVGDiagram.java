@@ -246,13 +246,15 @@ public class SVGDiagram extends SVGG {
 		arrowsAndLines.addAll(arrowList);
 		arrowsAndLines.addAll(lineList);
 		for (SVGLine line : arrowsAndLines) {
-			SVGTextBox headBox = SVGTextBox.getTouchingBox(line.getXY(0), textBoxList, delta);
-			if (headBox != null) {
-				SVGTextBox tailBox = SVGTextBox.getTouchingBox(line.getXY(1), textBoxList, delta);
-				if (tailBox != null) {
-					SVGConnector link = new SVGConnector(tailBox, headBox);
-					LOG.debug("LINK!! "+link);
-					connectorList.add(link);
+			if (line != null) {
+				SVGTextBox headBox = SVGTextBox.getTouchingBox(line.getXY(0), textBoxList, delta);
+				if (headBox != null) {
+					SVGTextBox tailBox = SVGTextBox.getTouchingBox(line.getXY(1), textBoxList, delta);
+					if (tailBox != null) {
+						SVGConnector link = new SVGConnector(tailBox, headBox);
+						LOG.debug("LINK!! "+link);
+						connectorList.add(link);
+					}
 				}
 			}
 		}
