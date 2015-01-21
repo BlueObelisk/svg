@@ -60,7 +60,7 @@ private static final Logger LOG = Logger.getLogger(SVGArrow.class);
 			int lineSerial = triangle.getLineTouchingPoint(subline.getXY(lineEnd), delta);
 			if (lineSerial != -1) {
 				int trianglePoint = (lineSerial + 2  ) % 3; // get opposite point
-				LOG.debug("line serial "+lineSerial+" / "+trianglePoint);
+				LOG.trace("line serial "+lineSerial+" / "+trianglePoint);
 				arrow = new SVGArrow(subline, lineEnd, triangle, trianglePoint);
 			}
 		}

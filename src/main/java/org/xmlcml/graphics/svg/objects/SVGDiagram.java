@@ -73,7 +73,7 @@ public class SVGDiagram extends SVGG {
 					}
 				} else if (shape instanceof SVGPath) {
 					if (shape.getSignature().equals("M")) {
-						System.err.println("omitted M");
+	//					System.err.println("omitted M");
 					} else {
 						SVGRoundedBox roundedBox = SVGRoundedBox.createRoundedBox((SVGPath)shape);
 						if (roundedBox != null) {
@@ -92,12 +92,12 @@ public class SVGDiagram extends SVGG {
 		}
 		polylineList = SVGPolyline.quadraticMergePolylines(polylineList, eps);
 		lineList = SVGLine.normalizeAndMergeAxialLines(lineList, eps);
-		LOG.debug("roundedBoxList: "+roundedBoxList.size());
-		LOG.debug("paths: "+pathList.size());
-		LOG.debug("polylines: "+polylineList.size());
-		LOG.debug("lines "+lineList.size());
-		LOG.debug("rects "+rectList.size());
-		LOG.debug("triangles "+triangleList.size());
+		LOG.trace("roundedBoxList: "+roundedBoxList.size());
+		LOG.trace("paths: "+pathList.size());
+		LOG.trace("polylines: "+polylineList.size());
+		LOG.trace("lines "+lineList.size());
+		LOG.trace("rects "+rectList.size());
+		LOG.trace("triangles "+triangleList.size());
 	}
 
 	private void addNewPath(SVGPath path) {
@@ -207,16 +207,16 @@ public class SVGDiagram extends SVGG {
 				}
 			}
 		}
-		LOG.debug("textBoxList "+textBoxList.size());
+		LOG.trace("textBoxList "+textBoxList.size());
 	}
 
 	protected void createArrows(double delta) {
 			arrowList = new ArrayList<SVGArrow>();
-			LOG.debug("triangles "+triangleList.size());
+			LOG.trace("triangles "+triangleList.size());
 			for (SVGTriangle triangle : triangleList) {
-				LOG.debug("t "+triangle);
+				LOG.trace("t "+triangle);
 			}
-			LOG.debug("lines "+lineList.size());
+			LOG.trace("lines "+lineList.size());
 			for (SVGLine line : lineList) {
 	//			LOG.debug("l "+line);
 			}
@@ -226,7 +226,7 @@ public class SVGDiagram extends SVGG {
 					SVGLine line = lineList.get(j);
 					SVGArrow arrow = SVGArrow.createArrow(line, triangle, delta);
 					if (arrow != null) {
-						LOG.debug("arrow "+arrow);
+						LOG.trace("arrow "+arrow);
 						newG.appendChild(arrow);
 						line.detach();
 						lineList.set(j, null);
@@ -237,7 +237,7 @@ public class SVGDiagram extends SVGG {
 				}
 				lineList.remove(j - 1);
 			}
-			LOG.debug("created arrows: "+arrowList.size());
+			LOG.trace("created arrows: "+arrowList.size());
 		}
 
 	protected List<SVGConnector> findConnectors(double delta) {
@@ -252,7 +252,7 @@ public class SVGDiagram extends SVGG {
 					SVGTextBox tailBox = SVGTextBox.getTouchingBox(line.getXY(1), textBoxList, delta);
 					if (tailBox != null) {
 						SVGConnector link = new SVGConnector(tailBox, headBox);
-						LOG.debug("LINK!! "+link);
+						LOG.trace("LINK!! "+link);
 						connectorList.add(link);
 					}
 				}

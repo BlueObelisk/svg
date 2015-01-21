@@ -29,7 +29,7 @@ public class SVGBoxChart extends SVGDiagram {
 		this.createArrows(eps);
 		this.findConnectors(eps);
 		for (SVGConnector link : connectorList) {
-			System.err.println("=================== \n"+link.toString()+"\n===================");
+//			System.err.println("=================== \n"+link.toString()+"\n===================");
 		}
 	}
 	
