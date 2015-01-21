@@ -125,7 +125,7 @@ public class SVGLineTest {
 		SVGLine.normalizeAndMergeAxialLines	(lineList, 0.5);
 		Assert.assertEquals("merged line", 4, lineList.size());
 		for (SVGLine line : lineList) {
-			LOG.debug(line);
+			LOG.trace(line);
 		}
 	}
 }
