@@ -4,11 +4,13 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+<!-- 
     <parent>
         <groupId>uk.ac.cam.ch.wwmm</groupId>
         <artifactId>wwmm-parent</artifactId>
         <version>5-SNAPSHOT</version>
     </parent>
+    -->
 
     <groupId>org.xml-cml</groupId>
     <artifactId>svg</artifactId>
@@ -76,14 +78,16 @@
             <artifactId>euclid</artifactId>
             <version>1.1-SNAPSHOT</version>
         </dependency>
-        
+
+<!--         
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-        
+-->
+
         <dependency>
             <version>1.1-SNAPSHOT</version>
             <groupId>org.xml-cml</groupId>
@@ -91,13 +95,14 @@
             <scope>test</scope>
         </dependency>
         
+<!--         
         <dependency>
         	<groupId>com.google.guava</groupId>
         	<artifactId>guava</artifactId>
         	<version>17.0</version>
         </dependency>
+-->    
     </dependencies>
-    
     <reporting>
         <plugins>
         
