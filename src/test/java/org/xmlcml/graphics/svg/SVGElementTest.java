@@ -16,19 +16,20 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nu.xom.Element;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.cml.testutil.JumboTestUtils;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.RealRange.Direction;
 import org.xmlcml.euclid.RealRangeArray;
+import org.xmlcml.testutil.TestUtils;
 import org.xmlcml.xml.XMLConstants;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SVGElementTest {
 
@@ -37,11 +38,11 @@ public class SVGElementTest {
 	@Test
 	@Ignore
 	public final void testcreateSVGElement() {
-		Element oldElement =JumboTestUtils.parseValidFile(GRAPHICS_RESOURCE + XMLConstants.U_S
+		Element oldElement =TestUtils.parseValidFile(GRAPHICS_RESOURCE + XMLConstants.U_S
 				+ "image12.svg");
 		SVGElement newSvg = SVGElement.readAndCreateSVG(oldElement);
 		Assert.assertEquals("class", SVGSVG.class, newSvg.getClass());
-		JumboTestUtils.assertEqualsCanonically("copy",JumboTestUtils.parseValidFile(GRAPHICS_RESOURCE + XMLConstants.U_S
+		TestUtils.assertEqualsCanonically("copy",TestUtils.parseValidFile(GRAPHICS_RESOURCE + XMLConstants.U_S
 				+ "image12.svg"), newSvg, true);
 	}
 
