@@ -16,17 +16,22 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.io.File;
+import java.util.List;
+
 import nu.xom.Element;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.cml.testutil.JumboTestUtils;
-import org.xmlcml.euclid.*;
+import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.Transform2;
+import org.xmlcml.euclid.Vector2;
+import org.xmlcml.testutil.TestUtils;
 import org.xmlcml.xml.XMLUtil;
-
-import java.io.File;
-import java.util.List;
 
 public class SVGTextTest {
 	private static Logger LOG = Logger.getLogger(SVGTextTest.class);
@@ -38,7 +43,7 @@ public class SVGTextTest {
 	@Test
 	@Ignore
 	public void testSetup() {
-		Element element = JumboTestUtils.parseValidString(STRING1);
+		Element element = XMLUtil.parseXML(STRING1);
 		SVGElement text = SVGElement.readAndCreateSVG(element);
 		Assert.assertNotNull(text);
 		Assert.assertEquals("class", SVGText.class, text.getClass());
@@ -52,41 +57,41 @@ public class SVGTextTest {
 	@Test
 	@Ignore
 	public void testApplyTransform() {
-		Element element = JumboTestUtils.parseValidString(STRING1);
+		Element element = XMLUtil.parseXML(STRING1);
 		SVGText text = (SVGText) SVGElement.readAndCreateSVG(element);
 		text.applyTransformAttributeAndRemove();
 		String expectedS = "<text " +
 				"style='font-size:6.2023;stroke:none;fill:black;'" +
 				" x='3.0' y='335.28' improper='true'" +
 				" xmlns='http://www.w3.org/2000/svg'>ppm</text>";
-		Element expected = JumboTestUtils.parseValidString(expectedS);
-		JumboTestUtils.assertEqualsIncludingFloat("transform", expected, text, true, 0.001);
+		Element expected = XMLUtil.parseXML(expectedS);
+		TestUtils.assertEqualsIncludingFloat("transform", expected, text, true, 0.001);
 	}
 
 	@Test
 	@Ignore
 	public void testFormat() {
-		Element element = JumboTestUtils.parseValidString(STRING1);
+		Element element = XMLUtil.parseXML(STRING1);
 		SVGText text = (SVGText) SVGElement.readAndCreateSVG(element);
 		text.applyTransformAttributeAndRemove();
 		String expectedS = "<text " +
 				"style='font-size:6.2023;stroke:none;fill:black;'" +
 				" x='3.0' y='335.28' improper='true'" +
 				" xmlns='http://www.w3.org/2000/svg'>ppm</text>";
-		Element expected = JumboTestUtils.parseValidString(expectedS);
-		JumboTestUtils.assertEqualsIncludingFloat("transform", expected, text, true, 0.001);
+		Element expected = XMLUtil.parseXML(expectedS);
+		TestUtils.assertEqualsIncludingFloat("transform", expected, text, true, 0.001);
 		text.format(1);
 		expectedS = "<text " +
 		"style='font-size:6.2023;stroke:none;fill:black;'" +
 		" x='3.0' y='335.3' improper='true'" +
 		" xmlns='http://www.w3.org/2000/svg'>ppm</text>";
-		expected = JumboTestUtils.parseValidString(expectedS);
-		JumboTestUtils.assertEqualsIncludingFloat("transform", expected, text, true, 0.001);
+		expected = XMLUtil.parseXML(expectedS);
+		TestUtils.assertEqualsIncludingFloat("transform", expected, text, true, 0.001);
 	}
 
 	@Test
 	public void testGetXandY() {
-		Element element = JumboTestUtils.parseValidString(STRING1);
+		Element element = XMLUtil.parseXML(STRING1);
 		SVGText text = (SVGText) SVGElement.readAndCreateSVG(element);
 		text.applyTransformAttributeAndRemove();
 		Assert.assertEquals("x", 3.0, text.getX(), 0.01);
@@ -95,7 +100,7 @@ public class SVGTextTest {
 
 	@Test
 	public void testGetBoundingBox() {
-		Element element = JumboTestUtils.parseValidString(STRING1);
+		Element element = XMLUtil.parseXML(STRING1);
 		SVGText text = (SVGText) SVGElement.readAndCreateSVG(element);
 		text.applyTransformAttributeAndRemove();
 		Real2Range bb = text.getBoundingBox();
@@ -111,8 +116,8 @@ public class SVGTextTest {
 		SVGElement text = new SVGText(new Real2(1., 2.), "string");
 		String expectedS = "<text style=' stroke : none; font-size : 7.654321;' " +
 				"x='1.0' y='2.0' xmlns='http://www.w3.org/2000/svg'>string</text>";
-		Element expected = JumboTestUtils.parseValidString(expectedS);
-		JumboTestUtils.assertEqualsIncludingFloat("transform", expected, text, true, 0.001);
+		Element expected = XMLUtil.parseXML(expectedS);
+		TestUtils.assertEqualsIncludingFloat("transform", expected, text, true, 0.001);
 	}
 
 	@Test
@@ -120,7 +125,7 @@ public class SVGTextTest {
 	public void testGetEstimatedHorizontalLength() {
 		String test1S = "<text style=' stroke : none; font-size : 7.654321;' " +
 		"x='1.0' y='2.0' xmlns='http://www.w3.org/2000/svg'>string</text>";
-		SVGText text1 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(test1S));
+		SVGText text1 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(test1S));
 		Assert.assertEquals("font", 7.654321, text1.getFontSize(), 0.001);
 		double fontWidthFactor = 1.1;
 		double length = text1.getEstimatedHorizontalLength(fontWidthFactor);
@@ -148,7 +153,7 @@ public class SVGTextTest {
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"266.4\" y=\"342.36\">0</text>" +
 				"</svg>";
-		SVGSVG svg = (SVGSVG) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(s));
+		SVGSVG svg = (SVGSVG) SVGElement.readAndCreateSVG(XMLUtil.parseXML(s));
 		List<SVGElement> elementList = SVGElement.generateElementList(svg, "./svg:text");
 		Assert.assertEquals("texts", 9, elementList.size());
 		double[] lengths = new double[elementList.size()];
@@ -177,7 +182,7 @@ public class SVGTextTest {
 		        5.2,
 		        3.5,
 	        };
-		String msg = JumboTestUtils.testEquals("lengths", expectedLength, lengths, 0.1);
+		String msg = TestUtils.testEquals("lengths", expectedLength, lengths, 0.1);
 		if (msg != null) {
 			Assert.fail(msg);
 		}
@@ -187,12 +192,12 @@ public class SVGTextTest {
 	@Ignore
 	public void testGetCalculatedTextEnd() {
 		double fontWidthFactor = 1.05;
-		SVGText text = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString("<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
+		SVGText text = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML("<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 		"improper=\"true\" x=\"3.0\" y=\"30.\">ppm</text>"));
 		Real2 textEnd = text.getCalculatedTextEnd(fontWidthFactor);
 		Assert.assertTrue("text end", new Real2(16.74119565,30.0).isEqualTo(textEnd, 0.1));
 		
-		text = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		text = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 			"<text rotate='"+SVGElement.YPLUS+"' " +
 			"style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 			"improper=\"true\" x=\"3.0\" y=\"30.\">ppm</text>"));
@@ -204,19 +209,19 @@ public class SVGTextTest {
 	@Ignore
 	public void testGetCalculatedTextEndCoordinate() {
 		double fontWidthFactor = 1.05;
-		SVGText text = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString("<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
+		SVGText text = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML("<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 		"improper=\"true\" x=\"3.0\" y=\"30.\">ppm</text>"));
 		double textEndCoord = text.getCalculatedTextEndCoordinate(fontWidthFactor);
 		Assert.assertEquals("text end", 16.74119565, textEndCoord, 0.1);
 		
-		text = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		text = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 			"<text rotate='"+SVGElement.YPLUS+"' " +
 			"style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 			"improper=\"true\" x=\"3.0\" y=\"30.\">ppm</text>"));
 		textEndCoord = text.getCalculatedTextEndCoordinate(fontWidthFactor);
 		Assert.assertEquals("text end", 16.26, textEndCoord, 0.1);
 		
-		text = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		text = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 			"<text rotate='"+SVGElement.YMINUS+"' " +
 			"style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 			"improper=\"true\" x=\"3.0\" y=\"30.\">ppm</text>"));
@@ -228,7 +233,7 @@ public class SVGTextTest {
 	@Ignore
 	public void testSetCalculatedTextEndCoordinate() {
 		double fontWidthFactor = 1.05;
-		SVGText text = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString("<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
+		SVGText text = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML("<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 		"improper=\"true\" x=\"3.0\" y=\"30.\">ppm</text>"));
 		double textEndCoord = text.getCalculatedTextEndCoordinate(fontWidthFactor);
 		Assert.assertEquals("text end", 16.74119565, textEndCoord, 0.1);
@@ -239,7 +244,7 @@ public class SVGTextTest {
 	@Test
 	@Ignore
 	public void testGetCurrentFontSize() {
-		SVGText text = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 			"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 		"improper=\"true\" x=\"3.0\" y=\"30.\">ppm</text>"));
 		Assert.assertEquals("font size", 6.20, text.getFontSize(), 0.1);
@@ -257,7 +262,7 @@ public class SVGTextTest {
 
 	@Test
 	public void testGetCurrentBaseY() {
-		SVGText text = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 			"improper=\"true\" x=\"3.0\" y=\"30.\">ppm</text>"));
 			Assert.assertEquals("baseY", 30., text.getCurrentBaseY(), 0.1);
@@ -273,7 +278,7 @@ public class SVGTextTest {
 
 	@Test
 	public void testGetSetRotate() {
-		SVGText text = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 			"improper=\"true\" x=\"3.0\" y=\"30.\">ppm</text>"));
 		Assert.assertNull("rotate", text.getRotate());
@@ -292,27 +297,27 @@ public class SVGTextTest {
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"14.76\" y=\"335.28\"> (f</text>" +
 				"</svg>", true, 20.59, "ppm (f");
-		SVGText text1 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text1 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"19.92\" y=\"335.28\">1)</text>"));
 		SVGText text2 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 25.44, "ppm (f1)", text0, text1);
 
-		SVGText text3 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text3 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"370.86\" y=\"342.36\">1.</text>"));
 		SVGElement text4 = testConcatenate(fontWidthFactor, fontHeightFactor, false, 25.44, null, text2, text3);
 		
-		SVGText text5 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text5 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 			"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 			"improper=\"true\" x=\"376.08\" y=\"342.36\">0</text>"));
 		SVGText text6 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 379.55, "1.0", text3, text5);
 		
-		SVGText text7 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text7 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 		"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 		"improper=\"true\" x=\"316.08\" y=\"342.36\">2.</text>"));
 		SVGElement text8 = testConcatenate(fontWidthFactor, fontHeightFactor, false, 25.44, null, text6, text7);
 		
-		SVGText text9 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text9 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 		"<text style=\"font-family:'Helvetica',sans-serif;font-size:6.2023;stroke:none;fill:black;\" " +
 		"improper=\"true\" x=\"321.24\" y=\"342.36\">0</text>"));
 
@@ -327,7 +332,7 @@ public class SVGTextTest {
 	 */
 	private SVGText testConcatenate(double fontWidthFactor,
 			double fontHeightFactor, String s, boolean mergedExpected, double endExpected, String textExpected) {
-		SVGSVG svg = (SVGSVG) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(s));
+		SVGSVG svg = (SVGSVG) SVGElement.readAndCreateSVG(XMLUtil.parseXML(s));
 		List<SVGElement> elementList = SVGElement.generateElementList(svg, "./svg:text");
 		Assert.assertEquals("texts", 2, elementList.size());
 		SVGText text0 = ((SVGText)elementList.get(0));
@@ -377,23 +382,23 @@ public class SVGTextTest {
 		  <line style="stroke-width:0.131;stroke-linecap:round;" x1="89.22" y1="277.86" x2="89.22" y2="304.14" /> 
 		</g>
 		*/
-		SVGText text0 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text0 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" " +
 				"improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"306.72\">17</text>"));
 		Assert.assertEquals("text0", 300.25, text0.getCalculatedTextEndCoordinate(fontWidthFactor), 0.1);
 		
-		SVGText text1 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text1 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" " +
 				"improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"300.54\">8</text> "));
 		Assert.assertEquals("text1", 297.30, text1.getCalculatedTextEndCoordinate(fontWidthFactor), 0.1);
 		SVGText text01 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 297.30, "178", text0, text1);
 		
-		SVGText text2 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text2 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" " +
 				"improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"297.54\">.</text> "));
 		SVGElement text02 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 295.92, "178.", text01, text2);
 		
-		SVGText text3 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text3 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:5.7793;stroke:none;fill:black;\" " +
 				"improper=\"true\" rotate=\"Y\" x=\"80.16\" y=\"295.74\">616</text>"));
 		SVGElement text03 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 286.03, "178.616", text01, text3);
@@ -416,42 +421,42 @@ public class SVGTextTest {
 		  <text style=\"font-family:'Helvetica',sans-serif;font-size:5.7091;stroke:none;fill:black;\" improper=\"true\" x=\"73.26\" y=\"301.68\">3</text> 
 		</g>
 		*/
-		SVGText text0 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text0 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				" <text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"24.36\" y=\"303.36\">7</text> "));
 		Assert.assertEquals("text0", 28.69, text0.getCalculatedTextEndCoordinate(fontWidthFactor), 0.1);
 		
-		SVGText text1 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text1 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"28.68\" y=\"303.36\">5</text> "));
 		SVGText text01 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 33.01, "75", text0, text1);
 		
-		SVGText text2 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text2 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"32.94\" y=\"303.36\"> M</text> "));
 		SVGElement text02 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 41.52, "75 M", text01, text2);
 		
-		SVGText text3 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text3 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"41.47\" y=\"303.36\">H</text>"));
 		SVGElement text03 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 47.04, "75 MH", text01, text3);
 		
-		SVGText text4 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text4 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"46.99\" y=\"303.36\">z,</text>"));
 		SVGElement text04 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 53.02, "75 MHz,", text01, text4);
 		
-		SVGText text5 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text5 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"55.11\" y=\"303.36\">CD</text>"));
 		SVGElement text05 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 66.25, "75 MHz, CD", text01, text5);
 		
-		SVGText text6 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text6 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:7.7348;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"66.08\" y=\"303.36\">Cl</text>"));
 		SVGElement text06 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 73.81, "75 MHz, CDCl", text01, text6);
 		
-		SVGText text7 = (SVGText) SVGElement.readAndCreateSVG(JumboTestUtils.parseValidString(
+		SVGText text7 = (SVGText) SVGElement.readAndCreateSVG(XMLUtil.parseXML(
 				"<text style=\"font-family:'Helvetica',sans-serif;font-size:5.7091;stroke:none;fill:black;\" " +
 				"improper=\"true\" x=\"73.26\" y=\"301.68\">3</text>"));
 		SVGElement text07 = testConcatenate(fontWidthFactor, fontHeightFactor, true, 76.45, "75 MHz, CDCl_{3", text01, text7);

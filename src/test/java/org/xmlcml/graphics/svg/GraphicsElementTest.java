@@ -2,9 +2,10 @@ package org.xmlcml.graphics.svg;
 
 import junit.framework.Assert;
 import nu.xom.Attribute;
+
 import org.junit.Test;
-import org.xmlcml.cml.testutil.JumboTestUtils;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.testutil.TestUtils;
 
 public class GraphicsElementTest {
 
@@ -13,7 +14,7 @@ public class GraphicsElementTest {
 		SVGCircle circle = new SVGCircle(new Real2(10., 20.), 3.);
 		circle.setStroke("red");
 		circle.setStrokeWidth(1.0);
-		JumboTestUtils.assertEqualsIncludingFloat("style",
+		TestUtils.assertEqualsIncludingFloat("style",
 				"<circle cx='10.0' cy='20.0' r='3.0' fill='#aaffff' stroke='red' stroke-width='1.0'"+ 
 				" xmlns='http://www.w3.org/2000/svg'/>", circle, true, 0.001);
 	}
@@ -22,13 +23,13 @@ public class GraphicsElementTest {
 	public void testUseStyleAttribute2() {
 		SVGCircle circle = new SVGCircle(new Real2(10., 20.), 3.);
 		// not default attributes (maybe a bad idea, but...)
-		JumboTestUtils.assertEqualsIncludingFloat("style",
+		TestUtils.assertEqualsIncludingFloat("style",
 				"<circle cx='10.0' cy='20.0' r='3.0' "+ 
 				" xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='0.5' fill='#aaffff'/>", circle, true, 0.001);
 		circle.setUseStyleAttribute(true);
 		circle.setStroke("red");
 		circle.setStrokeWidth(1.0);
-		JumboTestUtils.assertEqualsIncludingFloat("style",
+		TestUtils.assertEqualsIncludingFloat("style",
 				"<circle cx='10.0' cy='20.0' r='3.0' style=' fill : #aaffff; stroke : red; stroke-width : 1.0;'"+ 
 				" xmlns='http://www.w3.org/2000/svg'/>", circle, true, 0.001);
 	}
@@ -40,11 +41,11 @@ public class GraphicsElementTest {
 		circle.setUseStyleAttribute(true);
 		circle.setStroke("red");
 		circle.setStrokeWidth(1.0);
-		JumboTestUtils.assertEqualsIncludingFloat("style",
+		TestUtils.assertEqualsIncludingFloat("style",
 				"<circle cx='10.0' cy='20.0' r='3.0' style=' fill : #aaffff; stroke : red; stroke-width : 1.0;'"+ 
 				" xmlns='http://www.w3.org/2000/svg'/>", circle, true, 0.001);
 		circle.setUseStyleAttribute(false);
-		JumboTestUtils.assertEqualsIncludingFloat("style",
+		TestUtils.assertEqualsIncludingFloat("style",
 				"<circle cx='10.0' cy='20.0' r='3.0' fill='#aaffff' stroke='red' stroke-width='1.0'"+ 
 				" xmlns='http://www.w3.org/2000/svg'/>", circle, true, 0.001);
 	}
@@ -53,25 +54,25 @@ public class GraphicsElementTest {
 	@Test
 	public void testUseStyleAttribute4() {
 		SVGCircle circle = new SVGCircle(new Real2(10., 20.), 3.);
-		JumboTestUtils.assertEqualsIncludingFloat("style",
+		TestUtils.assertEqualsIncludingFloat("style",
 				"<circle cx='10.0' cy='20.0' r='3.0' "+ 
 				" xmlns='http://www.w3.org/2000/svg'  stroke='black' stroke-width='0.5' fill='#aaffff'/>", circle, true, 0.001);
 		circle.setUseStyleAttribute(true);
-		JumboTestUtils.assertEqualsIncludingFloat("style",
+		TestUtils.assertEqualsIncludingFloat("style",
 				"<circle cx='10.0' cy='20.0' r='3.0' style=' fill : #aaffff; stroke : red; stroke-width : 1.0;'"+ 
 				" xmlns='http://www.w3.org/2000/svg'/>", circle, true, 0.001);
 		circle.setStroke(null);
 		circle.setStrokeWidth(null);
-		JumboTestUtils.assertEqualsIncludingFloat("style",
+		TestUtils.assertEqualsIncludingFloat("style",
 				"<circle cx='10.0' cy='20.0' r='3.0' style=' fill : #aaffff;'"+ 
 				" xmlns='http://www.w3.org/2000/svg'/>", circle, true, 0.001);
 		circle.setUseStyleAttribute(false);
-		JumboTestUtils.assertEqualsIncludingFloat("style",
+		TestUtils.assertEqualsIncludingFloat("style",
 				"<circle cx='10.0' cy='20.0' r='3.0' fill='#aaffff'"+ 
 				" xmlns='http://www.w3.org/2000/svg'/>", circle, true, 0.001);
 		circle.setStroke("red");
 		circle.setStrokeWidth(1.0);
-		JumboTestUtils.assertEqualsIncludingFloat("style",
+		TestUtils.assertEqualsIncludingFloat("style",
 				"<circle cx='10.0' cy='20.0' r='3.0' stroke='red' stroke-width='1.0' fill='#aaffff'"+ 
 				" xmlns='http://www.w3.org/2000/svg'/>", circle, true, 0.001);
 	}
