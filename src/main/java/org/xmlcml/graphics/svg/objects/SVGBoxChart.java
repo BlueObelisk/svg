@@ -12,10 +12,11 @@ public class SVGBoxChart extends SVGDiagram {
 	static {
 		LOG.setLevel(Level.DEBUG);
 	}
+	private static final String BOX_CHART = "boxChart";
 
 	public SVGBoxChart() {
 		super();
-		this.addAttribute(new Attribute("class", "boxChart"));
+		this.setClassName(BOX_CHART);
 	}
 	
 	public SVGBoxChart(SVGElement diagram) {

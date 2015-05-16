@@ -97,4 +97,11 @@ public class SVGTSpan extends SVGText {
 		}
 		return tSpanList;
 	}
+	
+	public void removeAttributes() {
+		int natt = this.getAttributeCount();
+		for (int i = 0; i < natt; i++) {
+			this.getAttribute(0).detach();
+		}
+	}
 }

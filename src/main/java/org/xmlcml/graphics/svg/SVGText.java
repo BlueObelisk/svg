@@ -993,5 +993,12 @@ public class SVGText extends SVGElement {
 		g.drawString(value, x, y);
 		return image;
 	}
+
+	public void removeAttributes() {
+		int natt = this.getAttributeCount();
+		for (int i = 0; i < natt; i++) {
+			this.getAttribute(0).detach();
+		}
+	}
 	
 }

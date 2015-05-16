@@ -18,6 +18,7 @@ import org.xmlcml.graphics.svg.SVGText;
 
 public class SVGTextBox extends SVGG {
 
+	private static final String TEXT_BOX = "textBox";
 	private static final Logger LOG = Logger.getLogger(SVGTextBox.class);
 	static {
 		LOG.setLevel(Level.DEBUG);
@@ -31,7 +32,7 @@ public class SVGTextBox extends SVGG {
 	
 	public SVGTextBox() {
 		super();
-		this.addAttribute(new Attribute("class", "textBox"));
+		this.setClassName(TEXT_BOX);
 	}
 
 	public SVGTextBox(SVGRect rect) {

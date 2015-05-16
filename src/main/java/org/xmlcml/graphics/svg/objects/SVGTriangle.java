@@ -11,6 +11,7 @@ import org.xmlcml.graphics.svg.SVGPolyline;
 
 public class SVGTriangle extends SVGG {
 	
+	private static final String TRIANGLE = "triangle";
 	private static final Logger LOG = Logger.getLogger(SVGTriangle.class);
 	static {
 		LOG.setLevel(Level.DEBUG);
@@ -20,7 +21,7 @@ public class SVGTriangle extends SVGG {
 	
 	public SVGTriangle() {
 		super();
-		this.addAttribute(new Attribute("class", "triangle"));
+		this.setClassName(TRIANGLE);
 	}
 
 	public SVGTriangle(SVGPolyline polyline) {
