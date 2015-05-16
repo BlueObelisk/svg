@@ -15,6 +15,8 @@ private static final Logger LOG = Logger.getLogger(SVGArrow.class);
 		LOG.setLevel(Level.DEBUG);
 	}
 
+	private static final String ARROW = "arrow";
+
 	private SVGLine subline;
 	private int linePoint;
 	private SVGTriangle triangle;
@@ -24,7 +26,7 @@ private static final Logger LOG = Logger.getLogger(SVGArrow.class);
 	
 	public SVGArrow() {
 		super();
-		this.addAttribute(new Attribute("class", "arrow"));
+		this.setClassName(ARROW);
 	}
 
 	public SVGArrow(SVGLine subline, int linePoint, SVGTriangle triangle, int trianglePoint) {

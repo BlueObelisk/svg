@@ -10,6 +10,7 @@ import org.xmlcml.graphics.svg.SVGPath;
 
 public class SVGRoundedBox extends SVGG {
 	
+	private static final String ROUNDED_BOX = "roundedBox";
 	private static final Logger LOG = Logger.getLogger(SVGRoundedBox.class);
 	static {
 		LOG.setLevel(Level.DEBUG);
@@ -19,7 +20,7 @@ public class SVGRoundedBox extends SVGG {
 	
 	public SVGRoundedBox() {
 		super();
-		this.addAttribute(new Attribute("class", "roundedBox"));
+		this.setClassName(ROUNDED_BOX);
 	}
 	
 	public SVGRoundedBox(SVGPath path) {
