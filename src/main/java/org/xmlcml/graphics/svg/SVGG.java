@@ -19,8 +19,11 @@ package org.xmlcml.graphics.svg;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
+
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.graphics.svg.text.SVGWord;
+import org.xmlcml.xml.XMLUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -160,6 +163,17 @@ public class SVGG extends SVGElement {
 		List<SVGElement> elementList = SVGG.generateElementList(svgElement, xPath);
 		SVGG graphic = (elementList.size() == 0) ? null : (SVGG) elementList.get(index);
 		return graphic;
+	}
+	
+	/** returns bounding box for explicit child SVGRect.
+	 * 
+	 * some systems (e.g. HOCR+SVG) add an explicit child bounding box to an SVGG.
+	 * 
+	 * @return
+	 */
+	public Real2Range getChildRectBoundingBox() {
+		SVGRect rect = (SVGRect) XMLUtil.getSingleElement(this, "*[local-name()='"+SVGRect.TAG+"']");
+		return rect == null ? null : rect.getBoundingBox();
 	}
 
 }

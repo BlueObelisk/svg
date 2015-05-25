@@ -3,7 +3,6 @@ package org.xmlcml.graphics.svg.text;
 import java.util.ArrayList;
 import java.util.List;
 
-import nu.xom.Attribute;
 import nu.xom.Element;
 
 import org.apache.log4j.Level;
@@ -19,30 +18,29 @@ import org.xmlcml.xml.XMLUtil;
  * @author pm286
  *
  */
-public class SVGWordBlock extends SVGG {
+public class SVGWordPara extends SVGG {
 
 	
-	private static final Logger LOG = Logger.getLogger(SVGWordBlock.class);
+	private static final Logger LOG = Logger.getLogger(SVGWordPara.class);
 	static {
 		LOG.setLevel(Level.DEBUG);
 	}
 	
-	public static final String CLASS = "wordBlock";
+	public static final String CLASS = "para";
 	
-	public SVGWordBlock() {
+	public SVGWordPara() {
 		super();
 		this.setClassName(CLASS);
 	}
 
-	public List<SVGWordPara> getSVGParaList() {
-		List<Element> elements = XMLUtil.getQueryElements(this, "*[@class='"+SVGWordPara.CLASS+"']");
-		List<SVGWordPara> wordParaList = new ArrayList<SVGWordPara>();
+	public List<SVGWordLine> getSVGLineList() {
+		List<Element> elements = XMLUtil.getQueryElements(this, "*[@class='"+SVGWordLine.CLASS+"']");
+		List<SVGWordLine> wordLineList = new ArrayList<SVGWordLine>();
 		for (Element element : elements) {
-			wordParaList.add((SVGWordPara) element);
+			wordLineList.add((SVGWordLine) element);
 		}
-		return wordParaList;
+		return wordLineList;
 	}
-
 
 
 }

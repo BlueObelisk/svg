@@ -25,7 +25,10 @@ import nu.xom.Node;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.graphics.svg.text.SVGWordPage;
+import org.xmlcml.graphics.svg.text.SVGWordPageList;
 import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
 
 /** container for SVG
  * "svg"
@@ -39,6 +42,7 @@ public class SVGSVG extends SVGElement {
 	private static String svgSuffix = "svg";
 	private Double begin = null;
 	private Double dur = null;
+	private SVGWordPageList wordPageList;
 	
 	/** constructor.
 	 * 
@@ -161,6 +165,16 @@ public class SVGSVG extends SVGElement {
 			g.appendChild(child);
 		}
 		return g;
+	}
+
+	public SVGWordPage getSingleSVGPage() {
+		getSVGPageList();
+		return wordPageList == null ? null : (SVGWordPage) XMLUtil.getSingleElement(wordPageList, "*[@class='"+SVGWordPage.CLASS+"']");
+	}
+
+	public SVGWordPageList getSVGPageList() {
+		wordPageList = (SVGWordPageList) XMLUtil.getSingleElement(this, "*[@class='"+SVGWordPageList.CLASS+"']");
+		return wordPageList;
 	}
 
 }

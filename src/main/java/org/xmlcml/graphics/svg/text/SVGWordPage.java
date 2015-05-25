@@ -1,8 +1,14 @@
 package org.xmlcml.graphics.svg.text;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import nu.xom.Element;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.xml.XMLUtil;
 
 /** holds a "paragraph".
  * 
@@ -20,7 +26,7 @@ public class SVGWordPage extends SVGG {
 		LOG.setLevel(Level.DEBUG);
 	}
 	
-	private static final String WORD_PAGE = "wordPage";
+	public static final String CLASS = "wordPage";
 	
 	/**
 	 * TESSERACT O/P
@@ -29,8 +35,27 @@ public class SVGWordPage extends SVGG {
 	 */
 	public SVGWordPage() {
 		super();
-		this.setClassName(WORD_PAGE);
+		this.setClassName(CLASS);
 	}
+
+	public List<SVGWordBlock> getSVGBlockList() {
+		List<Element> elements = XMLUtil.getQueryElements(this, "*[@class='"+SVGWordBlock.CLASS+"']");
+		List<SVGWordBlock> wordBlockList = new ArrayList<SVGWordBlock>();
+		for (Element element : elements) {
+			wordBlockList.add((SVGWordBlock) element);
+		}
+		return wordBlockList;
+	}
+
+	public List<SVGWordLine> getSVGLineList() {
+		List<Element> elements = XMLUtil.getQueryElements(this, ".//*[@class='"+SVGWordLine.CLASS+"']");
+		List<SVGWordLine> wordLineList = new ArrayList<SVGWordLine>();
+		for (Element element : elements) {
+			wordLineList.add((SVGWordLine) element);
+		}
+		return wordLineList;
+	}
+
 
 
 }
