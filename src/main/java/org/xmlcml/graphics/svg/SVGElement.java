@@ -16,18 +16,49 @@
 
 package org.xmlcml.graphics.svg;
 
-import nu.xom.*;
-import nu.xom.canonical.Canonicalizer;
-import org.apache.log4j.Logger;
-import org.xmlcml.euclid.*;
-import org.xmlcml.euclid.RealRange.Direction;
-import org.xmlcml.xml.XMLConstants;
-import org.xmlcml.xml.XMLUtil;
-
-import java.awt.*;
-import java.io.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import nu.xom.Attribute;
+import nu.xom.Comment;
+import nu.xom.Element;
+import nu.xom.Elements;
+import nu.xom.Node;
+import nu.xom.Nodes;
+import nu.xom.ParentNode;
+import nu.xom.ProcessingInstruction;
+import nu.xom.Text;
+import nu.xom.canonical.Canonicalizer;
+
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Real;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealArray;
+import org.xmlcml.euclid.RealRange;
+import org.xmlcml.euclid.RealRange.Direction;
+import org.xmlcml.euclid.RealRangeArray;
+import org.xmlcml.euclid.RealSquareMatrix;
+import org.xmlcml.euclid.Transform2;
+import org.xmlcml.graphics.svg.text.SVGWordPara;
+import org.xmlcml.graphics.svg.text.SVGWord;
+import org.xmlcml.graphics.svg.text.SVGWordBlock;
+import org.xmlcml.graphics.svg.text.SVGWordLine;
+import org.xmlcml.graphics.svg.text.SVGWordPage;
+import org.xmlcml.graphics.svg.text.SVGWordPageList;
+import org.xmlcml.graphics.svg.text.SVGWordPhrase;
+import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
 
 /** 
  * Base class for lightweight generic SVG element.
@@ -108,7 +139,7 @@ public class SVGElement extends GraphicsElement {
 		} else if (tag.equals(SVGEllipse.TAG)) {
 			newElement = new SVGEllipse();
 		} else if (tag.equals(SVGG.TAG)) {
-			newElement = new SVGG();
+			newElement = createSVGGOrClasses(element);
 		} else if (tag.equals(SVGImage.TAG)) {
 			newElement = new SVGImage();
 		} else if (tag.equals(SVGLine.TAG)) {
@@ -144,7 +175,40 @@ public class SVGElement extends GraphicsElement {
 		}
         return newElement;
 	}
-	
+
+	private static SVGElement createSVGGOrClasses(Element element) {
+		SVGElement newElement;
+		String clazz = getClassAttributeValue(element);
+		// word stuff
+		if (SVGWordPara.CLASS.equals(clazz)) {
+			newElement = new SVGWordPara();
+		} else if (SVGWord.CLASS.equals(clazz)) {
+			newElement = new SVGWord();
+		} else if (SVGWordBlock.CLASS.equals(clazz)) {
+			newElement = new SVGWordBlock();
+		} else if (SVGWordLine.CLASS.equals(clazz)) {
+			newElement = new SVGWordLine();
+		} else if (SVGWordPage.CLASS.equals(clazz)) {
+			newElement = new SVGWordPage();
+		} else if (SVGWordPageList.CLASS.equals(clazz)) {
+			newElement = new SVGWordPageList();
+		} else if (SVGWordPhrase.CLASS.equals(clazz)) {
+			newElement = new SVGWordPhrase();
+		} else {
+			newElement = new SVGG();
+		}
+		return newElement;
+	}
+
+	/** value of the "class" attribute.
+	 * 
+	 * @param element
+	 * @return null if element is null.
+	 */
+	private static String getClassAttributeValue(Element element) {
+		return element == null ? null : element.getAttributeValue(SVG_CLASS);
+	}
+
 	/** 
 	 * Converts an SVG file to SVGElement
 	 * 
