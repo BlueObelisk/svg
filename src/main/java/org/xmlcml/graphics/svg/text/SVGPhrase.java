@@ -7,6 +7,7 @@ import nu.xom.Element;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.xml.XMLUtil;
 
@@ -86,4 +87,15 @@ public class SVGPhrase extends SVGG {
 		return gap < interWordGap;
 	}
 
+	public Real2Range getBoundingBox() {
+		Real2Range bbox = null;
+		for (SVGWord word : this.getOrCreateWordList()) {
+			if (bbox == null) {
+				bbox = word.getBoundingBox();
+			} else {
+				bbox = bbox.plus(word.getBoundingBox());
+			}
+		}
+		return bbox;
+	}
 }
