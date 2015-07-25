@@ -8,6 +8,7 @@ import nu.xom.Element;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.xml.XMLUtil;
 
@@ -39,8 +40,7 @@ public class SVGWordLine extends SVGG {
 	public List<SVGPhrase> makePhrasesFromWords() {
 		phraseList = new ArrayList<SVGPhrase>();
 		getOrCreateSVGWordList();
-		checkWordsAreSorted();
-		if (wordList.size() > 0) {
+		if (checkWordsAreSorted()) {
 			for (int i = 0; i < wordList.size(); i++) {
 				addWordToPhraseList(wordList.get(i));
 			}
@@ -48,12 +48,15 @@ public class SVGWordLine extends SVGG {
 		return phraseList;
 	}
 	
-	private void checkWordsAreSorted() {
+	private boolean checkWordsAreSorted() {
 		for (int i = 1; i < wordList.size(); i++) {
 			if (!isOrdered(wordList.get(i - 1), wordList.get(i))) {
-				throw new RuntimeException ("Unordered wordlist from Tesseract");
+				LOG.warn("Unordered wordlist from Tesseract: "+wordList.get(i - 1).toString()+" => "+wordList.get(i).toString());
+				LOG.warn("Unordered wordlist from Tesseract: "+wordList.get(i - 1).toString()+" => "+wordList.get(i).toString());
+				return false;
 			}
 		}
+		return true;
 	}
 
 	private void addWordToPhraseList(SVGWord svgWord) {
@@ -82,10 +85,30 @@ public class SVGWordLine extends SVGG {
 		}
 	}
 
+	/**
+	 * returns false only if both words are not null and not null coordinates.
+	 * 
+	 * @param svgWord0
+	 * @param svgWord1
+	 * @return
+	 */
 	private boolean isOrdered(SVGWord svgWord0, SVGWord svgWord1) {
-		Real2 xy0 = svgWord0.getChildRectBoundingBox().getCorners()[0];
-		Real2 xy1 = svgWord1.getChildRectBoundingBox().getCorners()[0];
-		return xy0.getX() < xy1.getX();
+		if (svgWord0 == null || svgWord1 == null) {
+			LOG.trace("null word/s "+svgWord0+"; "+svgWord1);
+			return true;
+		}
+		Real2 xy0 = getFirstCorner(svgWord0);
+		Real2 xy1 = getFirstCorner(svgWord1);
+		if (xy0 == null || xy1 == null) {
+			LOG.trace("null coords "+xy0+"; "+xy1);
+			return true;
+		}
+		return (xy0.getX() < xy1.getX());
+	}
+
+	private Real2 getFirstCorner(SVGWord svgWord) {
+		Real2Range bbox = svgWord.getChildRectBoundingBox();
+		return (bbox == null || bbox.getCorners() == null) ? null : bbox.getCorners()[0];
 	}
 
 	public List<SVGPhrase> getOrCreateSVGPhraseList() {
@@ -122,12 +145,18 @@ public class SVGWordLine extends SVGG {
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		int i = 0;
-		for (SVGPhrase phrase : phraseList) {
-			sb.append("[["+phrase.toString()+"]]");
+		if (phraseList.size() == 1 && phraseList.get(0).toString().length() == 0) {
+			// skip empty phrases
+		} else {
+			for (SVGPhrase phrase : phraseList) {
+				sb.append("<"+phrase.toString()+">");
+			}
 		}
 		return sb.toString();
 	}
 
+	public int getPhraseCount() {
+		return getOrCreateSVGPhraseList().size();
+	}
 
 }

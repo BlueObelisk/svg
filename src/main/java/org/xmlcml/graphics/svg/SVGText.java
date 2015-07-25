@@ -1001,4 +1001,9 @@ public class SVGText extends SVGElement {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return "["+this.getText()+"("+this.getXY()+")"+"]";
+	}
+	
 }

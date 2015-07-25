@@ -37,10 +37,25 @@ public class SVGWord extends SVGG {
 		return (SVGText) XMLUtil.getSingleElement(this, "*[local-name()='"+SVGText.TAG+"']");
 	}
 
+	/**
+	 * gap between end of last word and start of this.
+	 * 
+	 * if either component is null, return zero
+	 * 
+	 * @param lastWord preceding word
+	 * @return
+	 */
 	public double gapFollowing(SVGWord lastWord) {
-		return this.getChildRectBoundingBox().getXMin() - lastWord.getChildRectBoundingBox().getXMax();
+		Real2Range lastBox = (lastWord == null) ? null : lastWord.getChildRectBoundingBox();
+		Real2Range thisBox = this.getChildRectBoundingBox();
+		return (lastBox == null || thisBox == null) ? 0.0 : thisBox.getXMin() - lastBox.getXMax();
 	}
 
+	
+	@Override
+	public String toString() {
+		return getSVGText() == null ? null : getSVGText().toString();
+	}
 
 
 }
