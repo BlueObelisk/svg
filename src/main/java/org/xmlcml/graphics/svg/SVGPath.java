@@ -44,7 +44,6 @@ import java.util.List;
 public class SVGPath extends SVGShape {
 
 	private static Logger LOG = Logger.getLogger(SVGPath.class);
-	
 	static {
 		LOG.setLevel(Level.DEBUG);
 	}
@@ -56,7 +55,7 @@ public class SVGPath extends SVGShape {
 	public final static String TAG ="path";
 	private final static double EPS1 = 0.000001;
 	private final static double MIN_COORD = .00001;
-	public final static String ALL_PATH_XPATH = "//svg:path";
+	public final static String ALL_PATH_XPATH = ".//svg:path";
 	public final static String REMOVED = "removed";
 	public final static String ROUNDED_CAPS = "roundedCaps";
 	private static final Double ANGLE_EPS = 0.01;
