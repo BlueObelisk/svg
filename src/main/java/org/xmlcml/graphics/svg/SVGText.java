@@ -2,7 +2,6 @@ package org.xmlcml.graphics.svg;
 
 import nu.xom.*;
 
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.*;
 import org.xmlcml.graphics.svg.fonts.FontWidths;
@@ -718,6 +717,8 @@ public class SVGText extends SVGElement {
 	public static List<SVGText> extractSelfAndDescendantTexts(SVGElement svgElement) {
 		return SVGText.extractTexts(SVGUtil.getQuerySVGElements(svgElement, ALL_TEXT_XPATH));
 	}
+	
+
 
 	/** 
 	 * Special routine to make sure characters are correctly oriented

@@ -318,7 +318,13 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 			primitiveList.remove(i);
 		}
 	}
-	
+
+	/** creates a line from thin rectangle.
+	 * 
+	 * @param angleEps
+	 * @param maxWidth if great than this assumes it's a real rectangle.
+	 * @return
+	 */
 	public SVGLine createLineFromMLLLL(Angle angleEps, double maxWidth) {
 		SVGLine line1 = null;
 		SVGLine line2 = null;

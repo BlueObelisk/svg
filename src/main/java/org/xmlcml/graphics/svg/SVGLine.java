@@ -396,6 +396,27 @@ public class SVGLine extends SVGShape {
 		return horizontalVerticalList;
 	}
 
+	public static List<SVGLine> findHorizontalOrVerticalLines(List<SVGLine> lines, LineDirection direction, double eps) {
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		for (SVGLine line : lines) {
+			if ((LineDirection.HORIZONTAL.equals(direction) && line.isHorizontal(eps)) ||
+			    (LineDirection.VERTICAL.equals(direction) && line.isVertical(eps))) {
+				lineList.add(line);
+			}
+		}
+		return lineList;
+	}
+
+	public static List<SVGLine> findVerticalLines(List<SVGLine> lines, double eps) {
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		for (SVGLine line : lines) {
+			if (line.isHorizontal(eps)) {
+				lineList.add(line);
+			}
+		}
+		return lineList;
+	}
+
 	public void setWidth(double width) {
 		this.addAttribute(new Attribute("stroke-width", String.valueOf(width)));
 	}
@@ -713,6 +734,19 @@ public class SVGLine extends SVGShape {
 	private static void replaceLineAndCloseUp(int iline, SVGLine newLine, List<SVGLine> lineListNew) {
 		lineListNew.set(iline, newLine);
 		lineListNew.remove(iline + 1);
+	}
+
+	/** gets bounding box of list of lines.
+	 * 
+	 * @param lines
+	 * @return bbox (null if no lines)
+	 */
+	public static Real2Range getReal2Range(List<SVGLine> lines) {
+		Real2Range bbox = lines.size() == 0 ? null : lines.get(0).getBoundingBox();
+		for (int i = 1; i < lines.size(); i++) {
+			bbox = bbox.plusEquals(lines.get(i).getBoundingBox());
+		}
+		return bbox;
 	}
 
 }

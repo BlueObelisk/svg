@@ -27,16 +27,25 @@ public class SVGWord extends SVGG {
 	}
 	
 	public static final String CLASS = "word";
+	private double interCharacterFactor = 0.1;
 	
 	public SVGWord() {
 		super();
 		this.setClassName(CLASS);
 	}
 
+	public SVGWord(SVGText svgText) {
+		this.appendChild(svgText.copy());
+	}
+
+	/** from Tesseract
+	 * 
+	 * @return
+	 */
 	public SVGText getSVGText() {
 		return (SVGText) XMLUtil.getSingleElement(this, "*[local-name()='"+SVGText.TAG+"']");
 	}
-
+	
 	/**
 	 * gap between end of last word and start of this.
 	 * 
@@ -51,10 +60,64 @@ public class SVGWord extends SVGG {
 		return (lastBox == null || thisBox == null) ? 0.0 : thisBox.getXMin() - lastBox.getXMax();
 	}
 
+	/**
+	 * gap between end of last word and start of this.
+	 * 
+	 * if either component is null, return zero
+	 * 
+	 * @param lastWord preceding word
+	 * @return
+	 */
+	public double gapBefore(SVGText nextText) {
+		if (nextText == null) return Double.NaN;
+		Real2Range nextBox = nextText.getBoundingBox();
+		Real2Range thisBox = this.getBoundingBox();
+		return nextBox.getXMin() - thisBox.getXMax();
+	}
+
+	public Real2Range getBoundingBox() {
+		SVGText text = this.getSVGText();
+		return text == null ? null : text.getBoundingBox();
+	}
+	
+//	public boolean canGeometricallyAdd(SVGText svgText) {
+//		SVGText lastChar = textList.get(textList.size() - 1);
+//		double gap = svgWord.gapFollowing(lastWord);
+//		LOG.trace("GAP "+gap+"; "+lastWord.getChildRectBoundingBox()+"; "+svgWord.getChildRectBoundingBox());
+//		return gap < interWordGap;
+//	}
+
+	public Double getFontSize() {
+		SVGText text = this.getSVGText();
+		return text == null ? null : text.getFontSize();
+	}
+
 	
 	@Override
 	public String toString() {
 		return getSVGText() == null ? null : getSVGText().toString();
+	}
+
+	public boolean canAppend(SVGText text) {
+		double gap = gapBefore(text);
+		return gap < interCharacterFactor * getFontSize();
+	}
+
+	public void append(SVGText newText) {
+		SVGText svgText = this.getSVGText();
+		if (svgText != null) {
+//			Real2Range bbox = text.getBoundingBox().plusEquals(newText.getBoundingBox());
+			String textValue = svgText.getText();
+			svgText.getChild(0).detach();
+			String newValue = newText.getText();
+			svgText.appendChild(textValue + newValue);
+			svgText.getBoundingBox();
+		}
+	}
+
+	public String getStringValue() {
+		SVGText text = getSVGText();
+		return (text == null) ? null : text.getText();
 	}
 
 

@@ -8,7 +8,9 @@ import nu.xom.Element;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealArray;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.xml.XMLUtil;
 
 /** holds a set of words which are geometrically joined into a single unit.
@@ -97,5 +99,54 @@ public class SVGPhrase extends SVGG {
 			}
 		}
 		return bbox;
+	}
+
+	public static SVGPhrase createPhraseFromCharacters(List<SVGText> textList) {
+		SVGPhrase phrase = null;
+		LOG.trace("phrase: "+textList);
+		if (textList != null && textList.size() > 0) {
+			phrase = new SVGPhrase();
+			SVGWord word = new SVGWord(textList.get(0));
+			phrase.addTrailingWord(word);
+			for (int i = 1; i < textList.size(); i++) {
+				SVGText text = textList.get(i); 
+				if (word.canAppend(text)) {
+					word.append(text);
+				} else {
+					word = new SVGWord(text);
+					phrase.addTrailingWord(word);
+				}
+			}
+		}
+		return phrase;
+	}
+
+	public double getInterWordGap() {
+		return interWordGap;
+	}
+
+	public void setInterWordGap(double interWordGap) {
+		this.interWordGap = interWordGap;
+	}
+
+	public List<String> getOrCreateStringList() {
+		getOrCreateWordList();
+		List<String> stringList = new ArrayList<String>();
+		for (SVGWord word : wordList) {
+			stringList.add(word.getStringValue());
+		}
+		return stringList;
+	}
+	
+	/** returns an array of all the words as numbers.
+	 * useful for scales, graphs, lists, tables, etc.
+	 * fails if any word is not numeric
+	 * 
+	 * @return null if cannot parse values
+	 */
+	public RealArray getNumericValues() {
+		List<String> stringList = getOrCreateStringList();
+    	RealArray values = RealArray.createRealArray(stringList);
+    	return values;
 	}
 }

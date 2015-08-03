@@ -111,7 +111,7 @@ public class AxisAnalyzerTest {
 //		HtmlElement htmlElement = textStructurer.createHtmlElement();
 //		SVGUtil.debug(htmlElement, new FileOutputStream("target/horizontalAxis.html"), 1);
 //		Assert.assertEquals("horizontal", "<div xmlns=\"http://www.w3.org/1999/xhtml\">0 .00   0.01   0.02   0.03   0.04   0.05   <p />" +
-//				"<b>dN of </b> <b><i>EF-1 </i></b> Δ  null </div>", htmlElement.toXML());
+//				"<b>dN of </b> <b><i>EF-1 </i></b> ��  null </div>", htmlElement.toXML());
 	}
 	
 	@Test
@@ -128,7 +128,7 @@ public class AxisAnalyzerTest {
 //		SVGUtil.debug(htmlElement, new FileOutputStream("target/verticalAxis.html"), 1);
 //		// this is the vertical text
 //		Assert.assertEquals("horizontal", "<div xmlns=\"http://www.w3.org/1999/xhtml\">0.04   <sup>0.03  </sup> <p /><b><i> </i></b> <b><i>b</i></b> <b>" +
-//				"<i>u</i></b> <b><i>t</i></b> <b><i>-</i></b>Ε <p /><b> </b> <b>f</b> <sup>0.02  </sup> <p />" +
+//				"<i>u</i></b> <b><i>t</i></b> <b><i>-</i></b>�� <p /><b> </b> <b>f</b> <sup>0.02  </sup> <p />" +
 //				"<b>o</b> <b> </b> <b>N</b> <b>d</b> 0.01   0.00   </div>", htmlElement.toXML());
 	}
 	
