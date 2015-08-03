@@ -121,7 +121,7 @@ public class SVGClipPath extends SVGElement {
 	public static SVGClipPath getLargestClipPath(List<SVGClipPath> clipPathList) {
 		if (clipPathList == null || clipPathList.size() == 0) return null;
 		Real2Range largestBox = null;
-		SVGClipPath largestClipPath = null;
+		SVGClipPath largestClipPath = clipPathList.get(0);
 		largestBox = clipPathList.get(0).getBoundingBox();
 		for (int i = 1; i < clipPathList.size(); i++) {
 			SVGClipPath clipPath = clipPathList.get(i);
@@ -136,16 +136,10 @@ public class SVGClipPath extends SVGElement {
 
 	public static Multimap<String, SVGElement> getElementsByClipPath(SVGElement svgElement) {
 		Multimap<String, SVGElement> svgByClipPathId = ArrayListMultimap.create();
-		List<SVGElement> nonClippedElements = SVGUtil.getQuerySVGElements(svgElement, ".//*[namespace-uri()='"+SVG_NAMESPACE+"' and not(local-name()='defs') and not(local-name()='clipPath') and not(local-name()='title') and not(@clip-path)]");
-		LOG.debug("nonClipped "+nonClippedElements.size());
-		for (SVGElement nonElement : nonClippedElements) {
-			LOG.debug(nonElement.toXML());
-		}
-		
 		List<SVGElement> clippedElements = SVGUtil.getQuerySVGElements(svgElement, ".//*[@clip-path]");
 		for (SVGElement clippedElement : clippedElements) {
-			String clipPath = SVGClipPath.getClipPathRef(clippedElement);
-			svgByClipPathId.put(clipPath, clippedElement);
+			String clipPathId = SVGClipPath.getClipPathRef(clippedElement);
+			svgByClipPathId.put(clipPathId, clippedElement);
 		}
 		return svgByClipPathId;
 	}
@@ -196,16 +190,19 @@ public class SVGClipPath extends SVGElement {
 	 */
 	public static List<SVGClipPath> extractUsedClipPaths(SVGElement svgElement) {
 		List<SVGClipPath> clipPaths = extractClipPaths(svgElement);
-		List<String> nullIds = new ArrayList<String>();
-		for (SVGClipPath clipPath : clipPaths) {
+		LOG.trace("clipPaths: "+clipPaths.size());
+		for (int i = clipPaths.size() - 1; i >= 0; i--) {
+			SVGClipPath clipPath = clipPaths.get(i);
 			String id = clipPath.getId();
 			List<SVGElement> elementsWithClipPathId = findElementsWithClipPath(svgElement, id);
 			if (elementsWithClipPathId.size() == 0) {
-				nullIds.add(id);
+				LOG.trace("removed "+id);
+				clipPaths.remove(i);
+			} else {
+				LOG.trace(""+id+"; "+elementsWithClipPathId.size());
 			}
 		}
-		LOG.debug(nullIds);
-		return null;
+		return clipPaths;
 	}
 
 	/** finds elements with a clip-path attribute with given value.

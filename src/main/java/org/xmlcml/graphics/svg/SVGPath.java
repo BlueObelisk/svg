@@ -16,27 +16,38 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.PathIterator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.xmlcml.euclid.*;
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealArray;
+import org.xmlcml.euclid.RealRange;
+import org.xmlcml.euclid.Transform2;
+import org.xmlcml.euclid.Vector2;
 import org.xmlcml.graphics.svg.path.Arc;
 import org.xmlcml.graphics.svg.path.ClosePrimitive;
 import org.xmlcml.graphics.svg.path.CubicPrimitive;
+import org.xmlcml.graphics.svg.path.LinePrimitive;
+import org.xmlcml.graphics.svg.path.MovePrimitive;
 import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 import org.xmlcml.xml.XMLConstants;
 import org.xmlcml.xml.XMLUtil;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.util.ArrayList;
-import java.util.List;
 
 /** 
  * @author pm286
@@ -60,6 +71,7 @@ public class SVGPath extends SVGShape {
 	public final static String ROUNDED_CAPS = "roundedCaps";
 	private static final Double ANGLE_EPS = 0.01;
 	private static final Double MAX_WIDTH = 2.0;
+	private final static Pattern REPEATED_ML = Pattern.compile("ML(ML)*");
 	
 	private GeneralPath path2;
 	private boolean isClosed = false;
@@ -742,11 +754,14 @@ public class SVGPath extends SVGShape {
 
 	/** 
 	 * Creates a line from path with signature "MLLLL", "MLLLLZ".
+	 * 
+	 * creates a line from thin rectangle.
+
 	 * <p>
 	 * Uses primitiveList.createLineFromMLLLL().
 	 * 
 	 * @param angleEps
-	 * @param maxWidth
+	 * @param maxWidth above this assumes it's a rectangle
 	 * @return null if line has wrong signature or is too wide or not antiParallel.
 	 */
 	public SVGLine createLineFromMLLLL(Angle angleEps, Double maxWidth) {
@@ -758,5 +773,40 @@ public class SVGPath extends SVGShape {
 		}
 		return line;
 	}
+	
+	/**
+	 * a signature of MLMLML... indicates separate lines (either ladders or dashed lines)
+	 * 
+	 * @return list of lines (one for each ML)
+	 */
+	public List<SVGLine> createSeparatedLinesFromRepeatedML() {
+		String sig = getSignature();
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		if (sig.startsWith("ML") && sig.replaceAll("ML", "").length() == 0) {
+			ensurePrimitives();
+			for (int i = 0; i < primitiveList.size(); i += 2) {
+				MovePrimitive movePrimitive = (MovePrimitive) primitiveList.get(i);
+				LinePrimitive linePrimitive = (LinePrimitive) primitiveList.get(i + 1);
+				SVGLine line = new SVGLine(movePrimitive.getFirstCoord(), linePrimitive.getFirstCoord());
+				lineList.add(line);
+			}
+		}
+		return lineList;
+	}
+
+	public static List<SVGLine> createLinesFromPaths(List<SVGPath> pathList) {
+		List<SVGLine> allLines = new ArrayList<SVGLine>();
+		for (SVGPath path : pathList) {
+			String sig = path.getSignature();
+			if (REPEATED_ML.matcher(sig).matches()) {
+				List<SVGLine> lineList = path.createSeparatedLinesFromRepeatedML();
+				allLines.addAll(lineList);
+			} else {
+				
+			}
+		}
+		return allLines;
+	}
+	
 	
 }
