@@ -1,12 +1,10 @@
 package org.xmlcml.graphics.svg.text;
 
-import nu.xom.Attribute;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.xml.XMLUtil;
 
@@ -21,6 +19,7 @@ import org.xmlcml.xml.XMLUtil;
 public class SVGWord extends SVGG {
 
 	
+	private static final double DELTA_Y_TEXT = 0.3;
 	private static final Logger LOG = Logger.getLogger(SVGWord.class);
 	static {
 		LOG.setLevel(Level.DEBUG);
@@ -99,8 +98,12 @@ public class SVGWord extends SVGG {
 	}
 
 	public boolean canAppend(SVGText text) {
-		double gap = gapBefore(text);
-		return gap < interCharacterFactor * getFontSize();
+		double horizontalGap = gapBefore(text);
+		if (horizontalGap > interCharacterFactor * getFontSize()) {
+			return false;
+		}
+		Real2 deltaXY = this.getXY().subtract(text.getXY()); 
+		return Math.abs(deltaXY.getY()) < (DELTA_Y_TEXT * this.getFontSize());
 	}
 
 	public void append(SVGText newText) {
@@ -120,5 +123,9 @@ public class SVGWord extends SVGG {
 		return (text == null) ? null : text.getText();
 	}
 
+	public Real2 getXY() {
+		SVGText text = getSVGText();
+		return (text == null) ? null : text.getXY();
+	}
 
 }

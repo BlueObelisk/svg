@@ -71,7 +71,8 @@ public class SVGPath extends SVGShape {
 	public final static String ROUNDED_CAPS = "roundedCaps";
 	private static final Double ANGLE_EPS = 0.01;
 	private static final Double MAX_WIDTH = 2.0;
-	private final static Pattern REPEATED_ML = Pattern.compile("ML(ML)*");
+	public final static Pattern REPEATED_ML = Pattern.compile("ML(ML)*");
+	private static final double CIRCLE_EPSILON = 0.01;
 	
 	private GeneralPath path2;
 	private boolean isClosed = false;
@@ -777,36 +778,91 @@ public class SVGPath extends SVGShape {
 	/**
 	 * a signature of MLMLML... indicates separate lines (either ladders or dashed lines)
 	 * 
+	 * @param empty or null, use any MLML... ; or specific MLML
 	 * @return list of lines (one for each ML)
 	 */
-	public List<SVGLine> createSeparatedLinesFromRepeatedML() {
+	public List<SVGLine> createSeparatedLinesFromRepeatedML(String refSig) {
 		String sig = getSignature();
 		List<SVGLine> lineList = new ArrayList<SVGLine>();
-		if (sig.startsWith("ML") && sig.replaceAll("ML", "").length() == 0) {
-			ensurePrimitives();
-			for (int i = 0; i < primitiveList.size(); i += 2) {
-				MovePrimitive movePrimitive = (MovePrimitive) primitiveList.get(i);
-				LinePrimitive linePrimitive = (LinePrimitive) primitiveList.get(i + 1);
-				SVGLine line = new SVGLine(movePrimitive.getFirstCoord(), linePrimitive.getFirstCoord());
-				lineList.add(line);
+		if (isRepeatedML(sig)) {
+			if (refSig == null || "".equals(refSig.trim()) ||
+			refSig.equals(sig)) {
+				ensurePrimitives();
+				for (int i = 0; i < primitiveList.size(); i += 2) {
+					MovePrimitive movePrimitive = (MovePrimitive) primitiveList.get(i);
+					LinePrimitive linePrimitive = (LinePrimitive) primitiveList.get(i + 1);
+					SVGLine line = new SVGLine(movePrimitive.getFirstCoord(), linePrimitive.getFirstCoord());
+					lineList.add(line);
+				}
 			}
 		}
 		return lineList;
 	}
 
+	public static boolean isRepeatedML(String sig) {
+		return sig.startsWith("ML") && sig.replaceAll("ML", "").length() == 0;
+	}
+
 	public static List<SVGLine> createLinesFromPaths(List<SVGPath> pathList) {
 		List<SVGLine> allLines = new ArrayList<SVGLine>();
 		for (SVGPath path : pathList) {
-			String sig = path.getSignature();
-			if (REPEATED_ML.matcher(sig).matches()) {
-				List<SVGLine> lineList = path.createSeparatedLinesFromRepeatedML();
-				allLines.addAll(lineList);
-			} else {
-				
+			SVGLineList lineList = path.createLineListFromRepeatedML(null);
+			if (lineList != null) {
+				allLines.addAll(lineList.getLineList());
 			}
 		}
 		return allLines;
 	}
-	
+
+	private SVGLineList createLineListFromRepeatedML(String repeatedMLSignature) {
+		SVGLineList lineList = null;
+		List<SVGLine> lines = this.createSeparatedLinesFromRepeatedML(repeatedMLSignature);
+		if (lines.size() > 0) {
+			lineList = new SVGLineList(lines);
+		}
+		return lineList;
+	}
+
+//	private static SVGLineList createLineList(SVGPath path) {
+//		SVGLineList lineList = null;
+//		if (path != null && path.getSignature()) {
+//			
+//		}
+//		return lineList;
+//	}
+
+	private static void extracted(SVGPath path) {
+		String sig = path.getSignature();
+		if (REPEATED_ML.matcher(sig).matches()) {
+			List<SVGLine> lineList = path.createSeparatedLinesFromRepeatedML(null);
+		} else {
+			
+		}
+	}
+
+	public static List<SVGCircle> createCirclesFromPaths(List<SVGPath> pathList) {
+		List<SVGCircle> circleList = new ArrayList<SVGCircle>();
+		for (SVGPath path : pathList) {
+			SVGCircle circle = path.createCircle(CIRCLE_EPSILON);
+			if (circle != null) {
+				circleList.add(circle);
+			} else {
+				LOG.trace(path.getSignature());
+			}
+		}
+		return circleList;
+	}
+
+	public static List<SVGLineList> createLineListListFromPaths(
+			List<SVGPath> pathList, String repeatedMLSignature) {
+		List<SVGLineList> lineListList = new ArrayList<SVGLineList>();
+		for (SVGPath path : pathList) {
+			SVGLineList lineList = path.createLineListFromRepeatedML(repeatedMLSignature);
+			if (lineList != null) {
+				lineListList.add(lineList);
+			}
+		}
+		return lineListList;
+	}
 	
 }

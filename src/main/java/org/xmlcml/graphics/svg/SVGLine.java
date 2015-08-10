@@ -30,6 +30,7 @@ import nu.xom.Nodes;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.EuclidConstants;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
@@ -37,6 +38,7 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.graphics.svg.SVGLine.LineDirection;
 import org.xmlcml.xml.XMLConstants;
 
 /** draws a straight line.
@@ -110,6 +112,11 @@ public class SVGLine extends SVGShape {
 	public SVGLine(Line2 line) {
 		this(line.getXY(0), line.getXY(1));
 		this.euclidLine = line;
+	}
+	
+	public SVGLine(SVGLine line) {
+		super(line);
+		updateEuclidLine(this.getXY(0), this.getXY(1));
 	}
 	
 	protected void init() {
@@ -621,6 +628,16 @@ public class SVGLine extends SVGShape {
 		Real2 otherPoint0 = line.getXY(0);
 		Real2 otherPoint1 = line.getXY(1);
 		return thisPoint0.getDistance(otherPoint0) < eps && thisPoint1.getDistance(otherPoint1) < eps;
+	}
+
+	public LineDirection getOrCreateDirection(double epsilon) {
+		LineDirection direction = null;
+		if (isHorizontal(EuclidConstants.EPS)) {
+			direction = LineDirection.HORIZONTAL;
+		} else if (isHorizontal(epsilon)) {
+			direction = LineDirection.VERTICAL;
+		}
+		return direction;
 	}
 
 	/** filters horizontal and vertical lines, normalizes the direction and merges touching ones.
