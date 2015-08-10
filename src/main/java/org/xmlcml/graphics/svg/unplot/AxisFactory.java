@@ -15,6 +15,7 @@ import org.xmlcml.graphics.svg.SVGLine.LineDirection;
 import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.graphics.svg.text.SVGPhrase;
+import org.xmlcml.graphics.svg.text.SVGWord;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -37,22 +38,15 @@ public class AxisFactory {
 	private List<SVGPath> pathList;
 	private List<SVGText> textList;
 	private LineDirection direction;
-	private SVGLine singleLine;
 	private List<SVGLine> tickLines;
 	private List<SVGLine> lineList;
 	private List<SVGLine> horizontalLines;
 	private List<SVGLine> verticalLines;
 	private AnnotatedAxis axis;
 	private SVGPhrase scalesPhrase;
-	private RealArray scalesValues;
-	private Double majorTickLength;
-	private Double minorTickLength;
-	private String tickSignature;
 
 	public AxisFactory() {
 		direction = null;
-		singleLine = null;
-		tickLines = null;
 	}
 	
 	private void processPaths() {
@@ -73,7 +67,6 @@ public class AxisFactory {
 	private void processTexts() {
 		// assume sorted
 		processScales();
-		LOG.debug("scales: "+scalesPhrase+"; "+scalesValues);
 		processTitle();
 	}
 
@@ -84,16 +77,39 @@ public class AxisFactory {
 	private SVGPhrase processScales() {
 		scalesPhrase = null;
 		if (textList.size() > 0) {
-			scalesPhrase = SVGPhrase.createPhraseFromCharacters(textList);
-			scalesValues = scalesPhrase.getNumericValues();
-			axis.setTickValues(scalesValues);
+			if (LineDirection.HORIZONTAL.equals(direction)) {
+				scalesPhrase = SVGPhrase.createPhraseFromCharacters(textList);
+				axis.setTickValues(scalesPhrase.getNumericValues());
+			} else {
+				List<SVGWord> wordList = new ArrayList<SVGWord>();
+				SVGWord word = new SVGWord(textList.get(0));
+				wordList.add(word);
+				for (int i = 1; i < textList.size(); i++) {
+					SVGText text = textList.get(i);
+					if (word.canAppend(text)) {
+						word.append(text);
+					} else {
+						word = new SVGWord(textList.get(i));
+						wordList.add(word);
+					}
+				}
+				double[] values = new double[wordList.size()];
+				for (int i = 0; i < wordList.size(); i++) {
+					SVGWord word0 = wordList.get(i);
+					String ss = word0.getStringValue();
+					LOG.trace("ss "+ss);
+					values[i] = new Double(ss);
+				}
+				RealArray realArray = new RealArray(values);
+				axis.setTickValues(realArray);
+			}
 		}
 		return scalesPhrase;
 	}
 
 
 	private void createAxisAndRanges() {
-		RealRange range = singleLine.getBoundingBox().getXRange();
+		RealRange range = axis.getSingleLine().getBoundingBox().getXRange();
 		// assume sorted - we'll need to add sort later
 		Real2Range tick2Range = SVGLine.getReal2Range(tickLines);
 		RealRange tickRange = LineDirection.HORIZONTAL.equals(direction) ? tick2Range.getXRange() : tick2Range.getYRange();
@@ -118,17 +134,18 @@ public class AxisFactory {
 
 	private void createMainAndTickLines(LineDirection direction, SVGLine singleLine, List<SVGLine> tickLines) {
 		this.direction = direction;
-		this.singleLine = singleLine;
+		axis.setSingleLine(singleLine);
+		axis.setDirection(direction);
 		this.tickLines = tickLines;
 		Multiset<Double> tickLengths = HashMultiset.create();
 		for (SVGLine tickLine : tickLines) {
 			tickLengths.add((Double)Real.normalize(tickLine.getLength(), 2));
 		}
-		LOG.debug(tickLengths);
+		LOG.trace(tickLengths);
 		if (tickLengths.elementSet().size() == 1) {
-			majorTickLength = tickLengths.elementSet().iterator().next();
+			axis.setMajorTickLength(tickLengths.elementSet().iterator().next());
 		} else if (tickLengths.elementSet().size() == 2) {
-			getMajorAndMinorTickLengths(tickLengths);
+			analyzeMajorAndMinorTickLengths(tickLengths);
 			getTickLinesAndSignature();
 		} else {
 			LOG.error("cannot process ticks: "+tickLengths);
@@ -142,7 +159,7 @@ public class AxisFactory {
 		for (SVGLine tickLine : tickLines) {
 			Double l = tickLine.getLength();
 			String ss = null;
-			if (Real.isEqual(l,  majorTickLength, AnnotatedAxis.EPS)) {
+			if (Real.isEqual(l,  axis.getMajorTickLength(), AnnotatedAxis.EPS)) {
 				ss = MAJOR_CHAR;
 				majorTickLines.add(tickLine);
 			} else {
@@ -151,12 +168,14 @@ public class AxisFactory {
 			}
 			sb.append(ss);
 		}
-		axis.setMajorTicksPixels(getPixels(majorTickLines));
-		axis.setMinorTicksPixels(getPixels(minorTickLines));
+		axis.setMajorTickLines(majorTickLines);
+		axis.setMinorTickLines(minorTickLines);
+		axis.setMajorTicksPixels(getPixelCoordinatesForTickLines(majorTickLines));
+		axis.setMinorTicksPixels(getPixelCoordinatesForTickLines(minorTickLines));
 		axis.setTickSignature(sb.toString());
 	}
 
-	private RealArray getPixels(List<SVGLine> tickLines) {
+	private RealArray getPixelCoordinatesForTickLines(List<SVGLine> tickLines) {
 		double[] coord = new double[tickLines.size()];
 		for (int i = 0; i < tickLines.size(); i++) {
 			SVGLine tickLine = tickLines.get(i);
@@ -164,13 +183,12 @@ public class AxisFactory {
 			coord[i] = (LineDirection.HORIZONTAL.equals(direction)) ? xy.getX() : xy.getY();
 		}
 		RealArray array = new RealArray(coord);
-		LOG.debug("A "+array+"; "+array.calculateDifferences());
 		return array;
 	}
 
-	private void getMajorAndMinorTickLengths(Multiset<Double> tickLengths) {
-		majorTickLength = null;
-		minorTickLength = null;
+	private void analyzeMajorAndMinorTickLengths(Multiset<Double> tickLengths) {
+		Double majorTickLength = null;
+		Double minorTickLength = null;
 		for (Double d : tickLengths.elementSet()) {
 			if (majorTickLength == null) {
 				majorTickLength = d;
@@ -183,11 +201,13 @@ public class AxisFactory {
 				}
 			}
 		}
+		axis.setMajorTickLength(majorTickLength);
+		axis.setMinorTickLength(minorTickLength);
 	}
 
 	public AnnotatedAxis getAxis() {
+		axis.mapTicksToTickValues();
 		return axis;
 	}
-
 
 }

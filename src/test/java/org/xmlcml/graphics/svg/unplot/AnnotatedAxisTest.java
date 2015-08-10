@@ -22,8 +22,19 @@ public class AnnotatedAxisTest {
 	}
 	
 	@Test
-	public void testAxis() throws FileNotFoundException {
+	public void testHorizontalAxis() throws FileNotFoundException {
 		SVGElement svgElement = SVGUtil.parseToSVGElement(new FileInputStream(new File(Fixtures.FIGURE_DIR, "horizontalAxis.svg")));
+		List<SVGPath> pathList = SVGPath.extractPaths(svgElement);
+		List<SVGText> textList = SVGText.extractSelfAndDescendantTexts(svgElement);
+		AxisFactory axisFactory = new AxisFactory();
+		axisFactory.setTextsAndPaths(textList, pathList);
+		AnnotatedAxis axis = axisFactory.getAxis();
+		LOG.debug("axis: "+axis.toString());
+	}
+	
+	@Test
+	public void testVerticalAxis() throws FileNotFoundException {
+		SVGElement svgElement = SVGUtil.parseToSVGElement(new FileInputStream(new File(Fixtures.FIGURE_DIR, "verticalAxis.svg")));
 		List<SVGPath> pathList = SVGPath.extractPaths(svgElement);
 		List<SVGText> textList = SVGText.extractSelfAndDescendantTexts(svgElement);
 		AxisFactory axisFactory = new AxisFactory();

@@ -1006,5 +1006,16 @@ public class SVGText extends SVGElement {
 	public String toString() {
 		return "["+this.getText()+"("+this.getXY()+")"+"]";
 	}
+
+	public static List<String> extractStrings(List<SVGText> textList) {
+		List<String> stringList = null;
+		if (textList != null) {
+			stringList = new ArrayList<String>();
+			for (SVGText text : textList) {
+				stringList.add(text.getText());
+			}
+		}
+		return stringList;
+	}
 	
 }

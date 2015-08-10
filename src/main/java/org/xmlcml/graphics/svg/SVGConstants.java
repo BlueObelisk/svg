@@ -30,6 +30,7 @@ public interface SVGConstants extends XMLConstants {
 	public final static String SVGX_NS = "http://www.xml-cml.org/schema/svgx";
 	public final static String SVGX_PREFIX = "svgx";
 
+	public final static double EPS = 0.5;
 
     /** XPathContext for SVG.
      */

@@ -87,6 +87,8 @@ public class Fixtures {
 	public static final File MOLECULES_DIR = new File(SVG_DIR, "molecules");
 	public static final File IMAGE_2_13_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.13.svg");
 	public static final File IMAGE_2_11_NO2_SVG = new File(Fixtures.MOLECULES_DIR, "image.g.2.11.no2.svg");
+	
+	public static final double EPS = 0.5;
 
 	public static void writeImageQuietly(BufferedImage image, File file) {
 		if (image == null) {
