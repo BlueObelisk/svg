@@ -128,4 +128,9 @@ public class SVGWord extends SVGG {
 		return (text == null) ? null : text.getXY();
 	}
 
+	public String getSVGTextValue() {
+		SVGText text = this.getSVGText();
+		return text == null ? null : text.getValue();
+	}
+
 }
