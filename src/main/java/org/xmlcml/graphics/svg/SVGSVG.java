@@ -37,7 +37,7 @@ import org.xmlcml.xml.XMLUtil;
  */
 public class SVGSVG extends SVGElement {
 
-	public final static Logger LOG = Logger.getLogger(SVGSVG.class);
+	private final static Logger LOG = Logger.getLogger(SVGSVG.class);
 	public final static String TAG = "svg";
 	private static String svgSuffix = "svg";
 	private Double begin = null;
