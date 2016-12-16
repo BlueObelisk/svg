@@ -124,6 +124,7 @@ public class SVGSVG extends SVGElement {
 			svgg.detach();
 		}
 		SVGSVG svgsvg = new SVGSVG();
+//		svgsvg.setNamespaceURI(SVGConstants.SVGX_NS);
 		svgsvg.appendChild(svgg);
 		return svgsvg;
 	}

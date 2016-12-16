@@ -1,14 +1,5 @@
 package org.xmlcml.graphics.svg;
 
-import nu.xom.*;
-import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.euclid.Vector2;
-import org.xmlcml.xml.XMLConstants;
-import org.xmlcml.xml.XMLUtil;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +7,21 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealRange;
+import org.xmlcml.euclid.Transform2;
+import org.xmlcml.euclid.Vector2;
+import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
+
+import nu.xom.Attribute;
+import nu.xom.Builder;
+import nu.xom.Element;
+import nu.xom.Node;
+import nu.xom.Nodes;
 
 public class SVGUtil {
 
@@ -419,6 +425,18 @@ public class SVGUtil {
 			}
 		}
 		return svg;
+	}
+
+	public static boolean isNullReal2Range(Real2Range r2r) {
+		boolean isNull = true;
+		if (r2r != null) {
+			RealRange xRange = r2r.getXRange();
+			RealRange yRange = r2r.getYRange();
+			boolean xnull = xRange == null || xRange.toString().equals("NULL");
+			boolean ynull = xRange == null || yRange.toString().equals("NULL");
+			isNull = xnull || ynull;
+		}
+		return isNull;
 	}
 
 //	public static AffineTransform createAffineTransform(Transform2 transform2) {

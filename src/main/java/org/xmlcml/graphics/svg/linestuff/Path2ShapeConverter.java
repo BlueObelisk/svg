@@ -33,7 +33,7 @@ import java.util.Set;
 @Deprecated // use SVG
 public class Path2ShapeConverter {
 
-	private static final String Z_COORDINATE = "z";
+	public static final String Z_COORDINATE = "z";
 
 	private final static Logger LOG = Logger.getLogger(Path2ShapeConverter.class);
 	

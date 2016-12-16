@@ -2,6 +2,7 @@ package org.xmlcml.graphics.svg;
 
 import nu.xom.*;
 
+
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.*;
 import org.xmlcml.graphics.svg.fonts.FontWidths;
@@ -898,7 +899,8 @@ public class SVGText extends SVGElement {
 	public Double getEnSpaceCount(SVGText nextText) {
 		Double separation = getSeparation(nextText);
 		Double enSpace = getScaledWidthOfEnSpace();
-		enSpace = Math.max(enSpace, nextText.getScaledWidthOfEnSpace());
+		Double scaledWidth = nextText.getScaledWidthOfEnSpace();
+		enSpace = enSpace == null || scaledWidth == null ? null : Math.max(enSpace, scaledWidth);
 		return (separation == null || enSpace == null || Math.abs(enSpace) < MIN_FONT_SIZE ? null : separation / enSpace);
 	}
 
@@ -1017,5 +1019,5 @@ public class SVGText extends SVGElement {
 		}
 		return stringList;
 	}
-	
+
 }

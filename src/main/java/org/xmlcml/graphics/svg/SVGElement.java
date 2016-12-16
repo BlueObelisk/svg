@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import nu.xom.Attribute;
 import nu.xom.Comment;
@@ -68,6 +70,7 @@ import org.xmlcml.xml.XMLUtil;
  * @author pm286
  */
 public class SVGElement extends GraphicsElement {
+
 	private static Logger LOG = Logger.getLogger(SVGElement.class);
 
 	public final static String ALL_ELEMENT_XPATH = "//svg:element";
@@ -1030,7 +1033,7 @@ public class SVGElement extends GraphicsElement {
 	 * @return default none
 	 */
 	protected String getBBFill() {
-		return "none";
+		return GraphicsElement.NONE;
 	}
 
 	/** property of graphic bounding box
@@ -1275,6 +1278,19 @@ public class SVGElement extends GraphicsElement {
 	public RealRange getRealRange(Direction direction) {
 		Real2Range bbox = this.getBoundingBox();
 		return bbox == null ? null : bbox.getRealRange(direction);
+	}
+
+	public final static Set<String> COMMON_ATT_NAMES = new HashSet<String>();
+	static {
+		createCommonAttNameSet();
+	}
+	private static void createCommonAttNameSet() {
+		COMMON_ATT_NAMES.add(StyleBundle.STROKE);
+		COMMON_ATT_NAMES.add(StyleBundle.STROKE_WIDTH);
+		COMMON_ATT_NAMES.add(StyleBundle.FILL);
+		COMMON_ATT_NAMES.add(StyleBundle.FONT_FAMILY);
+		COMMON_ATT_NAMES.add(StyleBundle.FONT_WEIGHT);
+		COMMON_ATT_NAMES.add(StyleBundle.FONT_SIZE);
 	}
 
 	public static List<SVGElement> extractSelfAndDescendantElements(SVGElement element) {
