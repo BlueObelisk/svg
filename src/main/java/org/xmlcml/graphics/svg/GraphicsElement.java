@@ -39,10 +39,11 @@ import java.util.Map;
  */
 public class GraphicsElement extends Element implements SVGConstants {
 
-	private static final String NONE = "none";
-	private static final String FILL = "fill";
 	private final static Logger LOG = Logger.getLogger(GraphicsElement.class);
-	
+
+	public static final String NONE = "none";
+	public static final String FILL = "fill";
+
 	public enum FontWeight {
 		BOLD,
 		NORMAL

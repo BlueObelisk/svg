@@ -36,6 +36,8 @@ import java.util.List;
  */
 public class SVGG extends SVGElement {
 	
+	private static final String STRING_VALUE = "string-value";
+
 	@SuppressWarnings("unused")
 	private static Logger LOG = Logger.getLogger(SVGG.class);
 
@@ -174,6 +176,27 @@ public class SVGG extends SVGElement {
 	public Real2Range getChildRectBoundingBox() {
 		SVGRect rect = (SVGRect) XMLUtil.getSingleElement(this, "*[local-name()='"+SVGRect.TAG+"']");
 		return rect == null ? null : rect.getBoundingBox();
+	}
+
+	protected void setStringValueAttribute(String value) {
+		this.addAttribute(new Attribute(STRING_VALUE, value));
+	}
+
+	public String getStringValueAttribute() {
+		String value = this.getAttributeValue(STRING_VALUE);
+		if (value == null) {
+			value = this.getStringValue();
+			this.setStringValueAttribute(value);
+		}
+		return value;
+	}
+	
+	/** normally overridden.
+	 * 
+	 * @return null
+	 */
+	public String getStringValue() {
+		return null;
 	}
 
 }
