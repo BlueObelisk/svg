@@ -12,7 +12,7 @@ public class SVGBoxChart extends SVGDiagram {
 	static {
 		LOG.setLevel(Level.DEBUG);
 	}
-	private static final String BOX_CHART = "boxChart";
+	public static final String BOX_CHART = "boxChart";
 
 	public SVGBoxChart() {
 		super();

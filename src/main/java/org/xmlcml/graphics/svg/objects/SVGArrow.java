@@ -1,12 +1,13 @@
 package org.xmlcml.graphics.svg.objects;
 
-import nu.xom.Attribute;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGMarker;
+import org.xmlcml.graphics.svg.SVGPath;
+import org.xmlcml.graphics.svg.SVGPolyline;
+import org.xmlcml.graphics.svg.SVGUtil;
 
 public class SVGArrow extends SVGLine {
 
@@ -15,13 +16,40 @@ private static final Logger LOG = Logger.getLogger(SVGArrow.class);
 		LOG.setLevel(Level.DEBUG);
 	}
 
-	private static final String ARROW = "arrow";
+	public static final String ARROW = "arrow";
+	public final static SVGMarker ARROWHEAD;
+	public final static SVGPath TRIANGLE;
+	static {
+		ARROWHEAD = new SVGMarker();
+		/**
+    <marker id="triangle"
+      viewBox="0 0 10 10" refX="0" refY="5" 
+      markerUnits="strokeWidth"
+      markerWidth="4" markerHeight="3"
+      orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+
+		 */
+		ARROWHEAD.setId("arrowhead");
+		ARROWHEAD.setViewBox("0 0 10 10");
+		ARROWHEAD.setRefX("0");
+		ARROWHEAD.setRefY("5");
+		ARROWHEAD.setMarkerUnits(SVGMarker.STROKE_WIDTH);
+		ARROWHEAD.setMarkerWidth(4);
+		ARROWHEAD.setMarkerHeight(3);
+		ARROWHEAD.setOrient(SVGMarker.AUTO);
+		TRIANGLE = new SVGPath("M 0 0 L 10 5 L 0 10 z");
+		TRIANGLE.setFill("black");
+		ARROWHEAD.appendChild(TRIANGLE);
+		
+	}
 
 	private SVGLine subline;
+	/** the serial number of the end of the line that is part of the arrow */
 	private int linePoint;
 	private SVGTriangle triangle;
-//	private Real2 head;
-//	private Real2 tail;
+	/** the serial number of the edge of the triangle that touches the line */
 	private int trianglePoint;
 	
 	public SVGArrow() {
@@ -37,7 +65,7 @@ private static final Logger LOG = Logger.getLogger(SVGArrow.class);
 		
 		this.triangle = triangle;
 		this.trianglePoint = trianglePoint;
-		this.setXY(triangle.getLineStartingFrom(trianglePoint).getXY(0), 0);
+		this.setXY(triangle.getLineStartingFrom(trianglePoint).getXY(0), 1);
 		
 	}
 
@@ -59,11 +87,16 @@ private static final Logger LOG = Logger.getLogger(SVGArrow.class);
 	private static SVGArrow createArrow(SVGLine subline, int lineEnd, SVGTriangle triangle, double delta) {
 		SVGArrow arrow = null;
 		if (subline != null && triangle != null) {
-			int lineSerial = triangle.getLineTouchingPoint(subline.getXY(lineEnd), delta);
-			if (lineSerial != -1) {
-				int trianglePoint = (lineSerial + 2  ) % 3; // get opposite point
-				LOG.trace("line serial "+lineSerial+" / "+trianglePoint);
-				arrow = new SVGArrow(subline, lineEnd, triangle, trianglePoint);
+			SVGPolyline polyline = triangle.getOrCreateClosedPolyline();
+			Real2Range bboxLine = subline.getBoundingBox();
+			Real2Range bboxTriangle = triangle.getBoundingBox();
+			if (!SVGUtil.isNullReal2Range(bboxLine.intersectionWith(bboxTriangle))) {
+				int lineSerial = triangle.getLineTouchingPoint(subline.getXY(lineEnd), delta);
+				if (lineSerial != -1) {
+					int trianglePoint = (lineSerial + 2  ) % 3; // get opposite point
+					LOG.trace("line serial "+lineSerial+" / "+trianglePoint);
+					arrow = new SVGArrow(subline, lineEnd, triangle, trianglePoint);
+				}
 			}
 		}
 		return arrow;
@@ -76,4 +109,5 @@ private static final Logger LOG = Logger.getLogger(SVGArrow.class);
 		s += "{"+getXY(1)+","+getXY(0)+"}";
 		return s;
 	}
+
 }

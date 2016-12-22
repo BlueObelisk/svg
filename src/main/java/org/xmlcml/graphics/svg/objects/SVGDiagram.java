@@ -21,7 +21,7 @@ import org.xmlcml.graphics.svg.linestuff.Path2ShapeConverter;
 
 public class SVGDiagram extends SVGG {
 
-	private static final String DIAGRAM = "diagram";
+	public static final String DIAGRAM = "diagram";
 	private static final Logger LOG = Logger.getLogger(SVGDiagram.class);
 	static {
 		LOG.setLevel(Level.DEBUG);

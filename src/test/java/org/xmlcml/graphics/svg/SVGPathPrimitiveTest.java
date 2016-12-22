@@ -1,16 +1,21 @@
 package org.xmlcml.graphics.svg;
 
-import junit.framework.Assert;
+
+import java.io.File;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Range;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Real2;
-import org.xmlcml.graphics.svg.path.*;
-
-import java.io.File;
-import java.util.List;
+import org.xmlcml.graphics.svg.path.ClosePrimitive;
+import org.xmlcml.graphics.svg.path.CubicPrimitive;
+import org.xmlcml.graphics.svg.path.LinePrimitive;
+import org.xmlcml.graphics.svg.path.MovePrimitive;
+import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 
 public class SVGPathPrimitiveTest {
 

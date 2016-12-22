@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Axis.Axis2;
 import org.xmlcml.euclid.*;
 import org.xmlcml.euclid.RealArray.Monotonicity;
+import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 import org.xmlcml.xml.XMLConstants;
 
 import java.awt.*;
@@ -187,9 +188,7 @@ public abstract class SVGPoly extends SVGShape {
      */
     public void format(int places) {
     	getReal2Array();
-    	if (real2Array == null) {
-    		throw new RuntimeException("Null real2Array");
-    	} else {
+    	if (real2Array != null) {
 	    	real2Array.format(places);
 	    	setReal2Array(real2Array);
     	}
@@ -322,20 +321,36 @@ public abstract class SVGPoly extends SVGShape {
 			SVGMarker lastPoint = new SVGMarker(real2Array.get(0));
 			markerList.add(lastPoint);
 			SVGLine line;
-			for (int i = 1; i < real2Array.size(); i++) {
-				line = new SVGLine(real2Array.elementAt(i - 1), real2Array.elementAt(i));
-				copyNonSVGAttributes(this, line);
-				SVGMarker point = new SVGMarker(real2Array.get(i));
-				markerList.add(point);
-				lastPoint.addLine(line);
-				point.addLine(line);
-				if (line.getEuclidLine().getLength() < 0.0000001) {
-					LOG.trace("ZERO LINE");
-				}
+			int npoints = real2Array.size();
+			if (npoints == 1) {
+				// meaningless?
+			} else if (npoints == 2) {
+				line = new SVGLine(real2Array.get(0), real2Array.get(1));
 				lineList.add(line);
-				lastPoint = point;
+			} else {
+				for (int i = 1; i < real2Array.size(); i++) {
+					line = new SVGLine(real2Array.elementAt(i - 1), real2Array.elementAt(i));
+					copyNonSVGAttributes(this, line);
+					SVGMarker point = new SVGMarker(real2Array.get(i));
+					markerList.add(point);
+					lastPoint.addLine(line);
+					point.addLine(line);
+					if (line.getEuclidLine().getLength() < 0.0000001) {
+						LOG.trace("ZERO LINE");
+					}
+					lineList.add(line);
+					lastPoint = point;
+				}
+				if (isClosed()) {
+					line = new SVGLine(real2Array.elementAt(npoints - 1), real2Array.elementAt(0));
+					lineList.add(line);
+				}
+			}
+			if (npoints > 2 && lineList.size() < npoints) {
+				LOG.trace("unclosed Polyline");
 			}
 			setReal2Array(real2Array);
+			LOG.trace("npoints: "+npoints+"; "+lineList.size());
 		}
 		ensureLineList();
 		return lineList;
@@ -418,7 +433,7 @@ public abstract class SVGPoly extends SVGShape {
 
 	public SVGRect createRect(double epsilon) {
 		SVGRect rect = null;
-		if (this != null && isBox(epsilon)) {
+		if (isBox(epsilon)) {
 			Real2Range r2r = getBoundingBox();
 			rect = new SVGRect(r2r.getCorners()[0], r2r.getCorners()[1]);
 			rect.setFill("none");
@@ -452,9 +467,22 @@ public abstract class SVGPoly extends SVGShape {
 		if (isBox == null) {
 			isBox = false;
 			createLineList();
+			
 			if (lineList == null) {
+				return isBox;
+			}
+			/** error earlier in logic - duplicate last line - catch it anyway */
+			if (lineList.size() == 5) {
+				Real2 point30 = lineList.get(3).getXY(0);
+				Real2 point31 = lineList.get(3).getXY(1);
+				Real2 point40 = lineList.get(4).getXY(0);
+				Real2 point41 = lineList.get(4).getXY(1);
+				if (point30.isEqualTo(point40, epsilon) && point31.isEqualTo(point41, epsilon)) {
+					lineList.remove(4);
+				}
+			}
 				
-			} else if (lineList.size() == 4 || (lineList.size() == 3 && isClosed)) {
+			if (lineList.size() == 4 || (lineList.size() == 3 && isClosed)) {
 				SVGLine line0 = lineList.get(0);
 				SVGLine line2 = lineList.get(2);
 				Real2 point0 = line0.getXY(0);
@@ -483,7 +511,10 @@ public abstract class SVGPoly extends SVGShape {
 							Real.isEqual(point1x, point2x, epsilon) &&
 							Real.isEqual(point3x, point0x, epsilon);
 				}
+			} else {
+				LOG.trace("not a box "+lineList.size());
 			}
+			
 		}
 		return isBox;
 	}
@@ -513,5 +544,28 @@ public abstract class SVGPoly extends SVGShape {
 		if (real2Array == null) {
 			real2Array = new Real2Array();
 		}
+	}
+
+	public static SVGPoly createSVGPoly(SVGPath path) {
+		PathPrimitiveList primList = path.ensurePrimitives();
+		Real2 xyLast = null;
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		for (int i = 0; i < primList.size(); i++) {
+			SVGPathPrimitive primitive = primList.get(i);
+			Real2 xy = primitive.getLastCoord();
+			if (xyLast != null) {
+				SVGLine line = new SVGLine(xyLast, xy);
+				lineList.add(line);
+			}
+			xyLast = xy;
+			LOG.trace("Path primitive "+primitive);
+		}
+		SVGPoly poly = null;
+		if (path.isClosed()) {
+			poly = new SVGPolygon(lineList);
+		} else {
+			poly = new SVGPolyline(lineList);
+		}
+		return poly;
 	}
 }

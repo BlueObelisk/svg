@@ -28,8 +28,6 @@ import org.junit.Test;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.euclid.Vector2;
 import org.xmlcml.testutil.TestUtils;
 import org.xmlcml.xml.XMLUtil;
 
@@ -473,30 +471,24 @@ public class SVGTextTest {
 		text.setFontSize(20.);
 		svg.appendChild(text.copy());
 		text.setText(".__pi4");
-		rotateText(text, new Angle(Math.PI / 4));
+		text.rotateText(new Angle(Math.PI / 4));
 		LOG.trace("Transform: "+text.toXML());
 		svg.appendChild(text.copy());
 		text.setText(".__pi2");
-		rotateText(text, new Angle(Math.PI / 2));
+		text.rotateText(new Angle(Math.PI / 2));
 		LOG.trace("Transform: "+text.toXML());
 		svg.appendChild(text.copy());
 		text.setText(".__3pi4");
-		rotateText(text, new Angle(3 * Math.PI / 4));
+		text.rotateText(new Angle(3 * Math.PI / 4));
 		LOG.trace("Transform: "+text.toXML());
 		svg.appendChild(text.copy());
 		text.setText(".__pi");
-		rotateText(text, new Angle(Math.PI));
+		text.rotateText(new Angle(Math.PI));
 		LOG.trace("Transform: "+text.toXML());
 		svg.appendChild(text.copy());
-		XMLUtil.outputQuietly(svg, new File("target/text3.svg"), 1);
-	}
-
-	private void rotateText(SVGText text, Angle angle) {
-		Transform2 transform2;
-		transform2 = new Transform2(new Vector2(text.getXY()));
-		transform2 = transform2.concatenate(new Transform2(angle));
-		transform2 = transform2.concatenate(new Transform2(new Vector2(text.getXY().multiplyBy(-1.0))));
-		text.setTransform(transform2);
+		File textDir = new File("target/text/");
+		textDir.mkdirs();
+		XMLUtil.outputQuietly(svg, new File(textDir, "text3.svg"), 1);
 	}
 	
 }

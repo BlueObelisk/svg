@@ -16,16 +16,19 @@
 
 package org.xmlcml.graphics.svg;
 
-import nu.xom.Attribute;
-import nu.xom.Element;
-import nu.xom.Node;
+import java.awt.Graphics2D;
+import java.awt.geom.Ellipse2D;
+
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
+import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
+import nu.xom.Attribute;
+import nu.xom.Element;
+import nu.xom.Node;
 
 /** draws a straight line.
  * NOT TESTED
@@ -33,6 +36,9 @@ import java.awt.geom.Ellipse2D;
  *
  */
 public class SVGEllipse extends SVGShape {
+
+	public static final String ELLIPSE_MCCCC = "MCCCC";
+	public static final String ELLIPSE_MCCCCZ = "MCCCCZ";
 
 
 	@SuppressWarnings("unused")
@@ -42,8 +48,8 @@ public class SVGEllipse extends SVGShape {
 	private static final String RY = "ry";
 	private static final String R = "r";
 
-	
 	public final static String TAG ="ellipse";
+	
 
 	/** constructor
 	 */
@@ -176,6 +182,52 @@ public class SVGEllipse extends SVGShape {
 	@Override
 	public String getGeometricHash() {
 		return getAttributeValue(CX)+" "+getAttributeValue(CY)+" "+getAttributeValue(RX)+" "+getAttributeValue(RY);
+	}
+
+	public static SVGShape getEllipseOrCircle(SVGPath path, double eps) {
+		SVGShape ellipseOrCircle= null;
+		String signature = path.getSignature();
+		if (signature.equals(ELLIPSE_MCCCC) || signature.equals(ELLIPSE_MCCCCZ)) {
+/**
+ d="M350.644 164.631 
+			C350.644 170.705 327.979 175.631 300.02 175.631 
+			C272.06 175.631 249.395 170.705 249.395 164.631 
+			C249.395 158.555 272.06 153.631 300.02 153.631 
+			C327.979 153.631 350.644 158.555 350.644 164.631 "/>			
+ * 			
+ */
+		}
+		PathPrimitiveList primList = path.ensurePrimitives();
+		Real2[] points = new Real2[4];
+		for (int i = 1; i < 5; i++) {
+			SVGPathPrimitive primitive = primList.get(i);
+			points[i-1] = primitive.getLastCoord();
+		}
+		if (Real.isEqual(points[0].getX(), points[2].getX(), eps)) {
+			Real2 centrex = points[0].getMidPoint(points[2]);
+			Real2 centrey = points[1].getMidPoint(points[3]);
+			Double rx = null;
+			Double ry = null;
+			if (centrex.isEqualTo(centrey, eps)) {
+				if (Real.isEqual(points[0].getX(), points[2].getX(), eps) && Real.isEqual(points[1].getY(), points[3].getY(), eps)) {
+					ry = Math.abs(points[0].getY() - points[2].getY()) / 2.;
+					rx = Math.abs(points[1].getX() - points[3].getX()) / 2.;
+				} else if (Real.isEqual(points[1].getX(), points[3].getX(), eps) && Real.isEqual(points[0].getY(), points[2].getY(), eps)) {
+					rx = Math.abs(points[0].getX() - points[2].getX()) / 2.;
+					ry = Math.abs(points[1].getY() - points[3].getY()) / 2.;
+				} else {
+					LOG.debug("Cannot form ellipse");
+				}
+				if (rx != null) {
+					if (Real.isEqual(rx,  ry, eps)) {
+						ellipseOrCircle = new SVGCircle(centrex, (double) rx);
+					} else {
+						ellipseOrCircle = new SVGEllipse(centrex.getX(), centrey.getY(), rx, ry);
+					}
+				}
+			}
+		}
+		return ellipseOrCircle;
 	}
 	
 	

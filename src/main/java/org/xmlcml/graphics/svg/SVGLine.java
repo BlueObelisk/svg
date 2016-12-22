@@ -141,7 +141,7 @@ public class SVGLine extends SVGShape {
 	}
 	
 	public Double getX() {
-		throw new RuntimeException("Cannot define getY() for lines");
+		throw new RuntimeException("Cannot define getX() for lines");
 	}
 	
 	public Double getY() {
@@ -520,7 +520,7 @@ public class SVGLine extends SVGShape {
 		return getAttributeValue(X1)+" "+getAttributeValue(Y1)+" "+getAttributeValue(X2)+" "+getAttributeValue(Y2);
 	}
 
-	/** convenience method to extract list of svgTexts in element
+	/** convenience method to extract list of svgLines in element
 	 * 
 	 * @param svgElement
 	 * @return
@@ -638,6 +638,37 @@ public class SVGLine extends SVGShape {
 			direction = LineDirection.VERTICAL;
 		}
 		return direction;
+	}
+
+	public void setMarkerEndRef(SVGMarker marker) {
+		String id = marker.getId();
+		this.setMarkerEnd(makeUrlRef(id));
+	}
+
+	private void setMarkerEnd(String markerEnd) {
+		this.addAttribute(new Attribute(SVGMarker.MARKER_END, markerEnd));
+	}
+
+	public void setMarkerStartRef(SVGMarker marker) {
+		String id = marker.getId();
+		this.setMarkerStart(makeUrlRef(id));
+	}
+
+	private void setMarkerStart(String markerStart) {
+		this.addAttribute(new Attribute(SVGMarker.MARKER_START, markerStart));
+	}
+
+	public void setMarkerMidRef(SVGMarker marker) {
+		String id = marker.getId();
+		this.setMarkerMid(makeUrlRef(id));
+	}
+
+	private String makeUrlRef(String id) {
+		return "url(#"+id+")";
+	}
+
+	private void setMarkerMid(String markerMid) {
+		this.addAttribute(new Attribute(SVGMarker.MARKER_MID, markerMid));
 	}
 
 	/** filters horizontal and vertical lines, normalizes the direction and merges touching ones.

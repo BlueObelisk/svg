@@ -110,6 +110,19 @@ public class SVGPolyline extends SVGPoly {
     public Node copy() {
         return new SVGPolyline(this);
     }
+    
+	public SVGPolyline(List<SVGLine> lineList) {
+		this();
+		int npoints = lineList.size();
+		Real2Array real2Array0 = new Real2Array(npoints + 1);
+		for (int i = 0; i < npoints; i++) {
+			real2Array0.setElement(i, lineList.get(i).getXY(0));
+		}
+		real2Array0.setElement(npoints, lineList.get(npoints - 1).getXY(1));
+		setReal2Array(real2Array0);
+	}
+
+
 
 	/** 
 	 * Passes polyline or converts line.
@@ -173,7 +186,7 @@ public class SVGPolyline extends SVGPoly {
 		return polyline;
 	}
 
-	/** runs through a list of lines joining where possible to create (samller) list.
+	/** runs through a list of lines joining where possible to create (smaller) list.
 	 * 
 	 * Crude algorithm. 
 	 *   1 start = 0;
