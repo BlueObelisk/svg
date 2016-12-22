@@ -1009,6 +1009,14 @@ public class SVGText extends SVGElement {
 		return "["+this.getText()+"("+this.getXY()+")"+"]";
 	}
 
+	public void rotateText(Angle angle) {
+		Transform2 transform2;
+		transform2 = new Transform2(new Vector2(this.getXY()));
+		transform2 = transform2.concatenate(new Transform2(angle));
+		transform2 = transform2.concatenate(new Transform2(new Vector2(this.getXY().multiplyBy(-1.0))));
+		setTransform(transform2);
+	}
+
 	public static List<String> extractStrings(List<SVGText> textList) {
 		List<String> stringList = null;
 		if (textList != null) {

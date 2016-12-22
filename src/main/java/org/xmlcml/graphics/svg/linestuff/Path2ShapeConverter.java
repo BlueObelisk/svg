@@ -1,25 +1,38 @@
 package org.xmlcml.graphics.svg.linestuff;
 
-import nu.xom.Attribute;
-import nu.xom.ParentNode;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.euclid.*;
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
-import org.xmlcml.graphics.svg.*;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealArray;
+import org.xmlcml.graphics.svg.SVGCircle;
+import org.xmlcml.graphics.svg.SVGElement;
+import org.xmlcml.graphics.svg.SVGEllipse;
+import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGPath;
+import org.xmlcml.graphics.svg.SVGPathPrimitive;
+import org.xmlcml.graphics.svg.SVGPoly;
+import org.xmlcml.graphics.svg.SVGPolygon;
+import org.xmlcml.graphics.svg.SVGPolyline;
+import org.xmlcml.graphics.svg.SVGRect;
+import org.xmlcml.graphics.svg.SVGShape;
+import org.xmlcml.graphics.svg.SVGUtil;
+import org.xmlcml.graphics.svg.StyleBundle;
+import org.xmlcml.graphics.svg.objects.SVGTriangle;
 import org.xmlcml.graphics.svg.path.Arc;
 import org.xmlcml.graphics.svg.path.LinePrimitive;
 import org.xmlcml.graphics.svg.path.MovePrimitive;
 import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 import org.xmlcml.xml.XMLUtil;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import nu.xom.Attribute;
+import nu.xom.ParentNode;
 
 /** 
  * Converts SVGPaths to SVGShapes.
@@ -30,8 +43,9 @@ import java.util.Set;
  * 
  * @author pm286
  */
-@Deprecated // use SVG
+//@Deprecated // use SVG
 public class Path2ShapeConverter {
+
 
 	public static final String Z_COORDINATE = "z";
 
@@ -45,7 +59,7 @@ public class Path2ShapeConverter {
 
 	private static final double CIRCLE_EPS = 0.7;
 	private static final double MOVE_EPS = 0.001;
-	private static final double RECT_EPS = 0.01;
+	private static final double RECT_EPS = 0.03;
 	private static final double ROUNDED_BOX_EPS = 0.4;
 	
 	private static final Angle DEFAULT_MAX_ANGLE_FOR_PARALLEL = new Angle(0.15, Units.RADIANS);
@@ -76,6 +90,10 @@ public class Path2ShapeConverter {
 	private List<SVGPath> splitPathList;
 	private SVGPath svgPath;
 	private List<SVGShape> shapeListOut;
+
+	private boolean splitPolylines;
+
+	private double rectEpsilon = RECT_EPS;
 
 	public Path2ShapeConverter() {
 		
@@ -122,14 +140,14 @@ public class Path2ShapeConverter {
 	 * 
 	 * @return a list of shapes; each a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
 	 */
-	@Deprecated
-	public List<SVGShape> convertPathsToShapes() {
-		List<SVGShape> shapeListOut = null;
-		if (pathListIn != null) {
-			shapeListOut = convertPathsToShapes(pathListIn);
-		}
-		return shapeListOut;
-	}
+//	@Deprecated
+//	public List<SVGShape> convertPathsToShapes() {
+//		List<SVGShape> shapeListOut = null;
+//		if (pathListIn != null) {
+//			shapeListOut = convertPathsToShapes0(pathListIn);
+//		}
+//		return shapeListOut;
+//	}
 	
 	/** 
 	 * Main routine for list of paths. Doesn't observe splitAtMoveCommands.
@@ -138,10 +156,10 @@ public class Path2ShapeConverter {
 	 * @return a list of shapes; each a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
 	 */
 	public List<List<SVGShape>> convertPathsToShapesAndSplitAtMoves(List<SVGPath> pathList) {
-		return convertPathsToShapes(pathList, true);
+		return convertPathsToShapes0(pathList);
 	}
 	
-	public List<List<SVGShape>> convertPathsToShapes(List<SVGPath> inputPathList, boolean split) {
+	public List<List<SVGShape>> convertPathsToShapes0(List<SVGPath> inputPathList) {
 		setPathList(inputPathList);
 		List<List<SVGShape>> shapeListList = new ArrayList<List<SVGShape>>();
 		int id = 0;
@@ -152,7 +170,7 @@ public class Path2ShapeConverter {
 			inputPathList = removeRedundantMoveCommands(inputPathList);
 		}
 		List<List<SVGPath>> pathListList;
-		if (splitAtMoveCommands && split) {
+		if (splitAtMoveCommands) {
 			pathListList = splitAtMoveCommands(inputPathList);
 		} else {
 			pathListList = new ArrayList<List<SVGPath>>();
@@ -167,9 +185,15 @@ public class Path2ShapeConverter {
 			List<SVGShape> shapeList = new ArrayList<SVGShape>();
 			for (SVGPath path : pathList) {
 				SVGShape shape = convertPathToShape(path);
-				shape.setId(shape.getClass().getSimpleName().toLowerCase().substring(SVG.length())+"."+id);
-				shapeList.add(shape);
-				id++;
+				LOG.trace("shape"+shape.toXML());
+				if (shape != null) {
+					shape.setId(shape.getClass().getSimpleName().toLowerCase().substring(SVG.length())+"."+id);
+					shapeList.add(shape);
+					id++;
+				}
+			}
+			if (splitPolylines) {
+				shapeList = splitPolylines(shapeList);
 			}
 			shapeListList.add(shapeList);
 		}
@@ -177,6 +201,22 @@ public class Path2ShapeConverter {
 			//shapeListOut = removeDuplicateShapes(shapeListOut);
 		}
 		return shapeListList;
+	}
+
+	private List<SVGShape> splitPolylines(List<SVGShape> shapeList) {
+		List<SVGShape> shapeList1 = new ArrayList<SVGShape>();
+		for (SVGShape shape : shapeList) {
+			if (shape instanceof SVGPolyline) {
+				SVGPolyline polyline = ((SVGPolyline) shape);
+				List<SVGLine> lineList = polyline.createLineList();
+				copyAttributes(shape, lineList);
+//				shape.format(decimalPlaces);
+				shapeList1.addAll(lineList);
+			} else {
+				shapeList1.add(shape);
+			}
+		}
+		return shapeList1;
 	}
 
 	/** 
@@ -187,7 +227,7 @@ public class Path2ShapeConverter {
 	 * @deprecated Use convertPathsToShapesAndSplitAtMoves().
 	 */
 	public List<SVGShape> convertPathsToShapes(List<SVGPath> pathList) {
-		List<List<SVGShape>> converted = convertPathsToShapes(pathList, false);
+		List<List<SVGShape>> converted = convertPathsToShapes0(pathList);
 		List<SVGShape> results = new ArrayList<SVGShape>();
 		for (List<SVGShape> fromPath : converted) {
 			results.addAll(fromPath);
@@ -222,7 +262,10 @@ public class Path2ShapeConverter {
 			return null;
 		}
 		SVGShape shape = null;
-		shape = createRectOrAxialLine(path, RECT_EPS);
+		SVGShape polygon = null;
+		SVGShape triangle = null;
+		SVGShape rect = null;
+		shape = createRectOrAxialLine(path, rectEpsilon);
 		if (shape == null) {
 			shape = path.createRoundedBox(ROUNDED_BOX_EPS);
 		}
@@ -240,8 +283,11 @@ public class Path2ShapeConverter {
 				shape = polyline.createSingleLine();
 				if (shape == null) {
 					//Or a polygon?
-					shape = createPolygonRectOrLine(shape, polyline);
-					LOG.trace("polygon "+shape);
+					shape = createPolygonRectTriangleOrLine(shape, polyline);
+					if (shape instanceof SVGPolygon) {
+						polygon = (SVGPolygon) shape;
+						shape = polygon;
+					}
 				}
 				//No, reset to polyline
 				if (shape == null || shape instanceof SVGPolygon) {
@@ -249,14 +295,58 @@ public class Path2ShapeConverter {
 					if (shape == null) {
 						shape = createNarrowLine(polyline);
 						if (shape == null) {
-							shape = polyline;
+							if (polygon == null) {
+								shape = polyline;
+							} else {
+								shape = polygon;
+							}
 						}
 					} 
 				}
 			}
 		}
-		copyAttributes(path, shape);
-		shape.format(decimalPlaces);
+		if (shape instanceof SVGPath) {
+			shape = applyHeuristics((SVGPath)shape);
+		}
+		if (shape != null) {
+			copyAttributes(path, shape);
+			shape.format(decimalPlaces);
+		}
+		return shape;
+	}
+
+	/** try to convert from some more complex artifacts.
+	 * 
+	 * @param shape
+	 * @return
+	 */
+	private SVGShape applyHeuristics(SVGPath path) {
+		SVGShape shape = path; // no change
+		String signature = path.getSignature();
+		LOG.trace("SIG "+signature);
+		if (signature == null) {
+			LOG.warn("Null signature for path");
+		} else if (signature.equals(SVGTriangle.CONVEX_ARROWHEAD)) {
+			SVGTriangle triangle = SVGTriangle.getPseudoTriangle(path);
+			LOG.trace("PSEUDO TRIANGLE");
+			if (triangle != null) {
+				shape = triangle;
+			}
+		} else if (signature.equals(SVGEllipse.ELLIPSE_MCCCC) || signature.equals(SVGEllipse.ELLIPSE_MCCCCZ)){
+/* d="
+ *  M350.644 164.631 
+    C350.644 170.705 327.979 175.631 300.02 175.631 
+	C272.06 175.631 249.395 170.705 249.395 164.631 
+	C249.395 158.555 272.06 153.631 300.02 153.631 
+	C327.979 153.631 350.644 158.555 350.644 164.631 "/>			
+*/			
+			SVGShape ellipseOrCircle = SVGEllipse.getEllipseOrCircle(path, rectEpsilon);
+			if (ellipseOrCircle != null) {
+				shape = ellipseOrCircle;
+				ellipseOrCircle.setFill("none");
+			}
+		}
+		
 		return shape;
 	}
 
@@ -349,18 +439,29 @@ public class Path2ShapeConverter {
 		return line;
 	}
 
-	private SVGShape createPolygonRectOrLine(SVGShape shape, SVGPolyline polyline) {
+	public void setRectEpsilon(double rectEps) {
+		this.rectEpsilon = rectEps;
+		
+		
+	}
+	private SVGShape createPolygonRectTriangleOrLine(SVGShape shape, SVGPolyline polyline) {
 		if (polyline != null) {
-			SVGPolygon polygon = (SVGPolygon) polyline.createPolygon(RECT_EPS);
+			SVGPolygon polygon = (SVGPolygon) polyline.createPolygon(rectEpsilon);
 			if (polygon != null) {
-				SVGRect rect = polygon.createRect(RECT_EPS);
-				SVGLine line = createLineFromRect(rect);
-				if (line != null) {
-					shape = line;
-				} else if (rect != null){
-					shape = rect;
+				if (polygon.size() == 2) {
+					shape = new SVGLine(polygon);
+				} else if (polygon.size() == 3) {
+						shape = new SVGTriangle(polygon);
 				} else {
-					shape = polygon;
+					SVGRect rect = polygon.createRect(rectEpsilon);
+					SVGLine line = createLineFromRect(rect);
+					if (line != null) {
+						shape = line;
+					} else if (rect != null){
+						shape = rect;
+					} else {
+						shape = polygon;
+					}
 				}
 			}
 		}
@@ -730,26 +831,43 @@ public class Path2ShapeConverter {
 		return circle;
 	}
 
+
 	/**
-	 * Copies fill, opacity, stroke and stroke width attributes
+	 * Copies fill, opacity, stroke and stroke width and dash-array attributes to a list
 	 * 
-	 * @param path
+	 * @param input
+	 * @param resultList
+	 */
+	public static void copyAttributes(SVGElement input, List<? extends SVGElement> resultList) {
+		for (SVGElement result : resultList) {
+			copyAttributes(input, result);
+		}
+	}
+
+	/**
+	 * Copies fill, opacity, stroke and stroke width and dash-array attributes
+	 * 
+	 * @param input
 	 * @param result
 	 */
-	public static void copyAttributes(SVGPath path, SVGElement result) {
-		path.setUseStyleAttribute(false);
+	public static void copyAttributes(SVGElement input, SVGElement result) {
+		input.setUseStyleAttribute(false);
 		for (String attName : new String[]{
 				StyleBundle.FILL, 
 				StyleBundle.OPACITY, 
 				StyleBundle.STROKE, 
 				StyleBundle.STROKE_WIDTH, 
+				StyleBundle.DASHARRAY, 
 				}) {
-			String val = path.getAttributeValue(attName);
+			String val = input.getAttributeValue(attName);
 			if (val != null) {
 				result.addAttribute(new Attribute(attName, val));
+				if (attName.equals(StyleBundle.DASHARRAY)) {
+					LOG.trace("DASH "+input.toXML());
+				}
 			}
 		}
-		String zvalue = SVGUtil.getSVGXAttribute(path, Z_COORDINATE);
+		String zvalue = SVGUtil.getSVGXAttribute(input, Z_COORDINATE);
 		if (zvalue != null) {
 			SVGUtil.setSVGXAttribute(result, Z_COORDINATE, zvalue);
 		}
@@ -1010,6 +1128,14 @@ public class Path2ShapeConverter {
 	 */
 	public void setMaxRectThickness(double maxRectThickness) {
 		this.maxRectThickness = maxRectThickness;
+	}
+	
+	public void setSplitPolyLines(boolean split) {
+		this.splitPolylines = split;
+	}
+
+	public boolean isSplitPolyLines() {
+		return splitPolylines;
 	}
 
 }

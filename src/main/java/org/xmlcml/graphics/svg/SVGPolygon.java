@@ -28,6 +28,7 @@ import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Line2AndReal2Calculator;
+import org.xmlcml.euclid.Real;
 
 /** draws a straight line.
  * 
@@ -74,6 +75,16 @@ public class SVGPolygon extends SVGPoly {
 		setReal2Array(real2Array);
 	}
 	
+	public SVGPolygon(List<SVGLine> lineList) {
+		this();
+		int npoints = lineList.size();
+		Real2Array real2Array0 = new Real2Array(npoints);
+		for (int i = 0; i < npoints; i++) {
+			real2Array0.setElement(i, lineList.get(i).getXY(0));
+		}
+		setReal2Array(real2Array0);
+	}
+
 	protected void init() {
 		super.init();
 		isClosed = true;
@@ -98,7 +109,7 @@ public class SVGPolygon extends SVGPoly {
 	
 	public int size() {
 		getReal2Array();
-		return real2Array.size();
+		return real2Array == null ? 0 : real2Array.size();
 	}
 
 	@Override
@@ -164,5 +175,58 @@ public class SVGPolygon extends SVGPoly {
 		}
 		return (near || intersections % 2 == 1);
 	}
-	
+
+	public boolean hasMirror(int startPoint, double eps) {
+		boolean hasMirror = false;
+		hasMirror = hasMirrorAboutMidLine(startPoint, eps);
+		hasMirror &= hasMirroredSideLengths(startPoint, eps);
+		
+		return hasMirror;
+	}
+
+	private boolean hasMirrorAboutMidLine(int stIndex, double eps) {
+		boolean hasMirror = true;
+		int npoints = real2Array.size();
+		int npoints2 = npoints / 2;
+		int startIndex = (stIndex + 1) % npoints;
+		int endIndex = stIndex + npoints2;
+		LOG.debug(startIndex + "/" + endIndex);
+		Real2 startPoint = real2Array.get(startIndex);
+		Real2 endPoint = (npoints % 2 == 0) ? real2Array.get(endIndex) :
+			real2Array.get(endIndex).getMidPoint(real2Array.get(endIndex + 1));
+		LOG.debug(startPoint+"/"+endPoint);
+		Line2 line = new Line2(startPoint, endPoint);
+		for (int i = startIndex; i < endIndex; i++) {
+			Real2 ppi = real2Array.get(i % npoints);
+			Real2 ppn = real2Array.get((npoints - i) % npoints);
+			double di = line.getUnsignedDistanceFromPoint(ppi);
+			double dn = line.getUnsignedDistanceFromPoint(ppn);
+			if (!Real.isEqual(di,  dn, eps)) {
+				hasMirror = false;
+				break;
+			}
+		}
+		return hasMirror;
+	}
+
+	private boolean hasMirroredSideLengths(int stIndex, double eps) {
+		boolean hasMirror = true;
+		int npoints = real2Array.size();
+		int npoints2 = npoints / 2;
+		int startIndex = stIndex + 1;
+		int endIndex = stIndex + npoints2;
+		for (int i = startIndex; i < endIndex; i++) {
+			// are opposite sides equal?
+			if (i > startIndex) {
+				double sidei = real2Array.get(i % npoints).getDistance(real2Array.get((i - 1) % npoints));
+				double siden = real2Array.get((npoints - 2) % npoints).getDistance(real2Array.get((npoints - 1) % npoints));
+				if (!Real.isEqual(sidei, siden, eps)) {
+					hasMirror = false;
+					break;
+				}
+			}
+		}
+		return hasMirror;
+	}
+
 }

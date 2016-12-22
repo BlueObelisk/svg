@@ -823,23 +823,6 @@ public class SVGPath extends SVGShape {
 		return lineList;
 	}
 
-//	private static SVGLineList createLineList(SVGPath path) {
-//		SVGLineList lineList = null;
-//		if (path != null && path.getSignature()) {
-//			
-//		}
-//		return lineList;
-//	}
-
-	private static void extracted(SVGPath path) {
-		String sig = path.getSignature();
-		if (REPEATED_ML.matcher(sig).matches()) {
-			List<SVGLine> lineList = path.createSeparatedLinesFromRepeatedML(null);
-		} else {
-			
-		}
-	}
-
 	public static List<SVGCircle> createCirclesFromPaths(List<SVGPath> pathList) {
 		List<SVGCircle> circleList = new ArrayList<SVGCircle>();
 		for (SVGPath path : pathList) {

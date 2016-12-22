@@ -30,17 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nu.xom.Attribute;
-import nu.xom.Comment;
-import nu.xom.Element;
-import nu.xom.Elements;
-import nu.xom.Node;
-import nu.xom.Nodes;
-import nu.xom.ParentNode;
-import nu.xom.ProcessingInstruction;
-import nu.xom.Text;
-import nu.xom.canonical.Canonicalizer;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real;
@@ -52,15 +41,28 @@ import org.xmlcml.euclid.RealRange.Direction;
 import org.xmlcml.euclid.RealRangeArray;
 import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Transform2;
-import org.xmlcml.graphics.svg.text.SVGWordPara;
+import org.xmlcml.graphics.svg.objects.SVGArrow;
+import org.xmlcml.graphics.svg.objects.SVGTriangle;
 import org.xmlcml.graphics.svg.text.SVGWord;
 import org.xmlcml.graphics.svg.text.SVGWordBlock;
 import org.xmlcml.graphics.svg.text.SVGWordLine;
 import org.xmlcml.graphics.svg.text.SVGWordPage;
 import org.xmlcml.graphics.svg.text.SVGWordPageList;
+import org.xmlcml.graphics.svg.text.SVGWordPara;
 import org.xmlcml.graphics.svg.text.SVGWordPhrase;
 import org.xmlcml.xml.XMLConstants;
 import org.xmlcml.xml.XMLUtil;
+
+import nu.xom.Attribute;
+import nu.xom.Comment;
+import nu.xom.Element;
+import nu.xom.Elements;
+import nu.xom.Node;
+import nu.xom.Nodes;
+import nu.xom.ParentNode;
+import nu.xom.ProcessingInstruction;
+import nu.xom.Text;
+import nu.xom.canonical.Canonicalizer;
 
 /** 
  * Base class for lightweight generic SVG element.
@@ -146,7 +148,7 @@ public class SVGElement extends GraphicsElement {
 		} else if (tag.equals(SVGImage.TAG)) {
 			newElement = new SVGImage();
 		} else if (tag.equals(SVGLine.TAG)) {
-			newElement = new SVGLine();
+			newElement = createSVGLineOrClasses(element);
 		} else if (tag.equals(SVGPath.TAG)) {
 			newElement = new SVGPath();
 		} else if (tag.equals(SVGPattern.TAG)) {
@@ -154,7 +156,7 @@ public class SVGElement extends GraphicsElement {
 		} else if (tag.equals(SVGPolyline.TAG)) {
 			newElement = new SVGPolyline();
 		} else if (tag.equals(SVGPolygon.TAG)) {
-			newElement = new SVGPolygon();
+			newElement = createSVGPolygonOrClasses(element);
 		} else if (tag.equals(SVGRect.TAG)) {
 			newElement = new SVGRect();
 		} else if (tag.equals(SVGScript.TAG)) {
@@ -199,6 +201,28 @@ public class SVGElement extends GraphicsElement {
 			newElement = new SVGWordPhrase();
 		} else {
 			newElement = new SVGG();
+		}
+		return newElement;
+	}
+
+	private static SVGElement createSVGLineOrClasses(Element element) {
+		SVGElement newElement;
+		String clazz = getClassAttributeValue(element);
+		if (SVGArrow.ARROW.equals(clazz)) {
+			newElement = new SVGArrow();
+		} else {
+			newElement = new SVGLine();
+		}
+		return newElement;
+	}
+
+	private static SVGElement createSVGPolygonOrClasses(Element element) {
+		SVGElement newElement;
+		String clazz = getClassAttributeValue(element);
+		if (SVGTriangle.TRIANGLE.equals(clazz)) {
+			newElement = new SVGTriangle();
+		} else {
+			newElement = new SVGPolygon();
 		}
 		return newElement;
 	}

@@ -178,4 +178,8 @@ public class SVGSVG extends SVGElement {
 		return wordPageList;
 	}
 
+	public void setMarker(SVGMarker marker) {
+		appendChild(new SVGMarker(marker));
+	}
+
 }

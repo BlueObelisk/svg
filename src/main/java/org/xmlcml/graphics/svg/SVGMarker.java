@@ -16,24 +16,54 @@
 
 package org.xmlcml.graphics.svg;
 
-import nu.xom.Element;
-import nu.xom.Node;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import nu.xom.Attribute;
+import nu.xom.Element;
+import nu.xom.Node;
 
 /** a virtual point. May not correspond completely with SVG <marker>
  * creates a "point", drawn by an arbitrary symbol
  * @author pm286
  *
+ *
+ *typical marker as arrowhead
+ *<svg width="500" height="500" xmlns="http://www.w3.org/2000/svg" viewBox="0 40 400 200">
+    <marker id="triangle"
+      viewBox="0 0 10 10" refX="0" refY="5" 
+      markerUnits="strokeWidth"
+      markerWidth="4" markerHeight="3"
+      orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+	<line x1="100" y1="50.5" x2="300" y2="50.5" marker-end="url(#triangle)" stroke="black" stroke-width="10"/>
+	<polyline points="100 100 300 100" marker-end="url(#triangle)" stroke="black" stroke-width="10"/>
+	<path d="M100 150.5l200 0" marker-end="url(#triangle)" stroke="black" stroke-width="10"/>
+</svg>
+
  */
 public class SVGMarker extends SVGElement {
 
 	final public static String TAG ="marker";
+	public final static String VIEW_BOX = "viewBox";
+	public final static String REFX = "refX";
+	public final static String REFY = "refY";
+	public final static String MARKER_UNITS = "markerUnits";
+	public final static String MARKER_WIDTH = "markerWidth";
+	public final static String MARKER_HEIGHT = "markerHeight";
+	public final static String ORIENT = "orient";
+	public final static String AUTO = "auto";
+	public static final String STROKE_WIDTH = "strokeWidth";
+	public static final String MARKER_END = "marker-end";
+	public static final String MARKER_MID = "marker-mid";
+	public static final String MARKER_START = "marker-start";
+	
 	// an addition
 	private List<SVGLine> lineList; 
 	private static double size = 2;
@@ -186,6 +216,34 @@ public class SVGMarker extends SVGElement {
 		if (lineList == null) {
 			lineList = new ArrayList<SVGLine>();
 		}
+	}
+
+	public void setViewBox(String box) {
+		this.addAttribute(new Attribute(VIEW_BOX, box));
+	}
+
+	public void setRefX(String x) {
+		this.addAttribute(new Attribute(REFX, x));
+	}
+
+	public void setRefY(String y) {
+		this.addAttribute(new Attribute(REFY, y));
+	}
+
+	public void setMarkerUnits(String units) {
+		this.addAttribute(new Attribute(MARKER_UNITS, units));
+	}
+
+	public void setMarkerWidth(double width) {
+		this.addAttribute(new Attribute(MARKER_WIDTH, String.valueOf(width)));
+	}
+
+	public void setMarkerHeight(double height) {
+		this.addAttribute(new Attribute(MARKER_HEIGHT, String.valueOf(height)));
+	}
+
+	public void setOrient(String orient) {
+		this.addAttribute(new Attribute(ORIENT, orient));
 	}
 
 }

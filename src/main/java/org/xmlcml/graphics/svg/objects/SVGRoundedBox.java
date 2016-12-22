@@ -1,16 +1,13 @@
 package org.xmlcml.graphics.svg.objects;
 
-import nu.xom.Attribute;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPath;
 
 public class SVGRoundedBox extends SVGG {
 	
-	private static final String ROUNDED_BOX = "roundedBox";
+	public static final String ROUNDED_BOX = "roundedBox";
 	private static final Logger LOG = Logger.getLogger(SVGRoundedBox.class);
 	static {
 		LOG.setLevel(Level.DEBUG);

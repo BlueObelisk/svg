@@ -16,15 +16,31 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.awt.Polygon;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xmlcml.xml.XMLUtil;
 
 public class SVGPolygonTest {
 
-
-	@Test
-	public void testDummy() {
-		Assert.assertTrue(true);
+	private static final Logger LOG = Logger.getLogger(SVGPolygonTest.class);
+	static {
+		LOG.setLevel(Level.DEBUG);
 	}
 
+	public final static String ARROWHEAD_S = "<polygon  points=\"178.9 130.294 175.648 122.336 178.9 124.225 182.152 122.336\"/>";
+	public final static SVGPolygon ARROWHEAD;
+	static {
+		ARROWHEAD = (SVGPolygon) SVGElement.readAndCreateSVG(XMLUtil.parseXML(ARROWHEAD_S));
+		ARROWHEAD.getReal2Array();
+	}
+
+	@Test
+	public void testIsMirror() {
+		Assert.assertFalse(ARROWHEAD.hasMirror(0, SVGPolygon.EPS));
+		Assert.assertTrue(ARROWHEAD.hasMirror(1, SVGPolygon.EPS));
+	}
 }
