@@ -1,0 +1,46 @@
+package org.xmlcml.graphics.svg.util;
+
+import java.util.Iterator;
+import java.util.List;
+
+import org.xmlcml.graphics.svg.SVGElement;
+
+import nu.xom.Elements;
+
+public class SVGElementIterator implements Iterator<SVGElement> {
+
+	private Iterator<? extends SVGElement> iterator;
+	private ElementsIterator elementsIterator;
+	
+	public SVGElementIterator(List<? extends SVGElement> elementList) {
+		iterator = elementList.iterator();
+	}
+	public SVGElementIterator(Elements elements) {
+		elementsIterator = new ElementsIterator(elements);
+	}
+	public boolean hasNext() {
+		return iterator.hasNext();
+	}
+
+	public SVGElement next() {
+		return iterator.next();
+	}
+
+}
+class ElementsIterator {
+	int index;
+	private Elements elements;
+	public ElementsIterator(Elements elements) {
+		this.elements = elements;
+		index = 0;
+	}
+	
+	boolean hasNext() {
+		return index < elements.size();
+	}
+
+	SVGElement next() {
+		return (SVGElement) elements.get(index++);
+	}
+	
+}

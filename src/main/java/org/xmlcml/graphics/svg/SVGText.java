@@ -14,6 +14,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -239,6 +240,22 @@ public class SVGText extends SVGElement {
     		this.setFontSize(fontSize);
     	}
     }
+
+    /** round to decimal places.
+     * 
+     * @param places
+     * @return this
+     */
+    public void formatTransform(int places) {
+    	super.formatTransform(places);
+    	setXY(getXY().format(places));
+    	Double fontSize = this.getFontSize();
+    	if (fontSize != null) {
+    		fontSize = Util.format(fontSize, places);
+    		this.setFontSize(fontSize);
+    	}
+    }
+
 
 	/**
 	 * @return tag
@@ -719,6 +736,33 @@ public class SVGText extends SVGElement {
 		return SVGText.extractTexts(SVGUtil.getQuerySVGElements(svgElement, ALL_TEXT_XPATH));
 	}
 	
+	/** 
+	 * Convenience method to extract list of svgTexts in element
+	 * 
+	 * @param svgElement element to query
+	 * @param rotAngle angle rotated from 0
+	 * @param eps tolerance in rotation angle
+	 * @return
+	 */
+	public static List<SVGText> extractSelfAndDescendantTextsWithSpecificAngle(SVGElement svgElement, Angle targetAngle, double eps) {
+		List<SVGText> textList = extractSelfAndDescendantTexts(svgElement);
+		List<SVGText> newTextList = new ArrayList<SVGText>();
+		for (SVGText text : textList) {
+			Transform2 t2 = text.getTransform();
+			boolean rotated = false;
+			if (t2 == null) {
+				rotated = targetAngle.isEqualTo(0.0, eps);
+			} else {
+				Angle rotAngle = t2.getAngleOfRotation();
+				rotated = Real.isEqual(targetAngle.getRadian(), rotAngle.getRadian(), eps);
+			}
+			if (rotated) {
+				newTextList.add(text);
+			}
+		}
+		return newTextList;
+	}
+	
 
 
 	/** 
@@ -1026,6 +1070,19 @@ public class SVGText extends SVGElement {
 			}
 		}
 		return stringList;
+	}
+
+	/** utility to draw a list of text.
+	 * 
+	 * @param textList
+	 * @param file
+	 */
+	public static void drawTextList(List<? extends SVGElement> textList, File file) {
+		SVGG g = new SVGG();
+		for (SVGElement text : textList) {
+			g.appendChild(text.copy());
+		}
+		SVGSVG.wrapAndWriteAsSVG(g, file);
 	}
 
 }
