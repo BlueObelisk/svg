@@ -73,6 +73,8 @@ import nu.xom.canonical.Canonicalizer;
  */
 public class SVGElement extends GraphicsElement {
 
+	private static final int EXTRA_TRANSFORM_PRECISION = 2;
+
 	private static Logger LOG = Logger.getLogger(SVGElement.class);
 
 	public final static String ALL_ELEMENT_XPATH = "//svg:element";
@@ -838,20 +840,34 @@ public class SVGElement extends GraphicsElement {
 	 * @param places decimal places
 	 */
 	public void format(int places) {
-		formatCommonAttributes(places);
+//		formatCommonAttributes(places);
+		formatTransform(places + EXTRA_TRANSFORM_PRECISION);
 		List<SVGElement> childElements = SVGUtil.getQuerySVGElements(this,  "./svg:*");
 		for (SVGElement childElement : childElements) {
 			childElement.format(places);
 		}
 	}
-
+	// be careful as transforms require several places in matrix
 	private void formatCommonAttributes(int places) {
+		formatTransform(places);
+		// maybe more later
+	}
+
+	public void formatTransform(int places) {
 		Transform2 t2 = this.getTransform();
 		if (t2 != null) {
 			if (!t2.isUnit()) {
 				t2 = formatTransform(t2, places);
 				this.setTransform(t2);
 			}
+		}
+	}
+
+	public void formatTransformRecursively(int places) {
+		this.formatTransform(places);
+		List<SVGElement> childElements = SVGElement.generateElementList(this, ".//svg:*");
+		for (SVGElement childElement : childElements) {
+			childElement.formatTransformRecursively(places);
 		}
 	}
 
