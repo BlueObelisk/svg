@@ -128,4 +128,83 @@ public class SVGLineTest {
 			LOG.trace(line);
 		}
 	}
+	
+	@Test
+	public void testCreateMergedHorizontalOrVerticalLine() {
+		// overlap
+		SVGLine line0 = new SVGLine(new Real2(36.9, 100.0), new Real2(173.9, 100.0));
+		SVGLine line1 = new SVGLine(new Real2(173.9, 100.0), new Real2(335.1, 100.0));
+		SVGLine line = SVGLine.createMergedHorizontalOrVerticalLine(line0, line1, 0.5);
+		Assert.assertEquals("exact x"+line.toXML(), "<line xmlns=\"http://www.w3.org/2000/svg\" stroke=\"black\" stroke-width=\"1.0\" "
+				+ "x1=\"36.9\" y1=\"100.0\" x2=\"335.1\" y2=\"100.0\" />", line.toXML());
+		line0 = new SVGLine(new Real2(100.0, 36.9), new Real2(100.0, 173.9));
+		line1 = new SVGLine(new Real2(100.0, 173.9), new Real2(100.0, 335.1));
+		line = SVGLine.createMergedHorizontalOrVerticalLine(line0, line1, 0.5);
+		Assert.assertEquals("exact y "+line.toXML(), "<line xmlns=\"http://www.w3.org/2000/svg\" stroke=\"black\" stroke-width=\"1.0\" "
+				+ "x1=\"100.0\" y1=\"36.9\" x2=\"100.0\" y2=\"335.1\" />", line.toXML());
+		line0 = new SVGLine(new Real2(36.9, 100.0), new Real2(173.9, 100.0));
+		line1 = new SVGLine(new Real2(167.1, 100.0), new Real2(335.1, 100.0));
+		line = SVGLine.createMergedHorizontalOrVerticalLine(line0, line1, 0.5);
+		Assert.assertEquals("overlap x"+line.toXML(), "<line xmlns=\"http://www.w3.org/2000/svg\" stroke=\"black\" stroke-width=\"1.0\" "
+				+ "x1=\"36.9\" y1=\"100.0\" x2=\"335.1\" y2=\"100.0\" />", line.toXML());
+		line0 = new SVGLine(new Real2(100.0, 36.9), new Real2(100.0, 173.9));
+		line1 = new SVGLine(new Real2(100.0, 167.1), new Real2(100.0, 335.1));
+		line = SVGLine.createMergedHorizontalOrVerticalLine(line0, line1, 0.5);
+		Assert.assertEquals("overlap y"+line.toXML(), "<line xmlns=\"http://www.w3.org/2000/svg\" stroke=\"black\" stroke-width=\"1.0\" "
+				+ "x1=\"100.0\" y1=\"36.9\" x2=\"100.0\" y2=\"335.1\" />", line.toXML());
+	}
+	
+	@Test
+	public void testNonMergedHorizontalOrVerticalLine() {
+		// overlap
+		SVGLine line0 = new SVGLine(new Real2(100.0, 36.9), new Real2(100.0, 173.9));
+		SVGLine line1 = new SVGLine(new Real2(101.0, 173.9), new Real2(101.0, 335.1));
+		SVGLine line = SVGLine.createMergedHorizontalOrVerticalLine(line0, line1, 0.5);
+		Assert.assertNull("different x", line);
+		line0 = new SVGLine(new Real2(36.9, 100.0), new Real2(173.9, 100.0));
+		line1 = new SVGLine(new Real2(173.9, 101.0), new Real2(335.1, 101.0));
+		line = SVGLine.createMergedHorizontalOrVerticalLine(line0, line1, 0.5);
+		Assert.assertNull("different y", line);
+		line1 = new SVGLine(new Real2(175.0, 100.0), new Real2(335.1, 100.0));
+		line = SVGLine.createMergedHorizontalOrVerticalLine(line0, line1, 0.5);
+		Assert.assertNull("gap x", line);
+		line0 = new SVGLine(new Real2(100.0, 36.9), new Real2(100.0, 173.9));
+		line1 = new SVGLine(new Real2(100.0, 175.0), new Real2(100.0, 335.1));
+		line = SVGLine.createMergedHorizontalOrVerticalLine(line0, line1, 0.5);
+		Assert.assertNull("gap y", line);
+	}
+	
+	@Test
+	public void testMergeParallelLines() {
+		SVGLine line0 = new SVGLine(new Real2(36.9, 100.0), new Real2(173.9, 100.0));
+		SVGLine line1 = new SVGLine(new Real2(173.9, 100.0), new Real2(335.1, 100.0));
+		SVGLine line2 = new SVGLine(new Real2(335.1, 100.0), new Real2(503.1, 100.0));
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		lineList.add(line0);
+		lineList.add(line1);
+		lineList.add(line2);
+		List<SVGLine> newLineList = SVGLine.mergeParallelLines(lineList, 0.1);
+		Assert.assertEquals(1, newLineList.size());
+		SVGLine newLine = newLineList.get(0);
+		Assert.assertEquals("merged",  
+				"<line xmlns=\"http://www.w3.org/2000/svg\" stroke=\"black\" stroke-width=\"1.0\" x1=\"36.9\" y1=\"100.0\" x2=\"503.1\" y2=\"100.0\" />",
+				newLine.toXML());
+	}
+	
+	@Test
+	public void testMergeParallelLinesWithOverlap() {
+		SVGLine line0 = new SVGLine(new Real2(36.9, 100.0), new Real2(173.9, 100.0));
+		SVGLine line1 = new SVGLine(new Real2(167, 100.0), new Real2(335.1, 100.0));
+		SVGLine line2 = new SVGLine(new Real2(328.1, 100.0), new Real2(503.1, 100.0));
+		List<SVGLine> lineList = new ArrayList<SVGLine>();
+		lineList.add(line0);
+		lineList.add(line1);
+		lineList.add(line2);
+		List<SVGLine> newLineList = SVGLine.mergeParallelLines(lineList, 0.1);
+		Assert.assertEquals(1, newLineList.size());
+		SVGLine newLine = newLineList.get(0);
+		Assert.assertEquals("merged",  
+				"<line xmlns=\"http://www.w3.org/2000/svg\" stroke=\"black\" stroke-width=\"1.0\" x1=\"36.9\" y1=\"100.0\" x2=\"503.1\" y2=\"100.0\" />",
+				newLine.toXML());
+	}
 }
