@@ -309,7 +309,15 @@ public class Path2ShapeConverter {
 			shape = applyHeuristics((SVGPath)shape);
 		}
 		if (shape != null) {
+			// lines created from thin rects may have a different stroke-width to the original
+			Double strokeWidth = null;
+			if (shape instanceof SVGLine) {
+				strokeWidth = ((SVGLine) shape).getStrokeWidth();
+			}
 			copyAttributes(path, shape);
+			if (strokeWidth != null) {
+				shape.setStrokeWidth(strokeWidth);
+			}
 			shape.format(decimalPlaces);
 		}
 		return shape;
@@ -477,7 +485,7 @@ public class Path2ShapeConverter {
 		} else {
 			line = createLineFromRect(rect); 
 		}
-		shape = (line != null ? null : rect);
+		shape = (line != null ? line : rect);
 		return shape;
 	}
 
@@ -1108,12 +1116,15 @@ public class Path2ShapeConverter {
 			double height = rect.getHeight();
 			if (width < maxRectThickness) {
 				line1 = new SVGLine(origin.plus(new Real2(width / 2, 0.0)), origin.plus(new Real2(width / 2, height)));
+				line1.setStrokeWidth(width);
 			} 
 			if (height < maxRectThickness) {
 				line2 = new SVGLine(origin.plus(new Real2(0.0, height / 2)), origin.plus(new Real2(width, height / 2)));
+				line2.setStrokeWidth(height);
 			}
 		}
-		return (line1 == null ? line2 : (line2 == null ? line1 : (line1.getLength() > line2.getLength() ? line1 : line2)));
+		SVGLine line =  (line1 == null ? line2 : (line2 == null ? line1 : (line1.getLength() > line2.getLength() ? line1 : line2)));
+		return line;
 	}
 
 	/**

@@ -23,11 +23,6 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import nu.xom.Attribute;
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.Nodes;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.EuclidConstants;
@@ -38,8 +33,13 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
-import org.xmlcml.graphics.svg.SVGLine.LineDirection;
 import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
+
+import nu.xom.Attribute;
+import nu.xom.Element;
+import nu.xom.Node;
+import nu.xom.Nodes;
 
 /** draws a straight line.
  * 
@@ -728,9 +728,10 @@ public class SVGLine extends SVGShape {
 	 * @param eps
 	 * @return
 	 */
-	private static List<SVGLine> mergeParallelLines(List<SVGLine> lineList, double eps) {
+	public static List<SVGLine> mergeParallelLines(List<SVGLine> lineList, double eps) {
 		
 		/** runs through a list of lines joining where possible to create (smaller) list.
+		 * if lines overlap takes union
 		 * 
 		 * Crude algorithm. 
 		 *   1 start = 0;
@@ -748,35 +749,107 @@ public class SVGLine extends SVGShape {
 		 * @param eps
 		 * @return
 		 */
-		List<SVGLine> lineListNew = new ArrayList<SVGLine>(lineList);
+		List<SVGLine> lineListNew = new ArrayList<SVGLine>();
+		lineListNew.addAll(lineList);
 		boolean change = true;
-		int startLine = 0;
 		while (change) {
 			change = false;
 			int size = lineListNew.size();
-			for (int iline = startLine; iline < size - 1; iline++) {
-				SVGLine line0 = lineListNew.get(iline);
-				SVGLine line1 = lineListNew.get(iline + 1);
-				SVGLine newLine = createMergedLine(line0, line1, eps);
-				newLine = (newLine != null) ? newLine : createMergedLine(line1, line0, eps);
-				if (newLine != null) {
-					startLine = iline;
-					replaceLineAndCloseUp(iline, newLine, lineListNew);
-					break;
+			for (int iline = 0; iline < size - 1; iline++) {
+				size = lineListNew.size();
+				for (int jline = iline + 1; jline < size; jline++) {
+					SVGLine linei = lineListNew.get(iline);
+					SVGLine linej = lineListNew.get(jline);
+					LOG.trace("merging \n    "+linei.toXML()+"\n--> "+linej.toXML());
+					SVGLine newLine = createMergedHorizontalOrVerticalLine(linei, linej, eps);
+					if (newLine == null) {
+						// try the other direction
+						newLine = createMergedHorizontalOrVerticalLine(linej, linei, eps);
+					}
+					LOG.trace("newline: "+newLine.toXML());
+					if (newLine != null) {
+						lineListNew.remove(jline);
+						lineListNew.remove(iline);
+						lineListNew.add(newLine);
+						LOG.trace("after close lines "+lineListNew.size());
+						for (SVGLine line : lineListNew) {
+							LOG.trace(">> "+line.toXML());
+						}
+						change = true;
+						break;
+					}
 				}
 			}
 		}
 		return lineListNew;
 	}
 
-	private static SVGLine createMergedLine(SVGLine line0, SVGLine line1, double eps) {
+	/** join two horizontal or vertical lines at their ends.
+	 * lines might overlap, in which case the maximum line is taken
+	 * currently ignores attributes of line 1
+	 * 
+	 * @param line0
+	 * @param line1
+	 * @param eps
+	 * @return
+	 */
+	public static SVGLine createMergedHorizontalOrVerticalLine(SVGLine line0, SVGLine line1, double eps) {
 		SVGLine newLine = null;
-		Real2 last0 = line0.getXY(1);
-		Real2 first1 = line1.getXY(0);
-		if (last0.isEqualTo(first1, eps)) {
-			newLine = new SVGLine(line0.getXY(0), line1.getXY(1));
+		Real2 point0 = line0.getXY(1);
+		double x0 = point0.getX();
+		double y0 = point0.getY();
+		Real2 point1 = line1.getXY(0);
+		double x1 = point1.getX();
+		double y1 = point1.getY();
+		if (
+				(line0.isHorizontal(eps) && line1.isHorizontal(eps) && 
+				Real.isEqual(y0, y1, eps) &&
+				touchesOrOverlaps(x0, x1, eps)
+				)
+			||
+				(line0.isVertical(eps) && line1.isVertical(eps) && 
+				Real.isEqual(x0, x1, eps) &&
+				touchesOrOverlaps(y0, y1, eps)
+				)
+			) {
+		
+			Real2Range bbox = line0.getBoundingBox().plus(line1.getBoundingBox());
+			Real2 point00 = bbox.getCorners()[0];
+			Real2 point11 = bbox.getCorners()[1];
+			newLine = new SVGLine();
+			XMLUtil.copyAttributes(line0, newLine);
+			newLine.setXY(point00, 0);
+			newLine.setXY(point11, 1);
 		}
 		return newLine;
+	}
+
+	private static boolean touchesOrOverlaps(double x0, double x1, double eps) {
+		return Real.isEqual(x0, x1, eps) || x0 > x1;
+	}
+
+//	private static boolean canBeJoined(SVGLine line0, SVGLine line1, double eps, Angle angleEps) {
+//		return line0.isParallelTo(line1, angleEps) && 
+//			(
+//			Real.isEqual(line0.getXY(1), line1.getXY(0).getX(), eps) ||
+//			Real.isEqual(line0.getY(), first1.getY(), eps));
+//	}
+
+	/** some visually "joined" lines are actually overlapping.
+	 * 
+	 * @param last0
+	 * @param first1
+	 * @param eps
+	 * @return
+	 */
+	public static boolean overlaps(Real2 last0, Real2 first1, double eps) {
+		boolean joined = false;
+		if (Real.isEqual(last0.getY(), first1.getY(), eps) && last0.getX() > first1.getX()) {
+			joined = true;
+		} else if (Real.isEqual(last0.getX(), first1.getX(), eps) && last0.getY() > first1.getY()) {
+			joined = true;
+		}
+		return joined;
 	}
 
 	private static void replaceLineAndCloseUp(int iline, SVGLine newLine, List<SVGLine> lineListNew) {
