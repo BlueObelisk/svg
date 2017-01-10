@@ -870,14 +870,14 @@ public class SVGText extends SVGElement {
 	 * @return width (or null)
 	 */
 	public void setSVGXFontWidth(Double width) {
-		if (width != null) {
-			Attribute widthAtt = SVGUtil.getSVGXAttributeAttribute(this, WIDTH);
-			if (widthAtt == null) {
-				widthAtt.detach();
-			}
-		} else {
-			SVGUtil.setSVGXAttribute(this, WIDTH, String.valueOf(width));
-		}
+//		if (width != null) {
+//			Attribute widthAtt = SVGUtil.getSVGXAttributeAttribute(this, WIDTH);
+//			if (widthAtt != null) {
+//				widthAtt.detach();
+//			}
+//		}
+		SVGUtil.setSVGXAttribute(this, WIDTH, String.valueOf(width));
+//		}
 	}
 
 	public GlyphVector getGlyphVector() {

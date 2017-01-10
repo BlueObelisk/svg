@@ -530,6 +530,7 @@ public class SVGLine extends SVGShape {
 	}
 
 	public String toString() {
+		getEuclidLine();
 		return (euclidLine == null) ? null : euclidLine.toString();
 	}
 
@@ -762,11 +763,11 @@ public class SVGLine extends SVGShape {
 					SVGLine linej = lineListNew.get(jline);
 					LOG.trace("merging \n    "+linei.toXML()+"\n--> "+linej.toXML());
 					SVGLine newLine = createMergedHorizontalOrVerticalLine(linei, linej, eps);
-					if (newLine == null) {
-						// try the other direction
-						newLine = createMergedHorizontalOrVerticalLine(linej, linei, eps);
-					}
-					LOG.trace("newline: "+newLine.toXML());
+//					if (newLine == null) {
+//						// try the other direction
+//						newLine = createMergedHorizontalOrVerticalLine(linej, linei, eps);
+//					}
+//					LOG.trace("newline: "+newLine.toXML());
 					if (newLine != null) {
 						lineListNew.remove(jline);
 						lineListNew.remove(iline);
