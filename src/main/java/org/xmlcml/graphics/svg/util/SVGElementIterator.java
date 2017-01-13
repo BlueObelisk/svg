@@ -19,8 +19,16 @@ public class SVGElementIterator implements Iterator<SVGElement> {
 		elementsIterator = new ElementsIterator(elements);
 	}
 	public boolean hasNext() {
-		return iterator.hasNext();
+		return iterator != null ? iterator.hasNext() : elementsIterator.hasNext();
 	}
+	public void remove() {
+		if (iterator != null) {
+			iterator.remove();
+		} else {
+			elementsIterator.remove();
+		}
+	}
+	
 
 	public SVGElement next() {
 		return iterator.next();
@@ -41,6 +49,10 @@ class ElementsIterator {
 
 	SVGElement next() {
 		return (SVGElement) elements.get(index++);
+	}
+	
+	public void remove() {
+		index++;
 	}
 	
 }
