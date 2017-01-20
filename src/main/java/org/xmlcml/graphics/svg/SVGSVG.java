@@ -104,28 +104,34 @@ public class SVGSVG extends SVGElement {
 	 * @return
 	 */
 	public static SVGSVG wrapAndWriteAsSVG(SVGElement svgg, File file, double height, double width) {
-		SVGSVG svgsvg = wrapAsSVG(svgg);
-		svgsvg.setHeight(height);
-		svgsvg.setWidth(width);
-		try {
-			LOG.trace("Writing SVG "+file.getAbsolutePath());
-			file.getParentFile().mkdirs();
-			FileOutputStream fos = new FileOutputStream(file);
-			SVGUtil.debug(svgsvg, fos, 1);
-			fos.close();
-		} catch (Exception e) {
-			throw new RuntimeException("cannot write svg to "+file, e);
+		SVGSVG svgsvg = new SVGSVG();
+		if (svgg != null) {
+			svgsvg = wrapAsSVG(svgg);
+			svgsvg.setHeight(height);
+			svgsvg.setWidth(width);
+			try {
+				LOG.trace("Writing SVG "+file.getAbsolutePath());
+				file.getParentFile().mkdirs();
+				FileOutputStream fos = new FileOutputStream(file);
+				SVGUtil.debug(svgsvg, fos, 1);
+				fos.close();
+			} catch (Exception e) {
+				throw new RuntimeException("cannot write svg to "+file, e);
+			}
 		}
 		return svgsvg;
 	}
 
 	public static SVGSVG wrapAsSVG(SVGElement svgg) {
-		if (svgg.getParent() != null) {
-			svgg.detach();
+		SVGSVG svgsvg = null;
+		if (svgg != null) {
+			if (svgg.getParent() != null) {
+				svgg.detach();
+			}
+			svgsvg = new SVGSVG();
+	//		svgsvg.setNamespaceURI(SVGConstants.SVGX_NS);
+			svgsvg.appendChild(svgg);
 		}
-		SVGSVG svgsvg = new SVGSVG();
-//		svgsvg.setNamespaceURI(SVGConstants.SVGX_NS);
-		svgsvg.appendChild(svgg);
 		return svgsvg;
 	}
 
