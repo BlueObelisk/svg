@@ -51,6 +51,7 @@ class ElementsIterator {
 		return (SVGElement) elements.get(index++);
 	}
 	
+	// this adances the pointer. Apparently it's mandatory
 	public void remove() {
 		index++;
 	}

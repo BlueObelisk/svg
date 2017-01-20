@@ -228,8 +228,8 @@ public class SVGRect extends SVGShape {
 		return getAttributeValue(X)+" "+getAttributeValue(Y)+" "+getAttributeValue(WIDTH)+" "+getAttributeValue(HEIGHT);
 	}
 
-	public static List<SVGRect> extractSelfAndDescendantRects(SVGG g) {
-		return SVGRect.extractRects(SVGUtil.getQuerySVGElements(g, ALL_RECT_XPATH));
+	public static List<SVGRect> extractSelfAndDescendantRects(SVGElement svgElem) {
+		return SVGRect.extractRects(SVGUtil.getQuerySVGElements(svgElem, ALL_RECT_XPATH));
 	}
 
 	public boolean isEqual(SVGRect otherRect, double delta) {
