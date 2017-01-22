@@ -359,4 +359,16 @@ public class PathPrimitiveList implements Iterable<SVGPathPrimitive> {
 		return Arrays.toString(primitiveList.toArray());
 	}
 
+	public static PathPrimitiveList createPrimitiveList(String d) {
+		SVGPath path = new SVGPath(d);
+		PathPrimitiveList primitiveList = path.ensurePrimitives();
+		return primitiveList;
+	}
+
+	public void format(int places) {
+		for (SVGPathPrimitive primitive : this) {
+			primitive.format(places);
+		}
+	}
+
 }

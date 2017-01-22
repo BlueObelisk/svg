@@ -2,6 +2,7 @@ package org.xmlcml.graphics.svg.path;
 
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGPathPrimitive;
 
 import java.awt.geom.GeneralPath;
@@ -18,6 +19,15 @@ public class ClosePrimitive extends SVGPathPrimitive {
 	public ClosePrimitive() {
 	}
 	
+	public ClosePrimitive(Real2 real2) {
+		this.coordArray = new Real2Array();
+		if (real2 != null) {
+			coordArray.add(real2);
+		} else {
+			coordArray = null;
+		}
+	}
+
 	public String getTag() {
 		return TAG;
 	}

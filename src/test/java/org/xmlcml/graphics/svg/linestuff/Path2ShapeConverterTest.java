@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.graphics.svg.Fixtures;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGElement;
@@ -27,6 +27,7 @@ import org.xmlcml.graphics.svg.SVGUtil;
 
 public class Path2ShapeConverterTest {
 
+	private static final String[] COLORS = {"red", "yellow", "green", "cyan", "blue", "magenta", "brown", "black"};
 	private static final Logger LOG = Logger.getLogger(Path2ShapeConverterTest.class);
 	static {
 		LOG.setLevel(Level.DEBUG);
@@ -382,4 +383,78 @@ public class Path2ShapeConverterTest {
 			Assert.assertEquals(lineValue[i], String.valueOf(line.getGeometricHash()));
 		}
 	}
+	
+	@Test
+	public void testRelativeMove() {
+		SVGPath path = new SVGPath();
+	    path.setDString(""
+	    		+ "m 34.264,165.875 99.316,0 0,11.284 -99.316,0 z");
+		Path2ShapeConverter path2ShapeConverter = new Path2ShapeConverter();
+		path2ShapeConverter.setSplitPolyLines(false);
+		// this shouldn't be necessary
+		SVGG g = new SVGG();
+		g.appendChild(path);
+		List<SVGShape> shapes = path2ShapeConverter.convertPathsToShapes(g);
+		Assert.assertEquals(1, shapes.size());
+		SVGShape shape = shapes.get(0);
+		Assert.assertEquals("SVGRect", shape.getClass().getSimpleName());
+		SVGRect rect = (SVGRect) shape;
+		Assert.assertEquals("((34.264,133.58),(165.875,177.159))", rect.toString());
+	}
+
+	
+	@Test
+	public void testChainedRelativeMoveRects() {
+		SVGPath path = new SVGPath();
+	    path.setDString(""
+	    		+ "m 34.264,165.875 99.316,0 0,11.284 -99.316,0 z "
+		    	+ "m 99.317,0 69.449,0 0,11.284 -69.449,0 z");
+		Path2ShapeConverter path2ShapeConverter = new Path2ShapeConverter();
+		path2ShapeConverter.setSplitPolyLines(false);
+		// this shouldn't be necessary
+		SVGG g = new SVGG();
+		g.appendChild(path);
+		List<SVGShape> shapes = path2ShapeConverter.convertPathsToShapes(g);
+		Assert.assertEquals(2, shapes.size());
+		SVGRect rect0 = (SVGRect) shapes.get(0);
+		Assert.assertEquals("((34.264,133.58),(165.875,177.159))", rect0.toString());
+		SVGRect rect1 = (SVGRect) shapes.get(1);
+		rect1.format(3);
+		Real2Range bbox = rect1.getBoundingBox();
+		bbox.format(3);
+		Assert.assertEquals("((133.58,203.029),(165.875,177.159))", bbox.toString());
+		writeColouredShapes(shapes, new File("target/tables/rect2.svg"));
+	}
+		
+		@Test
+		public void testTwoRowsOfInternalMoves() {
+			SVGPath path = new SVGPath();
+		    path.setDString(""
+					+ "m 34.264,165.875 99.316,0 0,11.284 -99.316,0 z "
+					+ "m 99.317,0 69.449,0 0,11.284 -69.449,0 z "
+					+ "m 69.449,0 63.426,0 0,11.284 -63.426,0 z "
+					+ "m 63.426,0 62.112,0 0,11.284 -62.112,0 z "
+					+ ""
+					+ "m -232.192,22.567 99.316,0 0,11.283 -99.316,0 z "
+					+ "m 99.317,0 69.449,0 0,11.283 -69.449,0 z "
+					+ "m 69.449,0 63.426,0 0,11.283 -63.426,0 z "
+					+ "m 63.426,0 62.112,0 0,11.283 -62.112,0 z ");
+			SVGG g = new SVGG();
+			g.appendChild(path);
+			Path2ShapeConverter path2ShapeConverter = new Path2ShapeConverter();
+			List<SVGShape> shapes = path2ShapeConverter.convertPathsToShapes(g);
+			path2ShapeConverter.setSplitPolyLines(false);
+			Assert.assertEquals(8, shapes.size());
+			writeColouredShapes(shapes, new File("target/tables/multipleRect.svg"));
+	}
+
+		private void writeColouredShapes(List<SVGShape> shapes, File file) {
+			SVGG gg = new SVGG();
+			for (int i = 0; i < shapes.size(); i++) {
+				SVGShape shape = shapes.get(i);
+				shape.setFill(COLORS[i % COLORS.length]);
+				gg.appendChild(shape.copy());
+			}
+			SVGSVG.wrapAndWriteAsSVG(gg, file);
+		}
 }

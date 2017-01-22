@@ -16,6 +16,12 @@
 
 package org.xmlcml.graphics.svg;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import nu.xom.Element;
 import nu.xom.Node;
 
@@ -25,6 +31,12 @@ import nu.xom.Node;
  *
  */
 public class SVGDefs extends SVGElement {
+	private static final Logger LOG = Logger.getLogger(SVGDefs.class);
+	static {
+		LOG.setLevel(Level.DEBUG);
+	}
+
+	public final static String ALL_DEFS_XPATH = ".//svg:defs";
 
 	public final static String TAG ="defs";
 	/** constructor
@@ -63,6 +75,33 @@ public class SVGDefs extends SVGElement {
 	public String getTag() {
 		return TAG;
 	}
+
+	public static void removeDefs(SVGElement svgElement) {
+		List<SVGDefs> defsList = extractSelfAndDescendantRects(svgElement);
+		for (SVGDefs defs : defsList) {
+			defs.detach();
+		}
+	}
+	
+	public static List<SVGDefs> extractSelfAndDescendantRects(SVGElement svgElem) {
+		return SVGDefs.extractDefss(SVGUtil.getQuerySVGElements(svgElem, ALL_DEFS_XPATH));
+	}
+
+	/** makes a new list composed of the rects in the list
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	public static List<SVGDefs> extractDefss(List<SVGElement> elements) {
+		List<SVGDefs> defsList = new ArrayList<SVGDefs>();
+		for (SVGElement element : elements) {
+			if (element instanceof SVGDefs) {
+				defsList.add((SVGDefs) element);
+			}
+		}
+		return defsList;
+	}
+	
 
 	
 }

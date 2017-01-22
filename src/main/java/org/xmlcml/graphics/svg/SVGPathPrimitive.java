@@ -26,6 +26,9 @@ public abstract class SVGPathPrimitive {
 	public static final char REL_CUBIC = 'c';
 	public static final char REL_QUAD = 'q';
 	public static final char REL_CLOSE = 'z';
+
+	public static final String ABS = "ABS";
+	public static final String REL = "REL";
 	
 	protected Real2Array coordArray;
 	protected Real2 zerothCoord; // from preceding primitive
@@ -43,14 +46,27 @@ public abstract class SVGPathPrimitive {
 		}
 		List<String> tokenList = extractTokenList(d);
 		int itok = 0;
+		Real2 firstXY = null;
 		Real2 lastXY = null;
+		String mode = null;
+		char t = (char)0;
 		while (itok <tokenList.size()) {
 			String token = tokenList.get(itok);
-			if (token.length() != 1) {
-				throw new RuntimeException("Bad token, expected single char: "+token);
+			// implicit move/draw
+			if (token.length() != 1 || Character.isDigit(token.charAt(0))) {
+//				double[] dd = readDoubles(tokenList, 2, itok);
+//				throw new RuntimeException("Bad token, expected single char: "+token);
+				if (ABS.equals(mode)) {
+					t = ABS_LINE;
+				} else if (REL.equals(mode)) {
+					t = REL_LINE;
+				} else {
+					throw new RuntimeException("Bad token, expected single char: "+token);
+				}
+			} else {
+				t = token.charAt(0);
+				itok++;
 			}
-			char t = token.charAt(0);
-			itok++;
 			if (ABS_MOVE == t) {
 				double[] dd = readDoubles(tokenList, 2, itok);
 				itok += 2;
@@ -58,16 +74,19 @@ public abstract class SVGPathPrimitive {
 				SVGPathPrimitive pp = new MovePrimitive(r2);
 				primitiveList.add(pp);
 				lastXY = r2;
+				if (mode == null) mode = ABS;
 			} else if (REL_MOVE == t) {
 				double[] dd = readDoubles(tokenList, 2, itok);
 				itok += 2;
 				Real2 r2 = new Real2(dd[0], dd[1]);
+				firstXY = (lastXY == null) ? r2 : r2.plus(lastXY);
 				if (lastXY != null) {
 					r2 = r2.plus(lastXY);
 				}
 				SVGPathPrimitive pp = new MovePrimitive(r2);
 				primitiveList.add(pp);
 				lastXY = r2;
+				if (mode == null) mode = REL;
 			} else if (ABS_LINE == t) {
 				double[] dd = readDoubles(tokenList, 2, itok);
 				itok += 2;
@@ -75,6 +94,7 @@ public abstract class SVGPathPrimitive {
 				SVGPathPrimitive pp = new LinePrimitive(r2);
 				primitiveList.add(pp);
 				lastXY = r2;
+				firstXY = r2;
 			} else if (REL_LINE == t) {
 				double[] dd = readDoubles(tokenList, 2, itok);
 				itok += 2;
@@ -100,8 +120,11 @@ public abstract class SVGPathPrimitive {
 			} else if (REL_QUAD == t) {
 				throw new RuntimeException("relative quadratic not suported");
 			} else if (ABS_CLOSE == t || REL_CLOSE == t) {
-				SVGPathPrimitive pp = new ClosePrimitive();
+				lastXY = firstXY;
+				SVGPathPrimitive pp = new ClosePrimitive(lastXY);
 				primitiveList.add(pp);
+			} else {
+				throw new RuntimeException("unknown or unsupported primitive "+t);
 			}
 		}
 //		primitiveList.setFirstPoints();

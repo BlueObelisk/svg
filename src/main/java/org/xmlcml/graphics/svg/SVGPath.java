@@ -847,5 +847,19 @@ public class SVGPath extends SVGShape {
 		}
 		return lineListList;
 	}
+
+	/** translates "m" into "M" to create an absolute coordinate system.
+	 * Also epxands implicit L commands into absolute ones
+	 * @return
+	 */
+	public void makeRelativePathsAbsolute() {
+		String d = getDString();
+		if (d != null) {
+			primitiveList = PathPrimitiveList.createPrimitiveList(d);
+			String d1 = primitiveList.getDString();
+			this.setDString(d1);
+		}
+	}
+
 	
 }

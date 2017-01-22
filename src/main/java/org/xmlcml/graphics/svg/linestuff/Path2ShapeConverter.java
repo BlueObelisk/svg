@@ -95,6 +95,8 @@ public class Path2ShapeConverter {
 
 	private double rectEpsilon = RECT_EPS;
 
+	private boolean makeRelativePathsAbsolute = true;
+
 	public Path2ShapeConverter() {
 		
 	}
@@ -163,6 +165,9 @@ public class Path2ShapeConverter {
 		setPathList(inputPathList);
 		List<List<SVGShape>> shapeListList = new ArrayList<List<SVGShape>>();
 		int id = 0;
+		if (makeRelativePathsAbsolute ) {
+			makeRelativePathsAbsolute(inputPathList);
+		}
 		if (removeRedundantLineCommands) {
 			inputPathList = removeRedundantLineCommands(inputPathList);
 		}
@@ -201,6 +206,12 @@ public class Path2ShapeConverter {
 			//shapeListOut = removeDuplicateShapes(shapeListOut);
 		}
 		return shapeListList;
+	}
+
+	private void makeRelativePathsAbsolute(List<SVGPath> pathList) {
+		for (SVGPath path : pathList) {
+			path.makeRelativePathsAbsolute();
+		}
 	}
 
 	private List<SVGShape> splitPolylines(List<SVGShape> shapeList) {
@@ -574,6 +585,8 @@ public class Path2ShapeConverter {
 	public void setPathList(List<SVGPath> pathListIn) {
 		this.pathListIn = pathListIn;
 	}
+	
+	
 
 	private static SVGPath removeRedundantMoveCommands(SVGPath path, double eps) {
 		String d = path.getDString();
@@ -690,29 +703,24 @@ public class Path2ShapeConverter {
 		 if (newDStringList.size() == 1) {
 			 splitPathList.add(svgPath);
 		 } else {
-			 //ParentNode parent = svgPath.getParent();
-			 //int index = parent.indexOf(svgPath);
-			 double i = 0;
+			 double dz = 0;
 			 for (String newDString : newDStringList) {
-				 i += 0.001;
+				 dz += 0.001;
 				 SVGPath newPath = new SVGPath();
 				 XMLUtil.copyAttributesFromTo(svgPath, newPath);
 				 String zs = SVGUtil.getSVGXAttribute(svgPath, Z_COORDINATE);
-				 if (zs == null || zs.trim().length() == 0) {
-					 continue;
-				 }
-				 try {
-					 double z = Double.parseDouble(zs);
-					 SVGUtil.setSVGXAttribute(newPath, Z_COORDINATE, String.valueOf(z + i));
-				 } catch (Exception e) {
-					 LOG.error("cannot find/parse z: "+e);
-					 continue;
+				 if (zs != null && zs.trim().length() == 0) {
+					 try {
+						 double z = Double.parseDouble(zs);
+						 SVGUtil.setSVGXAttribute(newPath, Z_COORDINATE, String.valueOf(z + dz));
+					 } catch (Exception e) {
+						 LOG.error("cannot find/parse z: "+e);
+						 continue;
+					 }
 				 }
 				 newPath.setDString(newDString);
-				 //parent.insertChild(newPath, ++index);
 				 splitPathList.add(newPath);
 			 }
-			 //svgPath.detach();
 		 }
 		 return splitPathList;
 	}
@@ -724,8 +732,11 @@ public class Path2ShapeConverter {
 			return strings;
 		}
 		int current = -1;
+		int irel = -1; // maybe not split at REL
 		while (true) {
-			int i = d.indexOf(SVGPathPrimitive.ABS_MOVE, current + 1);
+			int iabs = d.indexOf(SVGPathPrimitive.ABS_MOVE, current + 1);
+//			int irel = d.indexOf(SVGPathPrimitive.REL_MOVE, current + 1);
+			int i = Math.max(iabs, irel);
 			if (i == -1 && current >= 0) {
 				strings.add(d.substring(current));
 				break;
@@ -976,7 +987,7 @@ public class Path2ShapeConverter {
 	
 	/**
 	 * Converts paths to shapes where appropriate in an SVG element
-	 * 
+	 * // FIXME - don't think we have to work on lists of Paths
 	 * @param svgElement
 	 */
 	public List<SVGShape> convertPathsToShapes(SVGElement svgElement) {

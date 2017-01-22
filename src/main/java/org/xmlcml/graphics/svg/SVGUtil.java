@@ -14,6 +14,7 @@ import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Vector2;
+import org.xmlcml.graphics.svg.linestuff.Path2ShapeConverter;
 import org.xmlcml.xml.XMLConstants;
 import org.xmlcml.xml.XMLUtil;
 
@@ -437,6 +438,14 @@ public class SVGUtil {
 			isNull = xnull || ynull;
 		}
 		return isNull;
+	}
+
+	public static List<SVGShape> makeShapes(SVGElement svgChunk) {
+		List<SVGPath> pathList = SVGPath.extractSelfAndDescendantPaths(svgChunk);
+		LOG.trace("paths "+pathList.size());
+		Path2ShapeConverter converter = new Path2ShapeConverter(pathList);
+		List<SVGShape> shapeList = converter.convertPathsToShapes(pathList);
+		return shapeList;
 	}
 
 //	public static AffineTransform createAffineTransform(Transform2 transform2) {
