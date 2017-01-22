@@ -1018,9 +1018,10 @@ public class SVGElement extends GraphicsElement {
 			Real2Range childBoundingBox = child.getBoundingBox();
 			if (childBoundingBox != null) {
 				if (!childBoundingBox.isValid()) {
-					throw new RuntimeException("invalid child BBox: "+child.getClass());
+					LOG.error("invalid child BBox: "+child.getClass());
+				} else {
+					boundingBox = boundingBox.plus(childBoundingBox);
 				}
-				boundingBox = boundingBox.plus(childBoundingBox);
 			}
 		}
 	}

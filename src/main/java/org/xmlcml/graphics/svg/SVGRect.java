@@ -175,6 +175,8 @@ public class SVGRect extends SVGShape {
     	setXY(getXY().format(places));
     	setHeight(Util.format(getHeight(), places));
     	setWidth(Util.format(getWidth(), places));
+    	forceGetBoundingBox();
+    	boundingBox.format(places);
     }
 	
 	/** extent of rect
@@ -183,12 +185,16 @@ public class SVGRect extends SVGShape {
 	 */
 	public Real2Range getBoundingBox() {
 		if (boundingBoxNeedsUpdating()) {
-			boundingBox = new Real2Range();
-			Real2 origin = getXY();
-			boundingBox.add(origin);
-			boundingBox.add(origin.plus(new Real2(getWidth(), getHeight())));
+			forceGetBoundingBox();
 		}
 		return boundingBox;
+	}
+
+	private void forceGetBoundingBox() {
+		boundingBox = new Real2Range();
+		Real2 origin = getXY();
+		boundingBox.add(origin);
+		boundingBox.add(origin.plus(new Real2(getWidth(), getHeight())));
 	}
 	
 	/** get tag.
@@ -236,5 +242,10 @@ public class SVGRect extends SVGShape {
 		Real2[] corners = this.getBoundingBox().getCorners();
 		Real2[] otherCorners = otherRect.getBoundingBox().getCorners();
 		return corners[0].getDistance(otherCorners[0]) < delta && corners[1].getDistance(otherCorners[1]) < delta;
+	}
+	
+	@Override
+	public String toString() {
+		return getBoundingBox().toString();
 	}
 }
