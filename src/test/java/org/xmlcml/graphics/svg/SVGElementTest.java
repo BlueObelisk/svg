@@ -19,19 +19,27 @@ package org.xmlcml.graphics.svg;
 import java.util.ArrayList;
 import java.util.List;
 
-import nu.xom.Element;
-
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.RealRange.Direction;
 import org.xmlcml.euclid.RealRangeArray;
+import org.xmlcml.euclid.Transform2;
 import org.xmlcml.testutil.TestUtils;
 import org.xmlcml.xml.XMLConstants;
 
+import nu.xom.Element;
+
 public class SVGElementTest {
+	private static final Logger LOG = Logger.getLogger(SVGElementTest.class);
+	static {
+		LOG.setLevel(Level.DEBUG);
+	}
 
 	public final static String GRAPHICS_RESOURCE = "org/xmlcml/cml/graphics/examples";
 
@@ -165,4 +173,28 @@ public class SVGElementTest {
 		Assert.assertEquals("create mask", maskRef, mask);
 	 }
 
+	@Test
+	public void testAngleOfRotation() {
+		String character = 
+		"<text transform=\"matrix(0.0,-1.0,1.0,0.0,-537.66101,906.323)\" x=\"184.331\" y=\"721.992\" font-size=\"9.0\">b</text>";
+		SVGElement text = (SVGText) SVGUtil.parseToSVGElement(character);
+		Transform2 t2 = text.getTransform();
+		Angle angle = t2.getAngleOfRotation();
+		Assert.assertTrue(angle.isEqualTo(new Angle(Math.PI * 0.5)));
+		Assert.assertTrue(angle.isEqualTo(Math.PI / 2.0, 0.0001));
+	}
+	
+	@Test
+	public void getRotatedElements() {
+		String xmlString = "<svg xmlns=\"http://www.w3.org/2000/svg\">"
+				+ "<text  x=\"380.168\" y=\"756.731\" font-size=\"7.0\" >X</text>"
+				+ "<path d=\"M191.581 732.0 L191.581 76.885\" transform=\"matrix(0.0,-1.0,1.0,0.0,-500.,900.)\"/>"
+				+ "<text transform=\"matrix(0.0,-1.0,1.0,0.0,-547.66901,916.33099)\" x=\"184.331\" y=\"732.0\" >P</text>"
+				+ "<g transform=\"matrix(0.0,1.0,-1.0,0.0,-500.,900.)\"><rect x1=\"10\" y1=\"50\" width=\"100\" height=\"30\"/></g>"
+				+ "</svg>";
+		SVGElement svgElement = SVGUtil.parseToSVGElement(xmlString);
+		List<SVGElement> rotatedElements = SVGElement.getRotatedDescendantElements(svgElement, new Angle(Math.PI/2.0), 0.001);
+		Assert.assertEquals(2,  rotatedElements.size());
+		
+	}
 }

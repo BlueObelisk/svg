@@ -16,14 +16,60 @@
 
 package org.xmlcml.graphics.svg;
 
-import junit.framework.Assert;
+import java.util.List;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Real2;
 
-import java.util.List;
-
 public class SVGPolylineTest {
+	public static final Logger LOG = Logger.getLogger(SVGPolylineTest.class);
+	static {
+		LOG.setLevel(Level.DEBUG);
+	}
+	public final static String SVG_STRING =
+			"<svg xmlns=\"http://www.w3.org/2000/svg\">"
+	 + "<polyline points=\""
+	 + " 96.071 211.257"
+	 + " 142.448 211.257"
+	 + " 188.492 211.257"
+	 + " 222.003 211.257"
+	 + " 383.366 211.257"
+	 + " 469.885 211.257"
+	 + " 508.313 211.257"
+	 + " 546.773 211.257"
+	 + " 584.984 211.257"
+	 + " 623.194 211.256"
+	 + " 661.155 211.256"
+	 + " 732.949 211.256"
+	 + " 750.695 211.256\" />"
+	 + "<polyline points=\""
+	 + " 193.144 469.885 "
+	 + " 193.144 508.313"
+	 + " 193.144 546.773"
+	 + " 193.144 584.984"
+	 + " 193.143 623.194"
+	 + " 193.143 661.155\" />"
+	 + "<polyline points=\""
+	 + " 96.071 400.725"
+	 + " 142.448 400.725"
+	 + " 188.492 400.725"
+	 + " 222.003 400.725"
+	 + " 383.366 400.724"
+	 + " 469.885 400.724"
+	 + " 508.313 400.724"
+	 + " 546.77 400.724"
+	 + " 584.984 400.724"
+	 + " 623.194 400.724"
+	 + " 661.155 400.724"
+	 + " 732.949 400.724"
+	 + " 750.695 400.724\" />"
+	 + "</svg>"
+	;
+
 
 	@Test
 	@Ignore // FIXME ANDY
@@ -80,4 +126,13 @@ public class SVGPolylineTest {
 		Assert.assertEquals("lines", 43, SVGLine.extractSelfAndDescendantLines(svg).size());
 	}
 
+	@Test
+	public void testReplaceRedundantSubLinesIntoSingleLine() {
+		SVGSVG svg = (SVGSVG) SVGUtil.parseToSVGElement(SVG_STRING);
+		List<SVGPolyline> polylineList = SVGPolyline.extractSelfAndDescendantPolylines(svg);
+		Assert.assertEquals(3, polylineList.size());
+		SVGPolyline poly1 = polylineList.get(0);
+		poly1.createVerticalOrHorizontalLine(0.03);
+		
+	}
 }

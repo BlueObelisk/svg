@@ -19,9 +19,7 @@ package org.xmlcml.graphics.svg;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileOutputStream;
-
-import nu.xom.Attribute;
-import nu.xom.Node;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Range;
@@ -29,6 +27,9 @@ import org.xmlcml.graphics.svg.text.SVGWordPage;
 import org.xmlcml.graphics.svg.text.SVGWordPageList;
 import org.xmlcml.xml.XMLConstants;
 import org.xmlcml.xml.XMLUtil;
+
+import nu.xom.Attribute;
+import nu.xom.Node;
 
 /** container for SVG
  * "svg"
@@ -89,6 +90,19 @@ public class SVGSVG extends SVGElement {
 	/** defaults to heigh=800 width=700.
 	 * 
 	 * */
+	public static SVGSVG wrapAndWriteAsSVG(List<? extends SVGElement> svgList, File file) {
+		SVGG g = new SVGG();
+		if (svgList != null) {
+			for (SVGElement element : svgList) {
+				g.appendChild(element.copy());
+			}
+		}
+		return wrapAndWriteAsSVG(g, file);
+	}
+	
+	/** defaults to heigh=800 width=700.
+	 * 
+	 * */
 	public static SVGSVG wrapAndWriteAsSVG(SVGElement svgg, File file) {
 		return wrapAndWriteAsSVG(svgg, file, 800.0, 700.0);
 	}
@@ -104,7 +118,7 @@ public class SVGSVG extends SVGElement {
 	 * @return
 	 */
 	public static SVGSVG wrapAndWriteAsSVG(SVGElement svgg, File file, double height, double width) {
-		SVGSVG svgsvg = new SVGSVG();
+		SVGSVG svgsvg = svgg instanceof SVGSVG ? (SVGSVG) svgg : new SVGSVG();
 		if (svgg != null) {
 			svgsvg = wrapAsSVG(svgg);
 			svgsvg.setHeight(height);
@@ -128,9 +142,13 @@ public class SVGSVG extends SVGElement {
 			if (svgg.getParent() != null) {
 				svgg.detach();
 			}
-			svgsvg = new SVGSVG();
-	//		svgsvg.setNamespaceURI(SVGConstants.SVGX_NS);
-			svgsvg.appendChild(svgg);
+			if (!(svgg instanceof SVGSVG)) {
+				svgsvg = new SVGSVG();
+		//		svgsvg.setNamespaceURI(SVGConstants.SVGX_NS);
+				svgsvg.appendChild(svgg);
+			} else {
+				svgsvg = (SVGSVG) svgg;
+			}
 		}
 		return svgsvg;
 	}

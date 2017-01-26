@@ -102,12 +102,12 @@ public class TextAnalyzerUtils {
 //		return svgText;
 //	}
 
-	private static SVGText findSingleSVGText(List<SVGElement> gList) {
-		SVGText svgText = null;
+	private static SVGElement findSingleSVGText(List<SVGElement> gList) {
+		SVGElement svgText = null;
 		SVGG gName = (SVGG) gList.get(0);
 		List<SVGElement> texts = SVGUtil.getQuerySVGElements(gName, "./svg:text");
 		if (texts.size() == 1) {
-			svgText = (SVGText) texts.get(0);
+			svgText = (SVGElement) texts.get(0);
 		}
 		return svgText;
 	}

@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.math.geometry.Rotation;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Real;
@@ -77,7 +78,8 @@ public class SVGElement extends GraphicsElement {
 
 	private static Logger LOG = Logger.getLogger(SVGElement.class);
 
-	public final static String ALL_ELEMENT_XPATH = "//svg:element";
+//	public final static String ALL_ELEMENT_XPATH = "//svg:element";
+	public final static String ALL_ELEMENT_XPATH = "//svg:*";
 
 	public final static String SVG_CLASS = "class";
 	public final static String IMPROPER = "improper";
@@ -395,14 +397,42 @@ public class SVGElement extends GraphicsElement {
 	 */
 	public Double getAngleOfRotationFromTransformInDegrees() {
 		Double angle = 0.0;
-		Transform2 transform = this.getTransform();
-		if (transform != null) {
-			Angle rotationAngle = transform.getAngleOfRotation();
-			if (rotationAngle != null) {
-				angle = rotationAngle.getDegrees();
-			}
+		Angle rotationAngle = getAngleOfRotation();
+		if (rotationAngle != null) {
+			angle = rotationAngle.getDegrees();
 		}
 		return angle;
+	}
+
+	/** get the angle described by the Transform attribute.
+	 * 
+	 * @return
+	 */
+	public Angle getAngleOfRotation() {
+		Transform2 transform = this.getTransform();
+		Angle rotationAngle = new Angle(0.0);
+		if (transform != null) {
+			rotationAngle = transform.getAngleOfRotation();
+		}
+		return rotationAngle;
+	}
+	
+	/**
+	 * uses transform attribute to get angle, 0 if absent
+	 * @return angle in degrees
+	 */
+	public Double getAngleOfRotationInRadiansFromTransform() {
+		Angle angle = getAngleOfRotation();
+		return angle == null ? null : angle.getRadian();
+	}
+	
+	/**
+	 * uses transform attribute to get angle, 0 if absent
+	 * @return angle in degrees
+	 */
+	public Double getAngleOfRotationInDegreesFromTransform() {
+		Angle angle = getAngleOfRotation();
+		return angle == null ? null : angle.getDegrees();
 	}
 	
 	/** currently a no-op.
@@ -1018,7 +1048,7 @@ public class SVGElement extends GraphicsElement {
 			Real2Range childBoundingBox = child.getBoundingBox();
 			if (childBoundingBox != null) {
 				if (!childBoundingBox.isValid()) {
-					LOG.error("invalid child BBox: "+child.getClass());
+					LOG.error("invalid child BBox: "+"parent: "+child.getClass()+"; "+childBoundingBox);
 				} else {
 					boundingBox = boundingBox.plus(childBoundingBox);
 				}
@@ -1321,6 +1351,23 @@ public class SVGElement extends GraphicsElement {
 		return bbox == null ? null : bbox.getRealRange(direction);
 	}
 
+	public Real2 getCentreForClockwise90Rotation() {
+		Real2Range bbox = getBoundingBox();
+		double yRange = bbox.getYRange().getRange();
+		Real2 centre = bbox.getCorners()[0].plus(new Real2(yRange/2.0, yRange/2.0));
+		return centre;
+	}
+
+	public void rotateAndAlsoUpdateTransforms(Real2 centreOfRotation, Angle angle) {
+		Transform2 t2 = Transform2.getRotationAboutPoint(angle, centreOfRotation);
+		Transform2 oldT2 = getTransform();
+		if (oldT2 != null) {
+			t2 = t2.concatenate(oldT2);
+		}
+		setTransform(t2);
+		this.applyTransformAttributeAndRemove();
+	}
+
 	public final static Set<String> COMMON_ATT_NAMES = new HashSet<String>();
 	static {
 		createCommonAttNameSet();
@@ -1341,6 +1388,42 @@ public class SVGElement extends GraphicsElement {
 	@Deprecated
 	public static List<SVGElement> extractSelfAndDescendantElements(SVGG g) {
 		return SVGUtil.getQuerySVGElements(g, ALL_ELEMENT_XPATH);
+	}
+
+	public static List<SVGElement> getRotatedDescendantElements(SVGElement svgElement, Angle angle, double eps) {
+		List<SVGElement> elementList = SVGElement.extractSelfAndDescendantElements(svgElement);
+		List<SVGElement> filteredList = getRotatedElementList(elementList, angle, eps);
+		return filteredList;
+	}
+
+	/**
+	 * 
+	 * @param elements list to filter
+	 * @param angle that elements should be rotated by
+	 * @param eps tolerance in radians
+	 * @return
+	 */
+	public static List<SVGElement> getRotatedElementList(List<? extends SVGElement> elements, Angle angle, double eps) {
+		List<SVGElement> filteredList = new ArrayList<SVGElement>();
+		for (SVGElement svgElem : elements) {
+			if (angle.isEqualTo(svgElem.getAngleOfRotation(), eps)) {
+				filteredList.add(svgElem);
+			}
+		}
+		return filteredList;
+	}
+
+	public static void rotateAndAlsoUpdateTransforms(
+			List<? extends SVGElement> svgList, Real2 centreForRotation, Angle angle) {
+		for (SVGElement svgElement : svgList) {
+			svgElement.rotateAndAlsoUpdateTransforms(centreForRotation, angle);
+		}
+		
+	}
+
+	public void rotateAndAlsoUpdateTransforms(Angle angle) {
+		Real2 centreOfRotation = this.getCentreForClockwise90Rotation();
+		this.rotateAndAlsoUpdateTransforms(centreOfRotation, angle);
 	}
 
 
