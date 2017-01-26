@@ -18,6 +18,9 @@ package org.xmlcml.graphics.svg;
 
 import nu.xom.Element;
 import nu.xom.Node;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.*;
 
 import java.awt.*;
@@ -31,6 +34,11 @@ import java.util.List;
  *
  */
 public class SVGRect extends SVGShape {
+
+	private static final Logger LOG = Logger.getLogger(SVGRect.class);
+	static {
+		LOG.setLevel(Level.DEBUG);
+	}
 
 	public final static String ALL_RECT_XPATH = ".//svg:rect";
 
@@ -154,16 +162,23 @@ public class SVGRect extends SVGShape {
 		restoreGraphicsSettingsAndTransform(g2d);
 	}
 
-	
+
+	// this only works for 0 += PI/2, +- PI
 	public void applyTransform(Transform2 t2) {
 		//assume scale and translation only
 		Real2 xy = getXY();
 		xy.transformBy(t2);
 		this.setXY(xy);
+		double h = getHeight();
+		double w = getWidth();
+		Angle a = t2.getAngleOfRotation();
 		Real2 xxyy = new Real2(xy.getX()+getWidth(), xy.getY()+getHeight());
 		xxyy.transformBy(t2);
-		setHeight(xxyy.getY() - xy.getY());
-		setWidth(xxyy.getX() - xy.getX());
+		if (a.isEqualTo(new Angle(Math.PI / 2.), 0.00001) ||
+				a.isEqualTo(new Angle(-Math.PI / 2.0), 0.00001)) {
+			setHeight(w);
+			setWidth(h);
+		}
 	}
 	
     /** round to decimal places.

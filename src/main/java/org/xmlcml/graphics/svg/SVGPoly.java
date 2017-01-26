@@ -55,8 +55,7 @@ public abstract class SVGPoly extends SVGShape {
 	public final static String[] SVG_ATTS0 = {
 		POINTS
 	};
-	public final static List<String> SVG_ATTS = Arrays.asList(
-            POINTS);
+	public final static List<String> SVG_ATTS = Arrays.asList(POINTS);
 	
 	protected Real2Array real2Array;
 	protected List<SVGLine> lineList;
@@ -124,8 +123,8 @@ public abstract class SVGPoly extends SVGShape {
 	
 	public Real2Array getReal2Array() {
 		if (real2Array == null) {
-			real2Array = Real2Array.createFromPairs(
-					getAttributeValue("points"), XMLConstants.S_COMMA+S_PIPE+S_SPACE);
+			String pointsValue = getAttributeValue("points");
+			real2Array = Real2Array.createFromPairs(pointsValue, ArrayBase.ARRAY_REGEX);
 		}
 		return real2Array;
 	}
@@ -313,7 +312,7 @@ public abstract class SVGPoly extends SVGShape {
 		}
 		if (lineList == null) {
 			if (pointsAtt != null) {
-				real2Array = Real2Array.createFromPairs(pointsAtt.getValue(), XMLConstants.S_SPACE + "|" + XMLConstants.S_COMMA);
+				real2Array = Real2Array.createFromPairs(pointsAtt.getValue(), ArrayBase.ARRAY_REGEX);
 			}
 			String id = getId();
 			lineList = new ArrayList<SVGLine>();

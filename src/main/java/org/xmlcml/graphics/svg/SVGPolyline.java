@@ -22,16 +22,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.ParentNode;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.xml.XMLUtil;
+
+import nu.xom.Element;
+import nu.xom.Node;
+import nu.xom.ParentNode;
 
 /** 
  * Represents a collection of straight lines (not implicitly closed).
@@ -51,6 +52,11 @@ public class SVGPolyline extends SVGPoly {
 	private static Logger LOG = Logger.getLogger(SVGPolyline.class);
 	
 	public final static String TAG ="polyline";
+
+//	private double xMean;
+//	private double yMean;
+//	private double xDelta;
+//	private double yDelta;
 
 	/** 
 	 * Constructor.
@@ -563,4 +569,51 @@ public class SVGPolyline extends SVGPoly {
 		}
 		return true;
 	}
+
+	/**
+	 * create a line if the polyline is aligned with either axis
+	 * 
+	 * @param delta tolerance from axis
+	 * @return null if no line
+	 */
+	public SVGLine createVerticalOrHorizontalLine(double delta) {
+		SVGLine line = null;
+		Real2Range bbox = getBoundingBox();
+		double xDelta = bbox.getXRange().getRange();
+		double yDelta = bbox.getYRange().getRange();
+		if (xDelta < delta || yDelta < delta) {
+			line = new SVGLine();
+			XMLUtil.copyAttributes(this, line);
+			line.setXY(getReal2Array().get(0), 0);
+			line.setXY(getReal2Array().get(size() - 1), 1);
+		}
+		return line;
+	}
+
+//	public void getStatistics() {
+//		Real2Array array = getReal2Array();
+//		RealArray xArray = array.getXArray();
+//		xMean = xArray.getMean();
+//		xDelta = xArray.getMax() - xArray.getMin();
+//		RealArray yArray = getReal2Array().getYArray();
+//		yMean = yArray.getMean();
+//		xDelta = xArray.getMax() - xArray.getMin();
+//		yRms = yArray.rms();
+//	}
+//
+//	public double getXDelta() {
+//		return xDelta;
+//	}
+//
+//	public double getYDelta() {
+//		return yDelta;
+//	}
+//
+//	public double getXMean() {
+//		return xMean;
+//	}
+//
+//	public double getYMean() {
+//		return yMean;
+//	}
 }

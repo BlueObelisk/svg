@@ -1,5 +1,6 @@
 package org.xmlcml.graphics.svg;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -442,7 +443,10 @@ public class SVGUtil {
 
 	public static List<SVGShape> makeShapes(SVGElement svgChunk) {
 		List<SVGPath> pathList = SVGPath.extractSelfAndDescendantPaths(svgChunk);
-		LOG.trace("paths "+pathList.size());
+		SVGSVG.wrapAndWriteAsSVG(svgChunk, new File("target/debug/shapes0.svg"));
+
+		LOG.debug("paths "+pathList.size());
+		SVGSVG.wrapAndWriteAsSVG(pathList, new File("target/debug/paths.svg"));
 		Path2ShapeConverter converter = new Path2ShapeConverter(pathList);
 		List<SVGShape> shapeList = converter.convertPathsToShapes(pathList);
 		return shapeList;

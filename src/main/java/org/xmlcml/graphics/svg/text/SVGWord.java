@@ -4,6 +4,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.xml.XMLUtil;
@@ -33,7 +34,7 @@ public class SVGWord extends SVGG {
 		this.setClassName(CLASS);
 	}
 
-	public SVGWord(SVGText svgText) {
+	public SVGWord(SVGElement svgText) {
 		this.appendChild(svgText.copy());
 	}
 
@@ -87,7 +88,7 @@ public class SVGWord extends SVGG {
 //	}
 
 	public Double getFontSize() {
-		SVGText text = this.getSVGText();
+		SVGElement text = this.getSVGText();
 		return text == null ? null : text.getFontSize();
 	}
 
@@ -129,7 +130,7 @@ public class SVGWord extends SVGG {
 	}
 
 	public String getSVGTextValue() {
-		SVGText text = this.getSVGText();
+		SVGElement text = this.getSVGText();
 		return text == null ? null : text.getValue();
 	}
 

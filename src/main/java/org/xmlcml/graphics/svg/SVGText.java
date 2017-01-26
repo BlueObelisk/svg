@@ -1085,4 +1085,13 @@ public class SVGText extends SVGElement {
 		SVGSVG.wrapAndWriteAsSVG(g, file);
 	}
 
+	public static List<SVGText> getRotatedElements(List<SVGText> characterList, Angle angle, double eps) {
+		List<SVGElement> elements = SVGElement.getRotatedElementList(characterList, angle, eps);
+		List<SVGText> textList = new ArrayList<SVGText>();
+		for (SVGElement element : elements) {
+			textList.add((SVGText) element);
+		}
+		return textList;
+	}
+
 }
