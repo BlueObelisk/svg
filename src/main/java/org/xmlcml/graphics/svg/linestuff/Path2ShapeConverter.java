@@ -239,11 +239,14 @@ public class Path2ShapeConverter {
 	 */
 	public List<SVGShape> convertPathsToShapes(List<SVGPath> pathList) {
 		List<List<SVGShape>> converted = convertPathsToShapes0(pathList);
-		List<SVGShape> results = new ArrayList<SVGShape>();
+		List<SVGShape> shapeList = new ArrayList<SVGShape>();
 		for (List<SVGShape> fromPath : converted) {
-			results.addAll(fromPath);
+			shapeList.addAll(fromPath);
 		}
-		return results;
+		for (SVGShape shape : shapeList) {
+			LOG.debug(">"+shape.getClass().getSimpleName()+">"+shape);
+		}
+		return shapeList;
 	}
 
 	private static List<SVGPath> removeRedundantMoveCommands(List<SVGPath> pathList) {

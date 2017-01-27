@@ -22,11 +22,8 @@ public class SVGPathTest {
 
 	
 	private final static Logger LOG = Logger.getLogger(SVGPathTest.class);
-
 	private final static Angle ANGLE_EPS = new Angle(0.01, Units.RADIANS);
-
 	private static final Double LINE_EPS = 1.0;
-
 	private static final Double MAX_WIDTH = 1.0;
 	
 	@Test

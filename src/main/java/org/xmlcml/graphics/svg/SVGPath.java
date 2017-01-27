@@ -861,5 +861,10 @@ public class SVGPath extends SVGShape {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return (this.toXML());
+	}
+
 	
 }
