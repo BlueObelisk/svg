@@ -27,6 +27,7 @@ import nu.xom.Nodes;
 
 public class SVGUtil {
 
+	private static final String PX = "px";
 	private static final String TRANSFORMS_APPLIED = "transformsApplied";
 	private static final Logger LOG = Logger.getLogger(SVGUtil.class);
 
@@ -450,6 +451,18 @@ public class SVGUtil {
 		Path2ShapeConverter converter = new Path2ShapeConverter(pathList);
 		List<SVGShape> shapeList = converter.convertPathsToShapes(pathList);
 		return shapeList;
+	}
+
+	/** some measurements use "px", etc.
+	 * This is not systematic - will aim to convert to pixels.
+	 * @param w
+	 * @return
+	 */
+	public static String convertUnits(String w) {
+		if (w != null && w.endsWith(PX)) {
+			w = w.substring(0,  w.length() - PX.length());
+		}
+		return w;
 	}
 
 //	public static AffineTransform createAffineTransform(Transform2 transform2) {

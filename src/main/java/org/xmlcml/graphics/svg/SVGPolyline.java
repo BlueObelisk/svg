@@ -52,11 +52,8 @@ public class SVGPolyline extends SVGPoly {
 	private static Logger LOG = Logger.getLogger(SVGPolyline.class);
 	
 	public final static String TAG ="polyline";
-
-//	private double xMean;
-//	private double yMean;
-//	private double xDelta;
-//	private double yDelta;
+	
+	protected double epsilon = 0.005;
 
 	/** 
 	 * Constructor.
@@ -298,8 +295,14 @@ public class SVGPolyline extends SVGPoly {
 	}
 
 	public SVGLine createSingleLine() {
-		createLineList();
-		return (lineList.size() == 1 ? lineList.get(0) : null);
+		SVGLine line = createVerticalOrHorizontalLine(epsilon);
+		if (line == null) {
+			createLineList();
+			if (lineList.size() == 1) {
+				line = lineList.get(0);
+			}
+		}
+		return line;
 	}
 	
 	/** 
@@ -590,30 +593,4 @@ public class SVGPolyline extends SVGPoly {
 		return line;
 	}
 
-//	public void getStatistics() {
-//		Real2Array array = getReal2Array();
-//		RealArray xArray = array.getXArray();
-//		xMean = xArray.getMean();
-//		xDelta = xArray.getMax() - xArray.getMin();
-//		RealArray yArray = getReal2Array().getYArray();
-//		yMean = yArray.getMean();
-//		xDelta = xArray.getMax() - xArray.getMin();
-//		yRms = yArray.rms();
-//	}
-//
-//	public double getXDelta() {
-//		return xDelta;
-//	}
-//
-//	public double getYDelta() {
-//		return yDelta;
-//	}
-//
-//	public double getXMean() {
-//		return xMean;
-//	}
-//
-//	public double getYMean() {
-//		return yMean;
-//	}
 }

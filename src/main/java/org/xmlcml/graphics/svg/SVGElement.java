@@ -976,6 +976,7 @@ public class SVGElement extends GraphicsElement {
 	
 	public Double getWidth() {
 		String w = this.getAttributeValue("width");
+		w = SVGUtil.convertUnits(w);
 		return (w == null) ? null : Double.valueOf(w);
 	}
 	
@@ -1424,6 +1425,12 @@ public class SVGElement extends GraphicsElement {
 	public void rotateAndAlsoUpdateTransforms(Angle angle) {
 		Real2 centreOfRotation = this.getCentreForClockwise90Rotation();
 		this.rotateAndAlsoUpdateTransforms(centreOfRotation, angle);
+	}
+
+	public static void format(List<? extends SVGElement> elementList, int nplaces) {
+		for (SVGElement element : elementList) {
+			element.format(nplaces);
+		}
 	}
 
 

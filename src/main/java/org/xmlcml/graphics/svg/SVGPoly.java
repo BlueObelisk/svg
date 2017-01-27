@@ -567,4 +567,9 @@ public abstract class SVGPoly extends SVGShape {
 		}
 		return poly;
 	}
+	
+	@Override
+	public String toString() {
+		return (String.valueOf(real2Array));
+	}
 }
