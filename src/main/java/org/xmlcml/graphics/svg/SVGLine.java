@@ -574,8 +574,8 @@ public class SVGLine extends SVGShape {
 	 * @param angleEps to test whether anti/parallel
 	 * @return null if lines not parallel
 	 */
-	public SVGLine getMeanLine(SVGLine line, Angle angleEps) {
-		SVGLine meanLine = null;
+	public SVGShape getMeanLine(SVGLine line, Angle angleEps) {
+		SVGShape meanLine = null;
 		if (isParallelTo(line, angleEps)) {
 			meanLine = new SVGLine(getXY(0).getMidPoint(line.getXY(0)), 
 			                       getXY(1).getMidPoint(line.getXY(1)));
@@ -639,37 +639,6 @@ public class SVGLine extends SVGShape {
 			direction = LineDirection.VERTICAL;
 		}
 		return direction;
-	}
-
-	public void setMarkerEndRef(SVGMarker marker) {
-		String id = marker.getId();
-		this.setMarkerEnd(makeUrlRef(id));
-	}
-
-	private void setMarkerEnd(String markerEnd) {
-		this.addAttribute(new Attribute(SVGMarker.MARKER_END, markerEnd));
-	}
-
-	public void setMarkerStartRef(SVGMarker marker) {
-		String id = marker.getId();
-		this.setMarkerStart(makeUrlRef(id));
-	}
-
-	private void setMarkerStart(String markerStart) {
-		this.addAttribute(new Attribute(SVGMarker.MARKER_START, markerStart));
-	}
-
-	public void setMarkerMidRef(SVGMarker marker) {
-		String id = marker.getId();
-		this.setMarkerMid(makeUrlRef(id));
-	}
-
-	private String makeUrlRef(String id) {
-		return "url(#"+id+")";
-	}
-
-	private void setMarkerMid(String markerMid) {
-		this.addAttribute(new Attribute(SVGMarker.MARKER_MID, markerMid));
 	}
 
 	/** filters horizontal and vertical lines, normalizes the direction and merges touching ones.
@@ -851,11 +820,6 @@ public class SVGLine extends SVGShape {
 			joined = true;
 		}
 		return joined;
-	}
-
-	private static void replaceLineAndCloseUp(int iline, SVGLine newLine, List<SVGLine> lineListNew) {
-		lineListNew.set(iline, newLine);
-		lineListNew.remove(iline + 1);
 	}
 
 	/** gets bounding box of list of lines.

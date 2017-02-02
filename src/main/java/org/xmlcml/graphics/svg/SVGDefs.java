@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real2Range;
 
 import nu.xom.Element;
 import nu.xom.Node;
@@ -102,6 +103,14 @@ public class SVGDefs extends SVGElement {
 		return defsList;
 	}
 	
+    /** return null
+     * 
+     */
+	public Real2Range getBoundingBox() {
+		return null;
+	}
+	
+
 
 	
 }

@@ -69,10 +69,13 @@ public class SVGScript extends SVGElement {
 		return TAG;
 	}
 
+    /** return null
+     * 
+     */
 	public Real2Range getBoundingBox() {
 		return null;
 	}
-
+	
 	public void applyTransform(Transform2 t2) {
 		// no-op
 	}

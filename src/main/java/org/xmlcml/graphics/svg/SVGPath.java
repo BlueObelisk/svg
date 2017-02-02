@@ -32,6 +32,7 @@ import nu.xom.Node;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
@@ -275,7 +276,7 @@ public class SVGPath extends SVGShape {
 			SVGPath path = (SVGPath) copy();
 			Real2 orig = path.getOrigin();
 			path.normalizeOrigin();
-			SVGLine line = path.createHorizontalOrVerticalLine(EPS);
+			SVGShape line = path.createHorizontalOrVerticalLine(EPS);
 			symbol.appendChild(path);
 			symbol.setId(path.getId()+".s");
 			List<SVGElement> defsNodes = SVGUtil.getQuerySVGElements(this, "/svg:svg/svg:defs");
@@ -284,7 +285,7 @@ public class SVGPath extends SVGShape {
 		return symbol;
 	}
 
-	private SVGLine createHorizontalOrVerticalLine(double eps) {
+	private SVGShape createHorizontalOrVerticalLine(double eps) {
 		SVGLine  line = null;
 		Real2Array coords = getCoords();
 		if (coords.size() == 2) {
@@ -866,5 +867,10 @@ public class SVGPath extends SVGShape {
 		return (this.toXML());
 	}
 
-	
+	@Override
+	public boolean isZeroDimensional() {
+		String signature = this.getSignature().toUpperCase();
+		return (signature.equals("MZ") || signature.equals("M"));
+	}
+
 }

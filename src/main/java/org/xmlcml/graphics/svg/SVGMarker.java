@@ -47,6 +47,14 @@ import nu.xom.Node;
 	<path d="M100 150.5l200 0" marker-end="url(#triangle)" stroke="black" stroke-width="10"/>
 </svg>
 
+marker for truncated line
+   <marker id="zeroline"
+      viewBox="-5 -5 10 10" refX="0" refY="0" 
+      markerUnits="strokeWidth" 
+      markerWidth="5" markerHeight="5" orient="auto">
+      <circle cx="0" cy="0" r="4" stroke-width="1.5" stroke="blue" fill="yellow"/>
+    </marker>
+
  */
 public class SVGMarker extends SVGElement {
 
@@ -64,6 +72,45 @@ public class SVGMarker extends SVGElement {
 	public static final String MARKER_MID = "marker-mid";
 	public static final String MARKER_START = "marker-start";
 	
+//	public static SVGCircle ZEROLINE_CIRCLE;
+//	public static SVGMarker ZEROLINE;
+//	public static String ZEROLINE_ID = "zeroline";
+//	
+//	public static SVGCircle ZEROPATH_CIRCLE;
+//	public static SVGMarker ZEROPATH;
+//	public static String ZEROPATH_ID = "zeropath";
+//	static {
+//		ZEROLINE_CIRCLE = new SVGCircle(new Real2(0.0, 0.0), 4.0);
+//		ZEROLINE_CIRCLE.setStrokeWidth(1.5);
+//		ZEROLINE_CIRCLE.setStroke("red");
+//		ZEROLINE_CIRCLE.setFill("cyan");
+//		ZEROLINE = new SVGMarker();
+//		ZEROLINE.setId(ZEROLINE_ID);
+//		ZEROLINE.setViewBox("-5 -5 10 10");
+//		ZEROLINE.setRefX("0");
+//		ZEROLINE.setRefY("0");
+//		ZEROLINE.setMarkerUnits(STROKE_WIDTH);
+//		ZEROLINE.setMarkerWidth(5);
+//		ZEROLINE.setMarkerHeight(5);
+//		ZEROLINE.setOrient(AUTO);
+//		ZEROLINE.appendChild(ZEROLINE_CIRCLE);
+//		
+//		ZEROPATH_CIRCLE = new SVGCircle(new Real2(0.0, 0.0), 4.0);
+//		ZEROPATH_CIRCLE.setStrokeWidth(1.5);
+//		ZEROPATH_CIRCLE.setStroke("blue");
+//		ZEROPATH_CIRCLE.setFill("orange");
+//		ZEROPATH = new SVGMarker();
+//		ZEROPATH.setId(ZEROPATH_ID);
+//		ZEROPATH.setViewBox("-5 -5 10 10");
+//		ZEROPATH.setRefX("0");
+//		ZEROPATH.setRefY("0");
+//		ZEROPATH.setMarkerUnits(STROKE_WIDTH);
+//		ZEROPATH.setMarkerWidth(5);
+//		ZEROPATH.setMarkerHeight(5);
+//		ZEROPATH.setOrient(AUTO);
+//		ZEROPATH.appendChild(ZEROPATH_CIRCLE);
+//		
+//	};
 	// an addition
 	private List<SVGLine> lineList; 
 	private static double size = 2;
@@ -184,12 +231,19 @@ public class SVGMarker extends SVGElement {
 	 * 
 	 * @return
 	 */
+
+//	public Real2Range getBoundingBox() {
+//		if (boundingBoxNeedsUpdating()) {
+//			SVGElement element = getSymbol();
+//			boundingBox = (element == null) ? null : element.getBoundingBox();
+//		}
+//		return boundingBox;
+//	}
+    /** return null
+     * 
+     */
 	public Real2Range getBoundingBox() {
-		if (boundingBoxNeedsUpdating()) {
-			SVGElement element = getSymbol();
-			boundingBox = (element == null) ? null : element.getBoundingBox();
-		}
-		return boundingBox;
+		return null;
 	}
 	
 	public SVGElement getSymbol() {

@@ -529,6 +529,7 @@ public class SVGPolyline extends SVGPoly {
 	/** 
 	 * Number of lines.
 	 * 
+	 * 
 	 * @return
 	 */
 	public int size() {
@@ -587,8 +588,8 @@ public class SVGPolyline extends SVGPoly {
 		if (xDelta < delta || yDelta < delta) {
 			line = new SVGLine();
 			XMLUtil.copyAttributes(this, line);
-			line.setXY(getReal2Array().get(0), 0);
-			line.setXY(getReal2Array().get(size() - 1), 1);
+			line.setXY(this.getFirst(), 0);
+			line.setXY(this.getLast(), 1);
 		}
 		return line;
 	}

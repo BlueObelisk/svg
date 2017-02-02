@@ -237,7 +237,7 @@ public class SVGPathTest {
 		Assert.assertEquals("uturns", 2, quadrantStartList.size());
 		SVGPath newPath = path.replaceAllUTurnsByButt(angle2);
 		Assert.assertEquals("new sig", "MLLLL", newPath.getSignature());
-		SVGLine line = newPath.createLineFromMLLLL(angle2, MAX_WIDTH);
+		SVGShape line = newPath.createLineFromMLLLL(angle2, MAX_WIDTH);
 		Assert.assertNotNull(line);
 	}
 

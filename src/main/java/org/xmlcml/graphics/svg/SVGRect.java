@@ -263,4 +263,5 @@ public class SVGRect extends SVGShape {
 	public String toString() {
 		return getBoundingBox().toString();
 	}
+	
 }

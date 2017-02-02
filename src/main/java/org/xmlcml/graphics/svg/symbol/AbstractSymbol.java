@@ -119,7 +119,7 @@ public abstract class AbstractSymbol extends SVGG {
 
 	protected void createSVGElement() {
 		this.deleteExistingChildNodes();
-		text = new SVGText(new Real2(0., 0.), getUnicode());
+		text = new SVGText(new Real2(0.001, 0.001), getUnicode());
 		text.setFontSize(null);
 		this.appendChild(text);
 	}

@@ -50,8 +50,20 @@ public class SVGSVG extends SVGElement {
 	 */
 	public SVGSVG() {
 		super(TAG);
+		addDefaults();
 	}
 	
+	private void addDefaults() {
+		this.addMarkerDefs();
+	}
+
+	private void addMarkerDefs() {
+		SVGDefs defs = new SVGDefs();
+//		this.appendChild(defs);
+//		defs.appendChild(SVGMarker.ZEROLINE.copy());
+//		defs.appendChild(SVGMarker.ZEROPATH.copy());
+	}
+
 	/** constructor
 	 */
 	public SVGSVG(SVGSVG element) {

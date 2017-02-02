@@ -290,4 +290,5 @@ public class SVGCircle extends SVGShape {
 	public static List<SVGCircle> extractSelfAndDescendantCircles(SVGG g) {
 		return SVGCircle.extractCircles(SVGUtil.getQuerySVGElements(g, ALL_CIRCLE_XPATH));
 	}
+
 }

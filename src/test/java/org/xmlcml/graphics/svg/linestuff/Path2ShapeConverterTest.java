@@ -146,7 +146,7 @@ public class Path2ShapeConverterTest {
 					.getChildElements().get(0);
 			Assert.assertEquals("sig",  "MLLL", svgPath.getSignature());
 			Path2ShapeConverter p2sConverter = new Path2ShapeConverter(svgPath);
-			SVGLine line = p2sConverter.createNarrowLine();
+			SVGShape line = p2sConverter.createNarrowLine();
 			Assert.assertNotNull("line", line);
 		}
 		

@@ -20,6 +20,7 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Range;
 
 /** supports use/symbol
   <defs>
@@ -93,4 +94,13 @@ public class SVGUse extends SVGElement {
     public void setSymbol(SVGSymbol symbol) {
     	
     }
+    
+    /** return null
+     * 
+     */
+	public Real2Range getBoundingBox() {
+		return null;
+	}
+	
+
 }
