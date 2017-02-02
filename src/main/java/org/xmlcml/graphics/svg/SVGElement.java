@@ -851,16 +851,23 @@ public class SVGElement extends GraphicsElement {
 	/**
 	 * get double value of attribute.
 	 * the full spec includes units but here we expect only numbers. Maybe later...
+	 * if coordinate is not guven defaults to ZERO.
+	 * 
 	 * @param attName
 	 * @return
 	 */
 	public double getCoordinateValueDefaultZero(String attName) {
 		double d = Double.NaN;
 		String v = this.getAttributeValue(attName);
-		try {
-			d = (v == null) ? 0.0 : Double.parseDouble(v);
-		} catch (NumberFormatException e) {
-			throw new RuntimeException("Cannot parse SVG coordinate "+v);
+		if (v == null) {
+			LOG.warn("DFAULT ZERO");
+			d = 0.0;
+		} else {
+			try {
+				d = Double.parseDouble(v);
+			} catch (NumberFormatException e) {
+				throw new RuntimeException("Cannot parse SVG coordinate "+v);
+			}
 		}
 		return d;
 	}
@@ -930,7 +937,6 @@ public class SVGElement extends GraphicsElement {
 			if (decimalPlaces != null) {
 				r2r.format(decimalPlaces);
 			}
-//			CMLElement.addCMLXAttribute(this, BOUNDING_BOX, r2r.toString());
 			SVGUtil.setSVGXAttribute(this, BOUNDING_BOX, r2r.toString());
 		}
 	}
@@ -1049,7 +1055,7 @@ public class SVGElement extends GraphicsElement {
 			Real2Range childBoundingBox = child.getBoundingBox();
 			if (childBoundingBox != null) {
 				if (!childBoundingBox.isValid()) {
-					LOG.error("invalid child BBox: "+"parent: "+child.getClass()+"; "+childBoundingBox);
+					//LOG.error("invalid child BBox: "+"parent: "+child.getClass()+"; "+childBoundingBox);
 				} else {
 					boundingBox = boundingBox.plus(childBoundingBox);
 				}

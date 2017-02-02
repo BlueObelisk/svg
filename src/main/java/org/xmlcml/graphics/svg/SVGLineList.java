@@ -57,7 +57,7 @@ public class SVGLineList extends SVGG implements Iterable<SVGLine> {
 		return lines.size();
 	}
 
-	public SVGLine remove(int i) {
+	public SVGShape remove(int i) {
 		ensureLines();
 		if (get(i) != null) {
 			return lines.remove(i);

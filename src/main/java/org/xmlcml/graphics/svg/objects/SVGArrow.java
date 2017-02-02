@@ -7,6 +7,7 @@ import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGMarker;
 import org.xmlcml.graphics.svg.SVGPath;
 import org.xmlcml.graphics.svg.SVGPolyline;
+import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.SVGUtil;
 
 public class SVGArrow extends SVGLine {
@@ -45,7 +46,7 @@ private static final Logger LOG = Logger.getLogger(SVGArrow.class);
 		
 	}
 
-	private SVGLine subline;
+	private SVGShape subline;
 	/** the serial number of the end of the line that is part of the arrow */
 	private int linePoint;
 	private SVGTriangle triangle;

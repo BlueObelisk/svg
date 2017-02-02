@@ -3,6 +3,8 @@ package org.xmlcml.graphics.svg;
 import java.util.ArrayList;
 import java.util.List;
 
+import nu.xom.Attribute;
+
 /** tags SVG primitives as geometric shapes.
  * <p>
  * Essentially implements Java2D.Shape
@@ -64,9 +66,60 @@ public abstract class SVGShape extends SVGElement {
 		return SVGShape.extractShapes(SVGUtil.getQuerySVGElements(svgElement, ALL_SHAPE_XPATH));
 	}
 
+	private static void replaceLineAndCloseUp(int iline, SVGLine newLine, List<SVGLine> lineListNew) {
+		lineListNew.set(iline, newLine);
+		lineListNew.remove(iline + 1);
+	}
+
 	public String getSignature() {
 		return getGeometricHash();
 	}
+
+	public void setMarkerEndRef(SVGMarker marker) {
+		String id = marker.getId();
+		this.setMarkerEnd(makeUrlRef(id));
+	}
+
+	private void setMarkerEnd(String markerEnd) {
+		this.addAttribute(new Attribute(SVGMarker.MARKER_END, markerEnd));
+	}
+
+	public void setMarkerStartRef(SVGMarker marker) {
+		String id = marker.getId();
+		this.setMarkerStart(makeUrlRef(id));
+	}
+
+	private void setMarkerStart(String markerStart) {
+		this.addAttribute(new Attribute(SVGMarker.MARKER_START, markerStart));
+	}
+
+	public void setMarkerMidRef(SVGMarker marker) {
+		String id = marker.getId();
+		this.setMarkerMid(makeUrlRef(id));
+	}
+
+	private String makeUrlRef(String id) {
+		return "url(#"+id+")";
+	}
+
+	private void setMarkerMid(String markerMid) {
+		this.addAttribute(new Attribute(SVGMarker.MARKER_MID, markerMid));
+	}
+
+	/** is this an zero-dimensional shape?
+	 * 
+	 * @return
+	 */
+	public boolean isZeroDimensional() {
+		if (boundingBox == null) {
+			getBoundingBox();
+		}
+		boolean isZeroDimensional = boundingBox == null ||
+			(boundingBox.getXRange().getRange() == 0.0 &&
+			boundingBox.getYRange().getRange() == 0.0);
+		return isZeroDimensional;
+	}
+
 
 	
 }

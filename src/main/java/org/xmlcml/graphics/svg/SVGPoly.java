@@ -572,4 +572,6 @@ public abstract class SVGPoly extends SVGShape {
 	public String toString() {
 		return (String.valueOf(real2Array));
 	}
+	
+
 }

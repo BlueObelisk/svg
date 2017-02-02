@@ -96,6 +96,9 @@ public class SVGText extends SVGElement {
 	}
 
 	private void setXYAndText(Real2 xy, String text) {
+		if (new Real2(0.0, 0.0).isEqualTo(xy, 0.000001)) {
+			throw new RuntimeException("Text of ),0 is suspicious");
+		}
 		setXY(xy);
 		setText(text);
 	}

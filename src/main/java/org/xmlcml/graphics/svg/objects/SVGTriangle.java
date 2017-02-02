@@ -15,6 +15,7 @@ import org.xmlcml.graphics.svg.SVGPathPrimitive;
 import org.xmlcml.graphics.svg.SVGPoly;
 import org.xmlcml.graphics.svg.SVGPolygon;
 import org.xmlcml.graphics.svg.SVGPolyline;
+import org.xmlcml.graphics.svg.SVGShape;
 import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 
 public class SVGTriangle extends SVGPolygon {
@@ -88,7 +89,7 @@ public class SVGTriangle extends SVGPolygon {
 		return triangle;
 	}
 
-	public SVGLine getLine(int serial) {
+	public SVGShape getLine(int serial) {
 		return polyline.getLineList().get(serial % 3);
 	}
 

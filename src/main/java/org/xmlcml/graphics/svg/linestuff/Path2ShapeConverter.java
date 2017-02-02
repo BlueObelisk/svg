@@ -190,7 +190,6 @@ public class Path2ShapeConverter {
 			List<SVGShape> shapeList = new ArrayList<SVGShape>();
 			for (SVGPath path : pathList) {
 				SVGShape shape = convertPathToShape(path);
-				LOG.trace("shape"+shape.toXML());
 				if (shape != null) {
 					shape.setId(shape.getClass().getSimpleName().toLowerCase().substring(SVG.length())+"."+id);
 					shapeList.add(shape);
@@ -238,13 +237,15 @@ public class Path2ShapeConverter {
 	 * @deprecated Use convertPathsToShapesAndSplitAtMoves().
 	 */
 	public List<SVGShape> convertPathsToShapes(List<SVGPath> pathList) {
-		List<List<SVGShape>> converted = convertPathsToShapes0(pathList);
+		List<List<SVGShape>> convertedShapeList = convertPathsToShapes0(pathList);
 		List<SVGShape> shapeList = new ArrayList<SVGShape>();
-		for (List<SVGShape> fromPath : converted) {
-			shapeList.addAll(fromPath);
-		}
-		for (SVGShape shape : shapeList) {
-			LOG.debug(">"+shape.getClass().getSimpleName()+">"+shape);
+		for (List<SVGShape> shapeListFromPath : convertedShapeList) {
+			for (SVGShape shape : shapeListFromPath) {
+				shapeList.add(shape);
+				if (shape.isZeroDimensional()) {
+					LOG.debug("Zero dimensional shape: "+shape.toXML());
+				}
+			}
 		}
 		return shapeList;
 	}
@@ -423,7 +424,7 @@ public class Path2ShapeConverter {
 	 * @return a rect, circle, line, polygon or polyline as appropriate; if none are then the original path
 	 */
 	@Deprecated
-	public SVGShape convertPathToShape() {
+	private SVGShape convertPathToShape() {
 		return convertPathToShape(svgPath);
 	}
 
@@ -1036,10 +1037,10 @@ public class Path2ShapeConverter {
 	 * @return
 	 */
 	@Deprecated
-	public SVGLine createNarrowLine() {
+	public SVGShape createNarrowLine() {
 		maxPathWidth = 1.0;
 		if (svgPath == null) return null;
-		SVGLine line = null;
+		SVGShape line = null;
 		String signature = svgPath.getSignature();
 		if (MLLL.equals(signature) || MLLLL.equals(signature)) {
 			PathPrimitiveList primList = svgPath.ensurePrimitives();

@@ -124,7 +124,7 @@ public class SVGLineTest {
 		lineList.add(new SVGLine(new Real2(2, 1), new Real2(1, 2)));
 		SVGLine.normalizeAndMergeAxialLines	(lineList, 0.5);
 		Assert.assertEquals("merged line", 4, lineList.size());
-		for (SVGLine line : lineList) {
+		for (SVGShape line : lineList) {
 			LOG.trace(line);
 		}
 	}
@@ -159,7 +159,7 @@ public class SVGLineTest {
 		// overlap
 		SVGLine line0 = new SVGLine(new Real2(100.0, 36.9), new Real2(100.0, 173.9));
 		SVGLine line1 = new SVGLine(new Real2(101.0, 173.9), new Real2(101.0, 335.1));
-		SVGLine line = SVGLine.createMergedHorizontalOrVerticalLine(line0, line1, 0.5);
+		SVGShape line = SVGLine.createMergedHorizontalOrVerticalLine(line0, line1, 0.5);
 		Assert.assertNull("different x", line);
 		line0 = new SVGLine(new Real2(36.9, 100.0), new Real2(173.9, 100.0));
 		line1 = new SVGLine(new Real2(173.9, 101.0), new Real2(335.1, 101.0));
