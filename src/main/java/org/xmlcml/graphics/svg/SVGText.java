@@ -1,15 +1,8 @@
 package org.xmlcml.graphics.svg;
 
-import nu.xom.*;
-
-
-import org.apache.log4j.Logger;
-import org.xmlcml.euclid.*;
-import org.xmlcml.graphics.svg.fonts.FontWidths;
-import org.xmlcml.xml.XMLConstants;
-import org.xmlcml.xml.XMLUtil;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -17,6 +10,25 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Angle;
+import org.xmlcml.euclid.EuclidConstants;
+import org.xmlcml.euclid.Real;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealSquareMatrix;
+import org.xmlcml.euclid.Transform2;
+import org.xmlcml.euclid.Util;
+import org.xmlcml.euclid.Vector2;
+import org.xmlcml.graphics.svg.fonts.FontWidths;
+import org.xmlcml.xml.XMLConstants;
+import org.xmlcml.xml.XMLUtil;
+
+import nu.xom.Element;
+import nu.xom.Node;
+import nu.xom.Nodes;
+import nu.xom.Text;
 
 /** 
  * Draws text.
@@ -161,9 +173,9 @@ public class SVGText extends SVGElement {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGText(this, TAG);
     }
     

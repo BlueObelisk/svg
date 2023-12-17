@@ -28,7 +28,6 @@ import org.xmlcml.graphics.svg.path.PathPrimitiveList;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-import nu.xom.Node;
 
 /** draws a straight line.
  * NOT TESTED
@@ -82,9 +81,9 @@ public class SVGEllipse extends SVGShape {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGEllipse(this);
     }
 

@@ -26,7 +26,6 @@ import org.xmlcml.euclid.Transform2;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
-import nu.xom.Node;
 
 /** a virtual point. May not correspond completely with SVG <marker>
  * creates a "point", drawn by an arbitrary symbol
@@ -140,9 +139,9 @@ public class SVGMarker extends SVGElement {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGMarker(this);
     }
 

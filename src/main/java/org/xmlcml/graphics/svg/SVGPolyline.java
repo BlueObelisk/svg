@@ -31,7 +31,6 @@ import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.xml.XMLUtil;
 
 import nu.xom.Element;
-import nu.xom.Node;
 import nu.xom.ParentNode;
 
 /** 
@@ -108,9 +107,9 @@ public class SVGPolyline extends SVGPoly {
     /**
      * Copies node.
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGPolyline(this);
     }
     

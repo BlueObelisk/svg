@@ -20,15 +20,14 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import nu.xom.Element;
-import nu.xom.Node;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Line2;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Line2AndReal2Calculator;
 import org.xmlcml.euclid.Real;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
+
+import nu.xom.Element;
 
 /** draws a straight line.
  * 
@@ -93,9 +92,9 @@ public class SVGPolygon extends SVGPoly {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGPolygon(this);
     }
 		

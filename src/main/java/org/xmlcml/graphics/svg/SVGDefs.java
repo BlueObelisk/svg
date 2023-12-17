@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Range;
 
 import nu.xom.Element;
-import nu.xom.Node;
 
 /** supports defs
  * 
@@ -62,9 +61,9 @@ public class SVGDefs extends SVGElement {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGDefs(this);
     }
 

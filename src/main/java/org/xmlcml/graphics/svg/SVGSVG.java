@@ -29,6 +29,7 @@ import org.xmlcml.xml.XMLConstants;
 import org.xmlcml.xml.XMLUtil;
 
 import nu.xom.Attribute;
+import nu.xom.Element;
 import nu.xom.Node;
 
 /** container for SVG
@@ -73,9 +74,9 @@ public class SVGSVG extends SVGElement {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGSVG(this);
     }
 

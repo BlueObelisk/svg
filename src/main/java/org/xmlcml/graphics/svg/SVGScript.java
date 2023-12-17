@@ -16,12 +16,12 @@
 
 package org.xmlcml.graphics.svg;
 
-import nu.xom.Attribute;
-import nu.xom.Element;
-import nu.xom.Node;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.xml.XMLConstants;
+
+import nu.xom.Attribute;
+import nu.xom.Element;
 
 /** supports defs
  * 
@@ -54,9 +54,9 @@ public class SVGScript extends SVGElement {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGScript(this);
     }
 

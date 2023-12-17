@@ -16,19 +16,29 @@
 
 package org.xmlcml.graphics.svg;
 
-import nu.xom.*;
-import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Transform2;
-import org.xmlcml.xml.XMLUtil;
-
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Transform2;
+import org.xmlcml.xml.XMLUtil;
+
+import nu.xom.Attribute;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Node;
+import nu.xom.Nodes;
 
 /** 
  * Base class for lightweight generic SVG element.
@@ -186,7 +196,7 @@ public class GraphicsElement extends Element implements SVGConstants {
      * 
      * @return node
      */
-    public Node copy() {
+    public Element copy() {
         return new GraphicsElement(this);
     }
 

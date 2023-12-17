@@ -16,11 +16,11 @@
 
 package org.xmlcml.graphics.svg;
 
-import nu.xom.Attribute;
-import nu.xom.Element;
-import nu.xom.Node;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
+
+import nu.xom.Attribute;
+import nu.xom.Element;
 
 /** supports use/symbol
   <defs>
@@ -84,9 +84,9 @@ public class SVGUse extends SVGElement {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGUse(this);
     }
 

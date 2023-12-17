@@ -17,7 +17,6 @@
 package org.xmlcml.graphics.svg;
 
 import nu.xom.Element;
-import nu.xom.Node;
 
 /** supports use/symbol
   <defs>
@@ -64,9 +63,9 @@ public class SVGSymbol extends SVGElement {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGSymbol(this);
     }
 

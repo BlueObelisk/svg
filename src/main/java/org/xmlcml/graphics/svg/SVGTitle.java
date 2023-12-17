@@ -16,13 +16,13 @@
 
 package org.xmlcml.graphics.svg;
 
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.Text;
+import java.awt.Graphics2D;
+
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Array;
 
-import java.awt.*;
+import nu.xom.Element;
+import nu.xom.Text;
 
 /** draws a straight line.
  * 
@@ -77,9 +77,9 @@ public class SVGTitle extends SVGElement {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGTitle(this);
     }
 	

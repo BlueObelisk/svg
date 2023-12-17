@@ -16,19 +16,19 @@
 
 package org.xmlcml.graphics.svg;
 
-import nu.xom.Attribute;
-import nu.xom.Element;
-import nu.xom.Node;
+import java.awt.Graphics2D;
+import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Util;
 
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.util.ArrayList;
-import java.util.List;
+import nu.xom.Attribute;
+import nu.xom.Element;
 
 /** draws a straight line.
  * 
@@ -92,9 +92,9 @@ public class SVGCircle extends SVGShape {
     /**
      * copy node .
      *
-     * @return Node
+     * @return Element
      */
-    public Node copy() {
+    public Element copy() {
         return new SVGCircle(this);
     }
 
