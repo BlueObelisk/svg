@@ -20,7 +20,6 @@ import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Node;
 import org.apache.log4j.Logger;
-import org.apache.xerces.impl.dv.util.Base64;
 import org.xmlcml.euclid.*;
 
 import javax.imageio.ImageIO;
@@ -250,7 +249,7 @@ public class SVGImage extends SVGShape {
 		}
 		LOG.trace("BufferedImage "+bufferedImage);
 		byte[] byteArray = baos.toByteArray();
-		String base64 = Base64.encode(byteArray);
+		String base64 = Base64.getEncoder().encodeToString(byteArray);
 		return base64;
 	}
 	
@@ -267,7 +266,7 @@ public class SVGImage extends SVGShape {
 			throw new RuntimeException("Cannot convert img/src");
 		}
 
-		byte[] byteArray = Base64.decode(srcBase64);
+		byte[] byteArray = Base64.getDecoder().decode(srcBase64);
 		LOG.trace("bytes "+byteArray.length);
 		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
 		BufferedImage bufferedImage = null;
